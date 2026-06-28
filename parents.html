@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>For Parents — Red 5</title>
+  <meta name="description" content="For Parents — how Red 5 keeps kids safe: human moderation, COPPA-minded privacy & parental consent, clear community rules, what kids can and can't do, and a parent dashboard.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="assets/logo.png">
+  <script src="app.js" defer></script>
+
+  <!-- Page-local styles (kept inline to avoid touching shared styles.css) -->
+  <style>
+    /* Can / can't do columns */
+    .cando{ display:grid; gap:1.4rem; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); }
+    .cando .col-card{ background:#fff; border:1px solid #eef0f4; border-radius:var(--radius-lg); padding:1.6rem; box-shadow:var(--shadow-sm); }
+    .cando .col-card h3{ display:flex; align-items:center; gap:.6rem; margin-top:0; }
+    .cando .col-card h3 .badge{ width:34px; height:34px; border-radius:10px; display:grid; place-items:center; }
+    .cando .can h3 .badge{ background:#dff6e6; color:var(--green); }
+    .cando .cant h3 .badge{ background:#fdeef0; color:var(--red); }
+    .cando ul{ list-style:none; padding:0; margin:1rem 0 0; display:grid; gap:.7rem; }
+    .cando li{ display:flex; align-items:flex-start; gap:.6rem; font-size:.97rem; }
+    .cando li svg{ width:20px; height:20px; flex:0 0 auto; margin-top:1px; }
+    .cando .can li svg{ color:var(--green); }
+    .cando .cant li svg{ color:var(--red); }
+
+    /* How-it-works steps */
+    .steps{ display:grid; gap:1.2rem; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); counter-reset:step; }
+    .step{ background:#fff; border:1px solid #eef0f4; border-radius:var(--radius); padding:1.4rem; box-shadow:var(--shadow-sm); position:relative; }
+    .step .step-num{ counter-increment:step; font-family:var(--font-display); font-weight:700; color:var(--accent); font-size:1.6rem; }
+    .step .step-num::before{ content:counter(step); }
+    .step h3{ margin:.3rem 0 .4rem; font-size:1.1rem; }
+    .step p{ margin:0; color:var(--muted); font-size:.95rem; }
+
+    /* FAQ accordion styles now live in styles.css (.faq) — shared site-wide. */
+  </style>
+</head>
+<body data-page="parents" class="accent-navy">
+
+  <section class="page-hero">
+    <div class="container">
+      <div class="breadcrumb"><a href="index.html">Home</a> / Parents</div>
+      <span class="eyebrow"><span data-icon="shield"></span> For Parents</span>
+      <h1>A Safe Place To Grow</h1>
+      <p>Red 5 is built to be a positive, age-appropriate clubhouse where children can learn, create and connect — with safety and kindness at the center of everything. Here's exactly how it works, what your child can and can't do, and how you stay in control.</p>
+      <div class="hero-actions" style="margin-top:1.2rem">
+        <a class="btn btn-navy btn-lg" href="parent-dashboard.html"><span data-icon="shield"></span> Open Parent Dashboard</a>
+        <a class="btn btn-outline btn-lg" href="#safety">How we keep kids safe</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Promise -->
+  <section class="section">
+    <div class="container">
+      <div class="grid grid-4">
+        <div class="tile"><span class="tile-icon" data-icon="shield"></span><h3>Safe &amp; Moderated</h3><p>Real people review content and conversations.</p></div>
+        <div class="tile"><span class="tile-icon" data-icon="lock"></span><h3>Private &amp; Secure</h3><p>We collect as little as possible and protect it.</p></div>
+        <div class="tile"><span class="tile-icon" data-icon="heart"></span><h3>Kind by Design</h3><p>A respectful community where every kid matters.</p></div>
+        <div class="tile"><span class="tile-icon" data-icon="gradcap"></span><h3>Positive &amp; Educational</h3><p>Content that builds confidence and good habits.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Honest prototype note -->
+  <section class="section-tight">
+    <div class="container">
+      <div class="callout">
+        <span class="ico" data-icon="bulb"></span>
+        <div><h3>A note on where we are today</h3>
+          <p>Red 5 is currently a prototype. The safety approach described here is our commitment for launch — real, dependable safety relies on trained human moderators and a secure backend, which are put in place before any child accounts or payments go live.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Safety -->
+  <section class="section alt" id="safety">
+    <div class="container">
+      <div class="section-head"><span class="eyebrow">Safety Guidelines</span><h2>How we keep Red 5 safe</h2><p>Layers of protection so kids can explore with confidence.</p></div>
+      <div class="grid grid-3">
+        <div class="tile"><span class="tile-icon" data-icon="parents"></span><h3>Human moderation</h3><p>Trained moderators review community posts and shared content to keep things kind and age-appropriate.</p></div>
+        <div class="tile"><span class="tile-icon" data-icon="check"></span><h3>Curated content only</h3><p>Videos, games and stories are chosen for a young audience — no open or unfiltered internet.</p></div>
+        <div class="tile"><span class="tile-icon" data-icon="shield"></span><h3>Easy reporting</h3><p>Simple report and block tools, plus clear guidance for kids on asking a trusted adult for help.</p></div>
+        <div class="tile"><span class="tile-icon" data-icon="lock"></span><h3>No public profiles</h3><p>Children don't share full names or personal details, and there are no open direct messages with strangers.</p></div>
+        <div class="tile"><span class="tile-icon" data-icon="smile"></span><h3>Kindness first</h3><p>Community standards are written in kid-friendly language and reinforced throughout the experience.</p></div>
+        <div class="tile"><span class="tile-icon" data-icon="bulb"></span><h3>Digital citizenship</h3><p>Built-in lessons help kids build smart, safe online habits as they grow.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How Talk-to-Rosie chat & Community stay safe -->
+  <section class="section" id="chat-safety">
+    <div class="container split">
+      <div>
+        <span class="eyebrow"><span data-icon="chat"></span> Talk to Rosie &amp; Community</span>
+        <h2>How chat &amp; community stay safe</h2>
+        <p>Red 5 has two ways for kids to connect — the friendly <strong>Talk to Rosie</strong> companion and the <strong>Community</strong>. Both are built to be safe spaces, not open chat rooms.</p>
+        <ul class="rules" style="margin-top:1rem">
+          <li><span class="num" data-icon="check"></span><div><b>Talk to Rosie is a guided helper.</b> It offers kind, encouraging, age-appropriate responses and gently points kids to a trusted adult for anything serious. It is not a real-time chat with strangers.</div></li>
+          <li><span class="num" data-icon="check"></span><div><b>Community is moderated.</b> Posts pass through filters and human review, and children can't exchange personal contact details.</div></li>
+          <li><span class="num" data-icon="check"></span><div><b>Report &amp; block are one tap away.</b> Anything that doesn't feel right can be flagged for a moderator instantly.</div></li>
+          <li><span class="num" data-icon="check"></span><div><b>No open messaging with strangers.</b> There are no private inboxes that let unknown adults reach your child.</div></li>
+        </ul>
+        <p class="muted mt-2">Reminder: Talk to Rosie is a supportive feature, not a counselor or emergency service. See the family note below.</p>
+      </div>
+      <div class="media" style="box-shadow:none;background:transparent">
+        <svg viewBox="0 0 320 260" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;border-radius:var(--radius-lg);background:linear-gradient(180deg,#e6ebf3,#f6f8fc)">
+          <path d="M64,70 h150 a18,18 0 0 1 18,18 v44 a18,18 0 0 1 -18,18 h-84 l-30,24 v-24 h-36 a18,18 0 0 1 -18,-18 v-44 a18,18 0 0 1 18,-18 z" fill="#2ba8e0" stroke="#1f8fc4" stroke-width="3.5"/>
+          <circle cx="96" cy="110" r="7" fill="#fff"/><circle cx="124" cy="110" r="7" fill="#fff"/><circle cx="152" cy="110" r="7" fill="#fff"/>
+          <g transform="translate(214,176)"><circle r="40" fill="#fff" stroke="#e1e8ef" stroke-width="3"/><path d="M0,12 C-16,-3 -10,-22 0,-10 C10,-22 16,-3 0,12 Z" fill="#ff4f6d"/></g>
+          <g transform="translate(70,206)"><circle r="26" fill="#dff6e6" stroke="#0e9384" stroke-width="3"/><path d="M-10,1 L-3,8 L11,-7" stroke="#0e9384" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>
+          <polygon points="276,60 278,66 284,68 278,70 276,76 274,70 268,68 274,66" fill="#ffce3a"/>
+          <polygon points="40,150 41.8,154.2 46,156 41.8,157.8 40,162 38.2,157.8 34,156 38.2,154.2" fill="#b9a3ff"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- Compliance note (REQUIRED — preserved) -->
+  <section class="section alt">
+    <div class="container">
+      <div class="callout red">
+        <span class="ico" data-icon="heart"></span>
+        <div><h3>An important note for families</h3>
+          <p>Red 5 is a supportive community and educational resource. It is not a replacement for professional therapy, medical care, or emergency support. If a child is in immediate danger, contact emergency services.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- What kids CAN and CAN'T do -->
+  <section class="section" id="what-kids-do">
+    <div class="container">
+      <div class="section-head"><span class="eyebrow">Clear boundaries</span><h2>What kids can &amp; can't do</h2><p>Simple, predictable rules so you always know what your child is using.</p></div>
+      <div class="cando">
+        <div class="col-card can">
+          <h3><span class="badge" data-icon="check"></span> Kids can</h3>
+          <ul>
+            <li><span data-icon="check"></span> Watch curated Rosie videos and shows</li>
+            <li><span data-icon="check"></span> Play games and use the Create Zone tools</li>
+            <li><span data-icon="check"></span> Read along with stories and books</li>
+            <li><span data-icon="check"></span> Earn badges and join monthly challenges</li>
+            <li><span data-icon="check"></span> Share kind, friendly posts in the moderated community</li>
+            <li><span data-icon="check"></span> Ask Talk to Rosie for encouragement</li>
+          </ul>
+        </div>
+        <div class="col-card cant">
+          <h3><span class="badge" data-icon="lock"></span> Kids can't</h3>
+          <ul>
+            <li><span data-icon="lock"></span> Share full names, addresses, schools or phone numbers</li>
+            <li><span data-icon="lock"></span> Message strangers privately or be contacted by unknown adults</li>
+            <li><span data-icon="lock"></span> Reach the open, unfiltered internet</li>
+            <li><span data-icon="lock"></span> See ads or behavioral ad targeting</li>
+            <li><span data-icon="lock"></span> Make purchases — only a parent can</li>
+            <li><span data-icon="lock"></span> Change account or safety settings</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COPPA / parental consent -->
+  <section class="section alt" id="consent">
+    <div class="container">
+      <div class="section-head"><span class="eyebrow">Parental consent</span><h2>Built with children's privacy in mind</h2><p>Red 5 is designed around verifiable parental consent and children's online privacy best practices (COPPA).</p></div>
+      <div class="steps">
+        <div class="step"><div class="step-num"></div><h3>A grown-up signs up</h3><p>A parent or guardian creates the account — children can't register on their own.</p></div>
+        <div class="step"><div class="step-num"></div><h3>You give consent</h3><p>You review what's collected and approve your child's participation before they take part.</p></div>
+        <div class="step"><div class="step-num"></div><h3>Kids explore safely</h3><p>Your child uses a curated, moderated, ad-free space with no open internet.</p></div>
+        <div class="step"><div class="step-num"></div><h3>You stay in control</h3><p>Review activity, manage settings, and pause or close the account anytime.</p></div>
+      </div>
+      <p class="muted mt-2" style="max-width:74ch">
+        We design to align with the Children's Online Privacy Protection Act (COPPA): a parent creates and consents to the account, we collect only what's necessary, and we never sell children's data. A full, plain-language Privacy Policy and consent flow will be provided before any accounts or payments go live.
+      </p>
+    </div>
+  </section>
+
+  <!-- Privacy -->
+  <section class="section" id="privacy">
+    <div class="container">
+      <div class="section-head"><span class="eyebrow">Privacy Policy</span><h2>Privacy &amp; security</h2><p>We treat children's information with great care.</p></div>
+      <ul class="rules">
+        <li><span class="num" data-icon="check"></span><div><b>We collect only what's needed.</b> Just enough to create and protect an account — never more than necessary.</div></li>
+        <li><span class="num" data-icon="check"></span><div><b>Parent-created accounts.</b> A parent or guardian sets up and oversees membership, with verifiable consent.</div></li>
+        <li><span class="num" data-icon="check"></span><div><b>No selling of personal data.</b> We do not sell children's personal information, ever.</div></li>
+        <li><span class="num" data-icon="check"></span><div><b>Child-appropriate experience.</b> No behavioral ad targeting of children within Red 5.</div></li>
+      </ul>
+      <p class="muted mt-2" style="max-width:70ch">This page is a friendly summary. A full Privacy Policy will be provided before any accounts or payments go live, written to align with children's online privacy best practices.</p>
+    </div>
+  </section>
+
+  <!-- Parent controls / dashboard -->
+  <section class="section alt" id="controls">
+    <div class="container split">
+      <div>
+        <span class="eyebrow"><span data-icon="shield"></span> Parent Dashboard</span>
+        <h2>Manage everything in one place</h2>
+        <p>The Parent Dashboard is your home base. See what your child has been up to and keep their experience just right.</p>
+        <ul class="rules" style="margin-top:1rem">
+          <li><span class="num" data-icon="check"></span><div><b>Activity summaries</b> — what your child watched, played and created.</div></li>
+          <li><span class="num" data-icon="check"></span><div><b>Time-spent reports</b> — a clear picture of healthy screen time.</div></li>
+          <li><span class="num" data-icon="check"></span><div><b>Safety &amp; moderation transparency</b> — see how content is reviewed.</div></li>
+          <li><span class="num" data-icon="check"></span><div><b>Manage membership</b> — upgrade, pause or cancel anytime.</div></li>
+        </ul>
+        <div class="hero-actions" style="margin-top:1.2rem">
+          <a class="btn btn-navy btn-lg" href="parent-dashboard.html"><span data-icon="arrow"></span> Open Parent Dashboard</a>
+          <a class="btn btn-outline btn-lg" href="membership.html#login">Manage Account</a>
+        </div>
+      </div>
+      <div class="media" style="box-shadow:none;background:transparent">
+        <svg viewBox="0 0 320 240" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;border-radius:var(--radius-lg);background:linear-gradient(180deg,#e6ebf3,#f6f8fc)">
+          <rect x="40" y="44" width="240" height="152" rx="14" fill="#fff" stroke="#d6deea" stroke-width="3"/>
+          <rect x="40" y="44" width="240" height="34" rx="14" fill="#16243f"/>
+          <circle cx="60" cy="61" r="5" fill="#ff5a5a"/><circle cx="78" cy="61" r="5" fill="#ffd23f"/><circle cx="96" cy="61" r="5" fill="#6cc24a"/>
+          <rect x="60" y="98" width="90" height="40" rx="8" fill="#e3f4fc"/><rect x="68" y="108" width="50" height="8" rx="4" fill="#56a8e6"/><rect x="68" y="122" width="34" height="8" rx="4" fill="#9cd3f0"/>
+          <rect x="170" y="98" width="90" height="40" rx="8" fill="#eaf5e0"/><rect x="178" y="108" width="50" height="8" rx="4" fill="#6cc24a"/><rect x="178" y="122" width="34" height="8" rx="4" fill="#aedd8e"/>
+          <g transform="translate(60,156)"><rect width="14" height="24" rx="3" fill="#7c5cff"/><rect x="22" y="8" width="14" height="16" rx="3" fill="#b9a3ff"/><rect x="44" y="-4" width="14" height="28" rx="3" fill="#7c5cff"/><rect x="66" y="6" width="14" height="18" rx="3" fill="#b9a3ff"/></g>
+          <g transform="translate(214,168)"><circle r="22" fill="none" stroke="#e1344a" stroke-width="8"/><circle r="22" fill="none" stroke="#ffd23f" stroke-width="8" stroke-dasharray="60 200" transform="rotate(-90)"/></g>
+          <polygon points="290,40 292,46 298,48 292,50 290,56 288,50 282,48 288,46" fill="#ffce3a"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- Community rules -->
+  <section class="section" id="rules">
+    <div class="container">
+      <div class="section-head"><span class="eyebrow">Community Rules</span><h2>Our community rules</h2><p>Simple promises everyone at Red 5 keeps.</p></div>
+      <ul class="rules">
+        <li><span class="num">1</span><div><b>Be kind and respectful</b> to every member — no bullying, teasing or mean words.</div></li>
+        <li><span class="num">2</span><div><b>Keep personal information private</b> — no full names, addresses, schools, phone numbers or passwords.</div></li>
+        <li><span class="num">3</span><div><b>Share only friendly, appropriate content</b> that fits a space made for kids.</div></li>
+        <li><span class="num">4</span><div><b>Listen to moderators</b> and use the report button if something doesn't feel right.</div></li>
+        <li><span class="num">5</span><div><b>Have fun and lift others up</b> — Red 5 is a place where every kid belongs.</div></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Membership / pricing -->
+  <section class="section alt">
+    <div class="container split">
+      <div>
+        <span class="eyebrow">Membership</span>
+        <h2>Simple, transparent pricing</h2>
+        <p>The Red 5 Club is <strong>$4.99/month</strong> and includes exclusive videos, unlimited games, the private community, monthly challenges, rewards &amp; badges, printable packs and early access content. There's also a free plan to look around together first.</p>
+        <p class="muted">No surprise fees. Parents manage the membership and can cancel anytime.</p>
+        <a class="btn btn-red btn-lg" href="membership.html"><span data-icon="star"></span> See Membership</a>
+      </div>
+      <div class="media" style="box-shadow:none">
+        <div class="plan" style="margin:0">
+          <h2>Red 5 Club</h2>
+          <div class="price"><span class="amt">$4.99</span><span class="per">/month</span></div>
+          <ul class="benefits">
+            <li><span data-icon="check"></span> Exclusive videos</li>
+            <li><span data-icon="check"></span> Unlimited games</li>
+            <li><span data-icon="check"></span> Private community</li>
+            <li><span data-icon="check"></span> Monthly challenges</li>
+            <li><span data-icon="check"></span> Rewards &amp; badges</li>
+            <li><span data-icon="check"></span> Printable packs</li>
+          </ul>
+          <a class="btn btn-yellow btn-block" href="membership.html">Join Today</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Parent FAQ -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head"><span class="eyebrow">Parent FAQ</span><h2>Common questions from grown-ups</h2><p>Honest answers about safety, privacy and control.</p></div>
+      <div class="faq">
+        <details open>
+          <summary>Is Red 5 actually safe right now?</summary>
+          <p>Red 5 is a prototype today. The safety measures on this page are our commitment for launch — dependable safety depends on trained human moderators and a secure backend, which are in place before any real child accounts go live. We won't overclaim production-grade safety until it's real.</p>
+        </details>
+        <details>
+          <summary>Who can my child talk to?</summary>
+          <p>Your child can post in a moderated community and use the Talk to Rosie companion. There is no open private messaging with strangers, and personal contact details can't be shared.</p>
+        </details>
+        <details>
+          <summary>What information do you collect?</summary>
+          <p>Only what's needed to create and protect an account, set up by a parent. We never sell children's personal data and we don't run behavioral advertising to kids.</p>
+        </details>
+        <details>
+          <summary>How do I cancel or close the account?</summary>
+          <p>Parents manage everything from the Parent Dashboard and can pause, cancel or close the account at any time, with no cancellation fees.</p>
+        </details>
+        <details>
+          <summary>Is Talk to Rosie a counselor?</summary>
+          <p>No. Talk to Rosie is a supportive, encouraging feature — it is not therapy, medical care, or emergency support. If a child is in immediate danger, contact emergency services.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- Help + Terms -->
+  <section class="section alt" id="help">
+    <div class="container">
+      <div class="grid grid-2">
+        <div class="tile"><span class="tile-icon" data-icon="chat"></span><h3>Help &amp; support</h3><p>Questions about your account, billing or safety? We're here to help — a parent support contact will be available with every membership.</p></div>
+        <div class="tile" id="terms"><span class="tile-icon" data-icon="book"></span><h3>Terms of use</h3><p>A clear, plain-language Terms of Use will be provided before accounts and payments go live, covering acceptable use, memberships and cancellations.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container">
+    <div class="cta-band">
+      <h2>Give your child a safe place to grow</h2>
+      <p>Join the Red 5 Club today — a positive, moderated community made just for kids.</p>
+      <div class="hero-actions">
+        <a class="btn btn-yellow btn-lg" href="membership.html"><span data-icon="star"></span> Join Red 5 Club</a>
+        <a class="btn btn-ghost btn-lg" href="lets-talk.html">See Let's Talk</a>
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>

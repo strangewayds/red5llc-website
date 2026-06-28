@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Join the Red 5 Club — Membership &amp; Login</title>
+  <meta name="description" content="Join the Red 5 Club for $4.99/month — exclusive videos, unlimited games, private community, challenges, rewards and more. Free plan available. Member login.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="assets/logo.png">
+  <script src="app.js" defer></script>
+
+  <!-- Page-local styles (kept inline to avoid touching shared styles.css) -->
+  <style>
+    /* Pricing tiers */
+    .tiers{ display:grid; gap:1.4rem; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); align-items:stretch; }
+    .tier{
+      position:relative; display:flex; flex-direction:column; background:#fff;
+      border:1px solid #eef0f4; border-radius:var(--radius-lg); padding:1.8rem 1.6rem;
+      box-shadow:var(--shadow-sm);
+    }
+    .tier.free{ border:2px dashed #d9dee8; }
+    .tier.club{
+      color:#fff; border:none;
+      background:linear-gradient(150deg, var(--maroon-1, #c01726), var(--maroon-2, #8a0f1b));
+      box-shadow:var(--shadow-lg);
+    }
+    .tier .tier-name{ font-family:var(--font-display); font-weight:700; font-size:1.4rem; }
+    .tier .tier-sub{ font-size:.95rem; color:var(--muted); margin:.2rem 0 0; }
+    .tier.club .tier-sub{ color:#ffd9dc; }
+    .tier .tier-price{ display:flex; align-items:baseline; gap:.25rem; margin:1rem 0 .2rem; }
+    .tier .tier-price .amt{ font-family:var(--font-display); font-weight:700; font-size:2.6rem; line-height:1; }
+    .tier .tier-price .per{ font-size:1rem; opacity:.8; }
+    .tier ul{ list-style:none; padding:0; margin:1.2rem 0; display:grid; gap:.7rem; }
+    .tier li{ display:flex; align-items:flex-start; gap:.6rem; font-size:.97rem; }
+    .tier li svg{ width:20px; height:20px; flex:0 0 auto; margin-top:1px; }
+    .tier.free li .ic-yes{ color:var(--green); }
+    .tier.free li .ic-no{ color:#c2c8d2; }
+    .tier.free li.off{ color:#9aa1ad; }
+    .tier.club li svg{ color:#ffd23f; }
+    .tier .tier-cta{ margin-top:auto; }
+    .ribbon{
+      position:absolute; top:18px; right:-2px; background:var(--yellow,#ffc53d); color:#4a3500;
+      font-family:var(--font-display); font-weight:700; font-size:.78rem; letter-spacing:.03em;
+      padding:.35rem .9rem; border-radius:999px 0 0 999px; box-shadow:0 6px 14px rgba(0,0,0,.18);
+    }
+
+    /* Comparison table */
+    .compare{ width:100%; border-collapse:collapse; background:#fff; border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow-sm); }
+    .compare th, .compare td{ padding:.85rem 1rem; text-align:left; border-bottom:1px solid #f0f2f6; font-size:.97rem; }
+    .compare thead th{ background:#fafbfd; font-family:var(--font-display); }
+    .compare th.col, .compare td.col{ text-align:center; width:120px; }
+    .compare tbody tr:last-child td{ border-bottom:none; }
+    .compare .yes{ color:var(--green); } .compare .no{ color:#c2c8d2; }
+    .compare .col svg{ width:22px; height:22px; }
+    .compare-wrap{ overflow-x:auto; }
+    .col-club{ color:var(--red); font-weight:700; }
+
+    /* FAQ accordion styles now live in styles.css (.faq) — shared site-wide. */
+
+    /* Demo join confirmation banner */
+    .join-confirm{ display:flex; gap:.8rem; align-items:flex-start; }
+    .join-confirm .ico{ flex:0 0 auto; width:42px; height:42px; border-radius:12px; background:#dff6e6; color:var(--green); display:grid; place-items:center; }
+    .join-confirm .ico svg{ width:24px; height:24px; }
+  </style>
+</head>
+<body data-page="membership" class="accent-red">
+
+  <section class="page-hero">
+    <div class="container">
+      <div class="breadcrumb"><a href="index.html">Home</a> / Join the Red 5 Club</div>
+      <span class="eyebrow"><span data-icon="star"></span> Membership</span>
+      <h1>Join the Red 5 Club</h1>
+      <p>One simple membership unlocks everything — videos, games, stories, challenges and a kind, safe community for your child. Start free, upgrade any time, and a grown-up stays in control the whole way.</p>
+    </div>
+  </section>
+
+  <!-- ===================== TRUST STRIP ===================== -->
+  <section class="trust-bar">
+    <div class="container">
+      <ul class="trust-list">
+        <li class="trust-item"><span class="t-green" data-icon="shield"></span> Ad-free &amp; safe</li>
+        <li class="trust-item"><span class="t-navy" data-icon="parents"></span> Parent-controlled</li>
+        <li class="trust-item"><span class="t-red" data-icon="heart"></span> Kind community</li>
+        <li class="trust-item"><span class="t-blue" data-icon="lock"></span> Private &amp; secure</li>
+        <li class="trust-item"><span class="t-gold" data-icon="star"></span> Cancel anytime</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===================== PRICING TIERS ===================== -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <h2>Pick the plan that fits your family</h2>
+        <p>Try Red 5 for free, or unlock everything with the Red 5 Club. No ads, ever — on either plan.</p>
+      </div>
+
+      <div class="tiers">
+
+        <!-- FREE -->
+        <div class="tier free">
+          <div class="tier-name">Red 5 Free</div>
+          <p class="tier-sub">A great way to look around together.</p>
+          <div class="tier-price"><span class="amt">$0</span><span class="per">/ forever</span></div>
+          <ul>
+            <li><span class="ic-yes" data-icon="check"></span> A taste of the Play Zone &amp; Create Zone</li>
+            <li><span class="ic-yes" data-icon="check"></span> Sample Rosie videos</li>
+            <li><span class="ic-yes" data-icon="check"></span> Read-along story previews</li>
+            <li><span class="ic-yes" data-icon="check"></span> Parent dashboard &amp; controls</li>
+            <li class="off"><span class="ic-no" data-icon="lock"></span> Private community (Club only)</li>
+            <li class="off"><span class="ic-no" data-icon="lock"></span> Printable packs &amp; rewards (Club only)</li>
+          </ul>
+          <div class="tier-cta">
+            <a class="btn btn-outline btn-lg btn-block" href="#join"><span data-icon="sparkle"></span> Start Free</a>
+          </div>
+        </div>
+
+        <!-- CLUB -->
+        <div class="tier club">
+          <span class="ribbon">Most popular</span>
+          <div class="tier-name"><span data-icon="crown"></span> Red 5 Club</div>
+          <p class="tier-sub">Everything Red 5 has to offer.</p>
+          <div class="tier-price"><span class="amt">$4.99</span><span class="per">/ month</span></div>
+          <ul>
+            <li><span data-icon="check"></span> Exclusive Rosie videos every week</li>
+            <li><span data-icon="check"></span> Unlimited games &amp; full creator tools</li>
+            <li><span data-icon="check"></span> Private, moderated community</li>
+            <li><span data-icon="check"></span> Monthly challenges, rewards &amp; badges</li>
+            <li><span data-icon="check"></span> Printable activity packs each month</li>
+            <li><span data-icon="check"></span> Early access to new content</li>
+          </ul>
+          <div class="tier-cta">
+            <a class="btn btn-yellow btn-lg btn-block" href="#join"><span data-icon="star"></span> Join the Club</a>
+          </div>
+        </div>
+
+      </div>
+
+      <p class="muted mt-2" style="text-align:center;max-width:60ch;margin-inline:auto">
+        One Club membership covers your whole household. Parents set up and manage the plan and can cancel anytime.
+      </p>
+    </div>
+  </section>
+
+  <!-- ===================== ILLUSTRATED "WHAT'S INSIDE" ===================== -->
+  <section class="section alt">
+    <div class="container">
+      <div class="section-head"><h2>What's inside the Club</h2><p>One membership, all the fun and learning.</p></div>
+      <div class="grid grid-3">
+
+        <article class="media-card">
+          <div class="media-thumb"><svg class="gcov" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="mtv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fde7e9"/><stop offset="1" stop-color="#fff7f8"/></linearGradient></defs><rect width="320" height="200" fill="url(#mtv)"/><g stroke="#c98aa0" stroke-width="4" stroke-linecap="round" fill="none"><line x1="150" y1="58" x2="128" y2="34"/><line x1="170" y1="58" x2="192" y2="32"/></g><circle cx="127" cy="32" r="6" fill="#ffb07a"/><circle cx="193" cy="30" r="6" fill="#ffd23f"/><rect x="96" y="58" width="128" height="92" rx="16" fill="#e1344a" stroke="#a8202f" stroke-width="3.5"/><rect x="110" y="72" width="80" height="64" rx="10" fill="#ff6274" stroke="#c12435" stroke-width="2.5"/><polygon points="138,90 138,118 162,104" fill="#fff"/><circle cx="204" cy="86" r="4.5" fill="#ffd23f"/><circle cx="204" cy="106" r="4.5" fill="#ffd23f"/><polygon points="60,52 61.8,56.2 66,58 61.8,59.8 60,64 58.2,59.8 54,58 58.2,56.2" fill="#ffce3a"/><polygon points="270,150 271.5,153.5 275,155 271.5,156.5 270,160 268.5,156.5 265,155 268.5,153.5" fill="#c9a0ff"/></svg></div>
+          <div class="media-body"><span class="tag">Watch</span><h3>Exclusive Rosie videos</h3>
+            <p>All of Rosie's episodes plus members-only content every week.</p>
+          </div>
+        </article>
+
+        <article class="media-card">
+          <div class="media-thumb"><svg class="gcov" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="mgame" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ecebff"/><stop offset="1" stop-color="#f8f8ff"/></linearGradient></defs><rect width="320" height="200" fill="url(#mgame)"/><path d="M118,82 C138,72 182,72 202,82 C228,88 236,112 229,132 C222,152 202,158 190,147 C182,140 175,138 160,138 C145,138 138,140 130,147 C118,158 98,152 91,132 C84,112 92,88 118,82 Z" fill="#7c5cff" stroke="#5733cf" stroke-width="3.5" stroke-linejoin="round"/><g fill="#4a2cc0"><rect x="121" y="100" width="9" height="26" rx="3"/><rect x="113" y="109" width="26" height="9" rx="3"/></g><circle cx="196" cy="103" r="5.4" fill="#ff5a5a"/><circle cx="185" cy="114" r="5.4" fill="#ffd23f"/><circle cx="207" cy="114" r="5.4" fill="#6cc24a"/><circle cx="196" cy="125" r="5.4" fill="#56a8e6"/><polygon points="252,52 254,57 259,59 254,61 252,66 250,61 245,59 250,57" fill="#ffce3a"/><polygon points="58,150 59.8,154.2 64,156 59.8,157.8 58,162 56.2,157.8 52,156 56.2,154.2" fill="#b9a3ff"/></svg></div>
+          <div class="media-body"><span class="tag">Play</span><h3>Unlimited games</h3>
+            <p>Every game in the Play Zone, with new ones added monthly.</p>
+          </div>
+        </article>
+
+        <article class="media-card">
+          <div class="media-thumb"><svg class="gcov" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="mcom" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e3f4fc"/><stop offset="1" stop-color="#f6fbfe"/></linearGradient></defs><rect width="320" height="200" fill="url(#mcom)"/><path d="M86,68 h96 a16,16 0 0 1 16,16 v30 a16,16 0 0 1 -16,16 h-56 l-22,18 v-18 h-18 a16,16 0 0 1 -16,-16 v-30 a16,16 0 0 1 16,-16 z" fill="#2ba8e0" stroke="#1f8fc4" stroke-width="3"/><circle cx="110" cy="100" r="6" fill="#fff"/><circle cx="134" cy="100" r="6" fill="#fff"/><circle cx="158" cy="100" r="6" fill="#fff"/><circle cx="214" cy="124" r="26" fill="#fff" stroke="#e1e8ef" stroke-width="2.5"/><path d="M214,135 C201,123 205,109 214,118 C223,109 227,123 214,135 Z" fill="#ff4f6d"/><polygon points="60,54 62,59 67,61 62,63 60,68 58,63 53,61 58,59" fill="#ffce3a"/><polygon points="268,150 269.8,154.2 274,156 269.8,157.8 268,162 266.2,157.8 262,156 266.2,154.2" fill="#7fcbee"/></svg></div>
+          <div class="media-body"><span class="tag">Connect</span><h3>Private community</h3>
+            <p>A safe, moderated space to share and connect kindly.</p>
+          </div>
+        </article>
+
+        <article class="media-card">
+          <div class="media-thumb"><svg class="gcov" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="mch" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff3da"/><stop offset="1" stop-color="#fffcf3"/></linearGradient></defs><rect width="320" height="200" fill="url(#mch)"/><g stroke="#f0b21f" stroke-width="4" stroke-linecap="round"><line x1="160" y1="40" x2="160" y2="52"/><line x1="122" y1="52" x2="129" y2="62"/><line x1="198" y1="52" x2="191" y2="62"/></g><circle cx="160" cy="102" r="40" fill="#ffd23f" stroke="#e8a92c" stroke-width="3.5"/><polygon points="160,80 166,98 185,98 170,109 176,128 160,116 144,128 150,109 135,98 154,98" fill="#fff"/><polygon points="60,150 61.8,154.2 66,156 61.8,157.8 60,162 58.2,157.8 54,156 58.2,154.2" fill="#ffce3a"/><polygon points="262,54 263.8,58.2 268,60 263.8,61.8 262,66 260.2,61.8 256,60 260.2,58.2" fill="#ffb07a"/></svg></div>
+          <div class="media-body"><span class="tag">Achieve</span><h3>Challenges &amp; badges</h3>
+            <p>Fun monthly challenges that build skills, plus rewards and badges to earn.</p>
+          </div>
+        </article>
+
+        <article class="media-card">
+          <div class="media-thumb"><svg class="gcov" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="mpr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eaf5e0"/><stop offset="1" stop-color="#f8fcf3"/></linearGradient></defs><rect width="320" height="200" fill="url(#mpr)"/><g transform="translate(160,98)"><g transform="rotate(-9)"><rect x="-34" y="-40" width="60" height="74" rx="6" fill="#fff" stroke="#d6e0c8" stroke-width="2"/><g stroke="#cfe0f0" stroke-width="3" stroke-linecap="round"><line x1="-20" y1="-24" x2="14" y2="-24"/><line x1="-20" y1="-12" x2="14" y2="-12"/></g><circle cx="-3" cy="10" r="10" fill="none" stroke="#ffb3c1" stroke-width="3"/></g><g transform="rotate(8) translate(22,0)"><rect x="-28" y="-44" width="60" height="74" rx="6" fill="#fff" stroke="#d6e0c8" stroke-width="2"/><g stroke="#d6ead8" stroke-width="3" stroke-linecap="round"><line x1="-16" y1="-26" x2="18" y2="-26"/><line x1="-16" y1="-14" x2="18" y2="-14"/><line x1="-16" y1="-2" x2="8" y2="-2"/></g></g></g><polygon points="232,56 240,74 260,75 244,88 250,108 232,96 214,108 220,88 204,75 224,74" fill="#ffd23f" stroke="#fff" stroke-width="3" stroke-linejoin="round" transform="scale(.62) translate(150,40)"/><polygon points="56,150 57.8,154.2 62,156 57.8,157.8 56,162 54.2,157.8 50,156 54.2,154.2" fill="#9ad36a"/></svg></div>
+          <div class="media-body"><span class="tag">Print</span><h3>Printable activity packs</h3>
+            <p>Fresh screen-free printables delivered every month.</p>
+          </div>
+        </article>
+
+        <article class="media-card">
+          <div class="media-thumb"><svg class="gcov" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="mearly" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dff6f3"/><stop offset="1" stop-color="#f4fcfb"/></linearGradient></defs><rect width="320" height="200" fill="url(#mearly)"/><g transform="translate(160,104)"><rect x="-46" y="-30" width="92" height="62" rx="10" fill="#14b8a6" stroke="#0e9384" stroke-width="3.5"/><path d="M-46,-20 h92 M-46,-8 h92" stroke="#0e9384" stroke-width="2" opacity=".4"/><polygon points="0,-2 0,18 16,8" fill="#fff"/></g><circle cx="160" cy="60" r="16" fill="#ffd23f" stroke="#e8a92c" stroke-width="3"/><path d="M160,52 v8 l5,4" stroke="#a8202f" stroke-width="3" fill="none" stroke-linecap="round"/><polygon points="60,150 61.8,154.2 66,156 61.8,157.8 60,162 58.2,157.8 54,156 58.2,154.2" fill="#19c9b4"/><polygon points="262,54 263.8,58.2 268,60 263.8,61.8 262,66 260.2,61.8 256,60 260.2,58.2" fill="#ffce3a"/></svg></div>
+          <div class="media-body"><span class="tag">First</span><h3>Early access</h3>
+            <p>Club members see new videos, games and stories before anyone else.</p>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== COMPARISON TABLE ===================== -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head"><h2>Free vs. Club, side by side</h2><p>Both plans are completely ad-free and parent-controlled.</p></div>
+      <div class="compare-wrap">
+        <table class="compare">
+          <thead>
+            <tr>
+              <th>What you get</th>
+              <th class="col">Free</th>
+              <th class="col col-club">Club $4.99</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Ad-free, kid-safe space</td><td class="col"><span class="yes" data-icon="check"></span></td><td class="col"><span class="yes" data-icon="check"></span></td></tr>
+            <tr><td>Parent dashboard &amp; controls</td><td class="col"><span class="yes" data-icon="check"></span></td><td class="col"><span class="yes" data-icon="check"></span></td></tr>
+            <tr><td>Rosie videos</td><td class="col">Samples</td><td class="col col-club">All + weekly</td></tr>
+            <tr><td>Games &amp; creator tools</td><td class="col">A taste</td><td class="col col-club">Unlimited</td></tr>
+            <tr><td>Read-along stories</td><td class="col">Previews</td><td class="col col-club">Full library</td></tr>
+            <tr><td>Private, moderated community</td><td class="col"><span class="no" data-icon="lock"></span></td><td class="col"><span class="yes" data-icon="check"></span></td></tr>
+            <tr><td>Monthly challenges, rewards &amp; badges</td><td class="col"><span class="no" data-icon="lock"></span></td><td class="col"><span class="yes" data-icon="check"></span></td></tr>
+            <tr><td>Printable activity packs</td><td class="col"><span class="no" data-icon="lock"></span></td><td class="col"><span class="yes" data-icon="check"></span></td></tr>
+            <tr><td>Early access to new content</td><td class="col"><span class="no" data-icon="lock"></span></td><td class="col"><span class="yes" data-icon="check"></span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== JOIN + LOGIN (DEMO) ===================== -->
+  <section class="section alt">
+    <div class="container">
+      <div class="auth-grid">
+
+        <div class="panel" id="join">
+          <span class="eyebrow"><span data-icon="sparkle"></span> New here?</span>
+          <h2>Create your Red 5 account</h2>
+          <p class="muted">A grown-up creates the account. Start on the free plan and upgrade to the Club whenever you like — we'll keep your child's experience safe and private.</p>
+          <form class="js-demo-form" novalidate>
+            <div class="field"><label for="pemail">Parent email</label><input id="pemail" type="email" placeholder="you@example.com" required></div>
+            <div class="field"><label for="ppass">Create a password</label><input id="ppass" type="password" placeholder="••••••••" required></div>
+            <div class="field"><label for="cname">Child's first name</label><input id="cname" type="text" placeholder="Rosie" required></div>
+            <div class="field"><label for="cage">Child's age</label><input id="cage" type="number" min="4" max="13" placeholder="9" required></div>
+            <button class="btn btn-red btn-lg btn-block" type="submit"><span data-icon="star"></span> Create My Account</button>
+            <div class="form-msg">
+              <div class="join-confirm">
+                <span class="ico" data-icon="check"></span>
+                <div>
+                  <strong>You're on the list! 🎉</strong><br>
+                  Thanks for trying the preview. Account creation and secure checkout open when the Red 5 Club launches — we'll email you the moment it's ready. No payment was taken.
+                </div>
+              </div>
+            </div>
+            <p class="form-note">This is a friendly preview. No payment is taken and no account is created yet — it's a prototype.</p>
+          </form>
+        </div>
+
+        <div class="panel" id="login">
+          <span class="eyebrow"><span data-icon="lock"></span> Members</span>
+          <h2>Member login</h2>
+          <p class="muted">Already part of the Club? Welcome back!</p>
+          <form class="js-demo-form" novalidate>
+            <div class="field"><label for="lemail">Email</label><input id="lemail" type="email" placeholder="you@example.com" required></div>
+            <div class="field"><label for="lpass">Password</label><input id="lpass" type="password" placeholder="••••••••" required></div>
+            <button class="btn btn-navy btn-lg btn-block" type="submit"><span data-icon="check"></span> Log In</button>
+            <div class="form-msg">👋 Welcome back! Member login opens when the Red 5 Club launches. Thanks for your patience!</div>
+            <p class="form-note">This is a friendly preview — logins aren't active yet.</p>
+          </form>
+          <p class="muted" style="margin-top:1rem;font-size:.92rem">
+            Already a member? Manage your plan and see activity in the
+            <a href="parent-dashboard.html" style="color:var(--red);font-weight:700">Parent Dashboard →</a>
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FAQ ===================== -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head"><h2>Membership questions</h2><p>Everything a grown-up might want to know before joining.</p></div>
+      <div class="faq">
+        <details open>
+          <summary>How much does the Red 5 Club cost?</summary>
+          <p>The Red 5 Club is <strong>$4.99 per month</strong>, with no surprise fees. There's also a free plan so you can look around together before deciding. One Club membership covers your whole household.</p>
+        </details>
+        <details>
+          <summary>Can I cancel anytime?</summary>
+          <p>Yes. Parents manage the membership and can cancel at any time — there are no long-term contracts and no cancellation fees.</p>
+        </details>
+        <details>
+          <summary>Is there a free option?</summary>
+          <p>Absolutely. Red 5 Free gives you a taste of the Play Zone and Create Zone, sample Rosie videos, story previews, and full access to the parent dashboard — with no ads and no time limit.</p>
+        </details>
+        <details>
+          <summary>Will my child see ads?</summary>
+          <p>No. Red 5 is completely ad-free on both the Free and Club plans, and we never target children with behavioral advertising.</p>
+        </details>
+        <details>
+          <summary>Is it safe? Who controls the account?</summary>
+          <p>A parent or guardian sets up and oversees the account, and the community is human-moderated. Read more in our <a href="parents.html" style="color:var(--red);font-weight:700">parent &amp; safety guide</a>. Note: Red 5 is a prototype today — full safety relies on human moderators and a secure backend that go live before launch.</p>
+        </details>
+        <details>
+          <summary>How many kids can use one membership?</summary>
+          <p>A single Club membership is designed to cover the children in your household, all managed from one parent account.</p>
+        </details>
+        <details>
+          <summary>Is my payment information secure?</summary>
+          <p>When the Club launches, checkout will run through a trusted, secure payment provider. In this preview no payment is collected and no card details are stored.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PARENT REASSURANCE CALLOUT ===================== -->
+  <section class="section alt">
+    <div class="container">
+      <div class="callout">
+        <span class="ico" data-icon="shield"></span>
+        <div><h3>Made with parents in mind</h3>
+          <p>Red 5 is a safe, ad-free, parent-controlled space. Wondering how we keep things safe and private? <a href="parents.html" style="color:var(--red);font-weight:700">Read our parent &amp; safety guide →</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container">
+    <div class="cta-band">
+      <h2>Give your child a safe place to grow</h2>
+      <p>Start free today, or join the Red 5 Club for $4.99/month — a positive, moderated community made just for kids.</p>
+      <div class="hero-actions">
+        <a class="btn btn-yellow btn-lg" href="#join"><span data-icon="star"></span> Join Red 5 Club</a>
+        <a class="btn btn-ghost btn-lg" href="parents.html">For Parents</a>
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>

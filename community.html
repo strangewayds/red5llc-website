@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Community — Red 5</title>
+  <meta name="description" content="The Red 5 Community — safe, moderated chat rooms, AI companions, kindness badges and a parent dashboard. The safest place online for kids to connect.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="assets/logo.png">
+  <script src="app.js" defer></script>
+  <script src="community.js" defer></script>
+</head>
+<body data-page="community" class="accent-red">
+
+  <section class="page-hero">
+    <div class="container">
+      <div class="breadcrumb"><a href="index.html">Home</a> / Community</div>
+      <span class="eyebrow"><span data-icon="parents"></span> Red 5 Community</span>
+      <h1>A Safe Place to Connect</h1>
+      <p>Kind, moderated chat rooms where kids make friends, share ideas, get help and cheer each other on — with friendly AI helpers and round-the-clock safety. No direct messages, ever.</p>
+    </div>
+  </section>
+
+  <!-- Safety highlights -->
+  <section class="section">
+    <div class="container">
+      <div class="grid grid-4">
+        <div class="tile"><span class="tile-icon" data-icon="shield"></span><h3>Every message screened</h3><p>AI checks each message <em>before</em> it can appear. Harmful messages are blocked.</p></div>
+        <div class="tile"><span class="tile-icon" data-icon="lock"></span><h3>No DMs, no personal info</h3><p>All chat is public &amp; moderated. Phone, address, school and socials are blocked.</p></div>
+        <div class="tile"><span class="tile-icon" data-icon="heart"></span><h3>Kindness, not competition</h3><p>Earn kindness points &amp; badges. No followers, no rankings, no popularity contests.</p></div>
+        <div class="tile"><span class="tile-icon" data-icon="parents"></span><h3>Parents in the loop</h3><p>A dashboard with activity, time and safety reports you can trust.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Rooms -->
+  <section class="section alt">
+    <div class="container">
+      <div class="section-head"><h2>Chat rooms</h2><p>Public, moderated, and welcoming. Pick a room and say hello!</p></div>
+      <div class="rooms-grid" id="rooms-grid"></div>
+    </div>
+  </section>
+
+  <!-- Avatar studio -->
+  <section class="section" id="studio">
+    <div class="container">
+      <div class="section-head"><h2>Create your safe avatar</h2><p>Describe a fun character and we'll make a cartoon avatar — never a real photo.</p></div>
+      <div id="avatar-studio"></div>
+    </div>
+  </section>
+
+  <!-- Companions -->
+  <section class="section alt">
+    <div class="container">
+      <div class="section-head"><h2>Meet the AI helpers</h2><p>Friendly companions who welcome new members, spark kind conversations, and help keep every room safe.</p></div>
+      <div id="companions"></div>
+      <div class="callout mt-3">
+        <span class="ico" data-icon="chat"></span>
+        <div><h3>Always honest about who they are</h3>
+          <p>The helpers never pretend to be human. Ask "Are you real?" and they'll say: <em>"I'm an AI helper created by Red 5 to help make this community fun, safe, and welcoming."</em></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reputation -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head"><h2>Earn kindness, not popularity</h2><p>Being kind, helpful and creative earns points and badges. We never show follower counts or public rankings.</p></div>
+      <div id="badge-showcase"></div>
+    </div>
+  </section>
+
+  <!-- Peer support + parents -->
+  <section class="section alt">
+    <div class="container">
+      <div class="grid grid-2">
+        <div class="callout">
+          <span class="ico" data-icon="heart"></span>
+          <div><h3>Peer Support Room</h3>
+            <p>A caring, carefully moderated space to talk about friendships, school stress and feelings. <strong>It is not therapy.</strong> Red 5 is a supportive community, not a replacement for professional counseling, therapy, medical care, or emergency services. Crisis language triggers resources and a moderator alert.</p>
+            <a class="btn btn-accent btn-sm mt-2" href="room.html?room=peer-support">Visit Peer Support</a>
+          </div>
+        </div>
+        <div class="callout">
+          <span class="ico" data-icon="shield"></span>
+          <div><h3>For parents</h3>
+            <p>See activity summaries, time-spent reports, and full safety &amp; moderation transparency — so you can feel comfortable letting your child take part.</p>
+            <a class="btn btn-accent btn-sm mt-2" href="parent-dashboard.html">Open Parent Dashboard</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container">
+    <div class="cta-band">
+      <h2>Join a kinder kind of community</h2>
+      <p>Red 5 Club members get full access to all moderated rooms, AI helpers, badges and rewards.</p>
+      <div class="hero-actions">
+        <a class="btn btn-yellow btn-lg" href="membership.html"><span data-icon="star"></span> Join Red 5 Club</a>
+        <a class="btn btn-ghost btn-lg" href="room.html?room=everyone-chat">Peek into Everyone Chat</a>
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>
