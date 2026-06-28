@@ -12,6 +12,38 @@
   <link rel="icon" href="assets/logo.png">
   <script src="app.js" defer></script>
   <script src="games.js" defer></script>
+  <style>
+    /* Play Zone game cards restyled to match the reference art direction.
+       Scoped to this page only (does NOT affect other pages or the global stylesheet),
+       and does NOT change the page's color scheme / hero / background. */
+    body[data-page="play"] .grid .media-card{
+      background:linear-gradient(180deg,#3b2e72 0%,#2a2052 100%);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:22px;
+      box-shadow:0 16px 38px rgba(40,28,92,.30);
+    }
+    body[data-page="play"] .grid .media-card:hover{
+      box-shadow:0 24px 52px rgba(40,28,92,.45);
+    }
+    body[data-page="play"] .grid .media-card .media-thumb{
+      margin:14px 14px 0;
+      border-radius:16px;
+      overflow:hidden;
+      box-shadow:0 10px 20px rgba(0,0,0,.28);
+    }
+    body[data-page="play"] .grid .media-card .media-body h3{ color:#ffffff; }
+    body[data-page="play"] .grid .media-card .media-body p{ color:#c7bdf0; }
+    /* Pink "Play"/"Unlock" buttons like the reference */
+    body[data-page="play"] .grid .media-card .btn-accent{
+      background:linear-gradient(135deg,#ff5ba6,#e21f86);
+      color:#ffffff; border:none;
+      box-shadow:0 6px 16px rgba(226,31,134,.42);
+    }
+    body[data-page="play"] .grid .media-card .btn-accent:hover{ filter:brightness(1.06); }
+    /* Keep the FREE / CLUB badges readable on the dark cards */
+    body[data-page="play"] .grid .media-card .tag.free{ color:#0f6b29; background:#d7f7dd; }
+    body[data-page="play"] .grid .media-card .tag.lock{ color:#7a5d00; background:#ffe6a3; }
+  </style>
 </head>
 <body data-page="play" class="accent-indigo">
 
