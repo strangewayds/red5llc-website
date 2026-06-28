@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Draw Studio — Red 5</title>
+  <meta name="description" content="Draw Studio — doodle, sketch and draw anything you can imagine, then save or print it!">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="assets/logo.png">
+  <style>
+    body{ margin:0; font-family:var(--font-body,'Nunito',sans-serif); background:#241a40; color:#fff; }
+    .ds-wrap{ min-height:100vh; display:flex; flex-direction:column; }
+    .ds-top{ display:flex; align-items:center; gap:.7rem; padding:.7rem 1rem; background:linear-gradient(90deg,#3a2768,#241a40); border-bottom:1px solid rgba(255,255,255,.08); flex-wrap:wrap; }
+    .ds-back,.ds-new{ display:inline-flex; align-items:center; gap:.4rem; background:rgba(255,255,255,.12); color:#fff; text-decoration:none; border:none; cursor:pointer; font-family:var(--font-display,'Fredoka'); font-weight:600; padding:.45rem .9rem; border-radius:999px; font-size:.9rem; }
+    .ds-back:hover,.ds-new:hover{ background:rgba(255,255,255,.2); }
+    .ds-title{ font-family:var(--font-display,'Fredoka'); font-weight:700; font-size:1.3rem; margin:0; letter-spacing:.5px; }
+    .ds-title .a{ color:#ffd23f; }
+    .ds-spacer{ flex:1; }
+    .ds-btn{ border:none; cursor:pointer; font-family:var(--font-display,'Fredoka'); font-weight:600; font-size:.9rem; padding:.5rem 1.05rem; border-radius:999px; color:#fff; display:inline-flex; align-items:center; gap:.4rem; box-shadow:0 6px 14px rgba(0,0,0,.2); }
+    .ds-btn.save{ background:linear-gradient(135deg,#3ddc84,#22b566); }
+    .ds-btn.print{ background:linear-gradient(135deg,#ff5ba6,#e21f86); }
+    .ds-btn:hover{ filter:brightness(1.07); }
+    .ds-main{ flex:1; display:grid; grid-template-columns:1fr 250px; gap:1rem; padding:1rem; align-items:start; }
+    @media (max-width:820px){ .ds-main{ grid-template-columns:1fr; } }
+    .ds-stagewrap{ background:#1e1638; border-radius:18px; padding:1rem; box-shadow:inset 0 0 0 1px rgba(255,255,255,.06); }
+    .ds-canvas{ background:#fff; border-radius:14px; width:100%; height:auto; display:block; touch-action:none; box-shadow:0 10px 30px rgba(0,0,0,.3); cursor:crosshair; }
+    .ds-panel{ background:#1e1638; border-radius:18px; padding:1rem; box-shadow:inset 0 0 0 1px rgba(255,255,255,.06); }
+    .ds-panel h2{ font-family:var(--font-display,'Fredoka'); font-size:.95rem; margin:0 0 .5rem; color:#cfc6ff; }
+    .ds-tools{ display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:1rem; }
+    .ds-tool{ border:none; cursor:pointer; background:rgba(255,255,255,.1); color:#fff; font-size:1.2rem; padding:.5rem 0; border-radius:10px; }
+    .ds-tool.active{ background:linear-gradient(135deg,#7c4dff,#5e40d8); box-shadow:0 4px 12px rgba(124,77,255,.5); }
+    .ds-tool:hover{ filter:brightness(1.1); }
+    .ds-swatches{ display:grid; grid-template-columns:repeat(8,1fr); gap:5px; margin-bottom:1rem; }
+    .ds-sw{ width:100%; aspect-ratio:1; border-radius:7px; border:2px solid rgba(255,255,255,.15); cursor:pointer; padding:0; }
+    .ds-sw.sel{ border-color:#fff; box-shadow:0 0 0 2px #ffd23f; }
+    .ds-current{ display:flex; align-items:center; gap:.5rem; margin-bottom:.8rem; }
+    .ds-current .dot{ width:30px; height:30px; border-radius:50%; border:3px solid #fff; }
+    .ds-current span{ font-weight:700; font-size:.85rem; color:#cfc6ff; }
+    .ds-size label{ font-size:.82rem; color:#cfc6ff; font-weight:700; display:block; margin-bottom:.3rem; }
+    .ds-size input{ width:100%; margin-bottom:1rem; }
+    .ds-tip{ font-size:.78rem; color:#a99fd6; line-height:1.4; }
+    .ds-stickers{ padding:0 1rem 1.2rem; }
+    .ds-cats{ display:flex; gap:.4rem; flex-wrap:wrap; margin-bottom:.6rem; }
+    .ds-cat{ border:none; cursor:pointer; background:rgba(255,255,255,.1); color:#fff; font-family:var(--font-display,'Fredoka'); font-weight:600; font-size:.82rem; padding:.35rem .8rem; border-radius:999px; }
+    .ds-cat.active{ background:linear-gradient(135deg,#ff5ba6,#e21f86); }
+    .ds-stamprow{ display:flex; gap:.5rem; flex-wrap:wrap; }
+    .ds-stamp{ width:48px; height:48px; font-size:1.6rem; background:#fff; border:3px solid transparent; border-radius:12px; cursor:pointer; line-height:1; }
+    .ds-stamp.sel{ border-color:#ffd23f; }
+    .ds-mascot{ display:flex; align-items:center; gap:.5rem; margin-top:1rem; background:rgba(255,255,255,.06); border-radius:12px; padding:.5rem .7rem; }
+    .ds-mascot .star{ font-size:1.5rem; } .ds-mascot p{ margin:0; font-size:.8rem; color:#ffe9a8; font-weight:700; }
+    .toast{ position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(20px); background:#2b2150; color:#fff; padding:.7rem 1.2rem; border-radius:999px; box-shadow:0 10px 30px rgba(0,0,0,.4); opacity:0; pointer-events:none; transition:.25s; font-weight:600; z-index:50; }
+    .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+  <div class="ds-wrap">
+    <div class="ds-top">
+      <a class="ds-back" href="create-zone.html">← Back to Create Zone</a>
+      <button class="ds-new" id="dsNew" type="button">＋ New Canvas</button>
+      <h1 class="ds-title">DRAW <span class="a">STUDIO</span></h1>
+      <div class="ds-spacer"></div>
+      <button class="ds-btn save" id="dsSave" type="button">⬇ Save</button>
+      <button class="ds-btn print" id="dsPrint" type="button">🖨 Print</button>
+    </div>
+
+    <div class="ds-main">
+      <div class="ds-stagewrap">
+        <canvas class="ds-canvas" id="dsCanvas" width="1000" height="680"></canvas>
+      </div>
+
+      <div class="ds-panel">
+        <h2>Tools</h2>
+        <div class="ds-tools" id="dsTools"></div>
+        <div class="ds-current"><span>Color:</span><div class="dot" id="dsDot"></div></div>
+        <h2>Colors</h2>
+        <div class="ds-swatches" id="dsSwatches"></div>
+        <div class="ds-size"><label>Brush size: <b id="dsSizeVal">10</b></label><input type="range" id="dsSize" min="2" max="60" value="10"></div>
+        <p class="ds-tip">Pick a tool and color and draw on the canvas. Tap a sticker then tap the canvas to stamp it. Undo with the ↶ tool.</p>
+        <div class="ds-mascot"><span class="star">🌟</span><p>Use your imagination!</p></div>
+      </div>
+    </div>
+
+    <div class="ds-stickers">
+      <h2>Stickers</h2>
+      <div class="ds-cats" id="dsCats"></div>
+      <div class="ds-stamprow" id="dsStamps"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="dsToast"></div>
+  <script src="draw-studio.js" defer></script>
+</body>
+</html>
