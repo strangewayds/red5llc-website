@@ -4,13 +4,40 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Create Zone — Red 5</title>
-  <meta name="description" content="The Red 5 Create Zone — drawing, coloring, crafts and printable activities for kids.">
+  <meta name="description" content="The Red 5 Create Zone — coloring, drawing, crafts, stickers, comics, stories and more. Dream it. Make it. Share it.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" href="assets/logo.png">
   <script src="app.js" defer></script>
+  <style>
+    /* Create Zone activity grid — light cards, landscape artwork on top,
+       title + description + colored Open/View button. Scoped to this page. */
+    body[data-page="create"] .cz-grid{
+      display:grid; grid-template-columns:repeat(auto-fill, minmax(285px, 1fr)); gap:1.2rem;
+    }
+    body[data-page="create"] .cz-card{
+      background:#ffffff; border:1px solid #efe7df; border-radius:18px; overflow:hidden;
+      box-shadow:0 10px 26px rgba(120,90,60,.10); display:flex; flex-direction:column;
+      transition:transform .15s ease, box-shadow .15s ease;
+    }
+    body[data-page="create"] .cz-card:hover{ transform:translateY(-4px); box-shadow:0 18px 42px rgba(120,90,60,.18); }
+    body[data-page="create"] .cz-thumb{ display:block; aspect-ratio:384 / 182; overflow:hidden; }
+    body[data-page="create"] .cz-thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+    body[data-page="create"] .cz-body{ display:flex; align-items:center; gap:.8rem; padding:.85rem 1rem 1rem; }
+    body[data-page="create"] .cz-info{ flex:1; min-width:0; }
+    body[data-page="create"] .cz-info h3{ margin:0 0 .25rem; font-size:1.02rem; display:flex; align-items:center; gap:.45rem; color:var(--c,#5b3fb0); }
+    body[data-page="create"] .cz-info p{ margin:0; font-size:.84rem; color:var(--muted); line-height:1.35; }
+    body[data-page="create"] .cz-emoji{ font-size:1.15rem; line-height:1; }
+    body[data-page="create"] .cz-open{
+      flex:none; background:var(--c,#7c4dff); color:#fff; border:none; cursor:pointer;
+      font-family:var(--font-display); font-weight:600; font-size:.9rem; padding:.5rem 1.15rem;
+      border-radius:999px; text-decoration:none; box-shadow:0 6px 14px rgba(0,0,0,.15);
+      white-space:nowrap; transition:filter .15s ease, transform .15s ease;
+    }
+    body[data-page="create"] .cz-open:hover{ filter:brightness(1.08); transform:translateY(-1px); }
+  </style>
 </head>
 <body data-page="create" class="accent-orange">
 
@@ -18,66 +45,108 @@
     <div class="container">
       <div class="breadcrumb"><a href="index.html">Home</a> / Create Zone</div>
       <span class="eyebrow"><span data-icon="palette"></span> Create Zone</span>
-      <h1>Make Something Awesome</h1>
-      <p>Drawing, coloring, crafts and printable activities — let your imagination run wild!</p>
+      <h1>Create Zone</h1>
+      <p>Dream it. Make it. Share it with the world.</p>
     </div>
   </section>
 
   <section class="section">
     <div class="container">
-      <div class="grid grid-3">
+      <div class="cz-grid">
 
-        <!-- Coloring Pages : palette + brush + crayons -->
-        <article class="media-card">
-          <div class="media-thumb"><svg class="gcov" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="czbg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fdeee6"/><stop offset="1" stop-color="#fff9f5"/></linearGradient></defs><rect width="320" height="200" fill="url(#czbg1)"/><g transform="translate(104,150) rotate(-26)"><rect x="-11" y="-26" width="22" height="50" rx="8" fill="#ff9a3d"/><polygon points="-11,-26 11,-26 0,-42" fill="#ffe0c2"/><rect x="-11" y="-6" width="22" height="6" fill="#e8852f"/></g><g transform="translate(130,156) rotate(16)"><rect x="-11" y="-26" width="22" height="50" rx="8" fill="#56a8e6"/><polygon points="-11,-26 11,-26 0,-42" fill="#cfe7fa"/><rect x="-11" y="-6" width="22" height="6" fill="#2f86c4"/></g><g transform="translate(180,102)"><ellipse cx="0" cy="0" rx="54" ry="40" fill="#fff5ec" stroke="#efd7c4" stroke-width="3"/><ellipse cx="22" cy="22" rx="11" ry="9" fill="#fdeee6"/><circle cx="-32" cy="-12" r="8" fill="#ff5a5a"/><circle cx="-12" cy="-24" r="8" fill="#ffd23f"/><circle cx="12" cy="-24" r="8" fill="#6cc24a"/><circle cx="32" cy="-10" r="8" fill="#56a8e6"/><circle cx="-28" cy="10" r="8" fill="#ff8a3d"/><circle cx="-4" cy="2" r="8" fill="#b06cff"/></g><g transform="translate(150,56) rotate(35)"><rect x="-5" y="0" width="10" height="44" rx="5" fill="#d99a5a"/><rect x="-6" y="42" width="12" height="9" rx="3" fill="#c4ccd6"/><path d="M-6,51 Q0,70 6,51 Z" fill="#ff7a9c"/></g><polygon points="44,42 45.8,46.2 50,48 45.8,49.8 44,54 42.2,49.8 38,48 42.2,46.2" fill="#ffb07a"/><polygon points="278,150 279.5,153.5 283,155 279.5,156.5 278,160 276.5,156.5 273,155 276.5,153.5" fill="#c9a0ff"/></svg></div>
-          <div class="media-body"><span class="tag">Color</span><h3>Coloring Pages</h3>
-            <p>Pick a picture and fill it with your favorite colors.</p>
-            <div class="row"><a class="btn btn-accent btn-sm" href="#" data-demo="Activity preview! Printable packs unlock in the Red 5 Club."><span data-icon="play"></span> Open</a></div>
+        <article class="cz-card" style="--c:#7c4dff">
+          <a class="cz-thumb" href="coloring-world.html"><img src="assets/cz-coloring.png" alt="Coloring World"></a>
+          <div class="cz-body">
+            <div class="cz-info"><h3><span class="cz-emoji">🎨</span> Coloring World</h3><p>Pick your favorite picture and bring it to life with color!</p></div>
+            <a class="cz-open" href="coloring-world.html">Open</a>
           </div>
         </article>
 
-        <!-- Free Draw Pad : spiral notepad + squiggle + pencil -->
-        <article class="media-card">
-          <div class="media-thumb"><svg class="gcov" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="czbg2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fdeee6"/><stop offset="1" stop-color="#fff9f5"/></linearGradient></defs><rect width="320" height="200" fill="url(#czbg2)"/><g transform="translate(150,108) rotate(-6)"><rect x="-58" y="-44" width="116" height="92" rx="10" fill="#ffffff" stroke="#ecdfd4" stroke-width="2"/><rect x="-58" y="-44" width="116" height="16" rx="8" fill="#ffe7d8"/><g fill="#c3bcb2"><circle cx="-40" cy="-44" r="4"/><circle cx="-20" cy="-44" r="4"/><circle cx="0" cy="-44" r="4"/><circle cx="20" cy="-44" r="4"/><circle cx="40" cy="-44" r="4"/></g><path d="M-34,8 q13,-26 26,0 q12,24 26,2 q8,-12 16,-3" fill="none" stroke="#3a93dd" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></g><g transform="translate(220,150) rotate(-125)"><rect x="-7" y="-6" width="14" height="54" rx="3" fill="#ffc24a"/><rect x="-7" y="42" width="14" height="10" rx="3" fill="#ff8fae"/><polygon points="-7,-6 7,-6 0,-20" fill="#f3cfa6"/><polygon points="-2.6,-15 2.6,-15 0,-20" fill="#5a4634"/></g><polygon points="252,52 253.5,55.5 257,57 253.5,58.5 252,62 250.5,58.5 247,57 250.5,55.5" fill="#ffb07a"/><polygon points="58,150 59.5,153.5 63,155 59.5,156.5 58,160 56.5,156.5 53,155 56.5,153.5" fill="#c9a0ff"/></svg></div>
-          <div class="media-body"><span class="tag">Draw</span><h3>Free Draw Pad</h3>
-            <p>A blank canvas for doodles, characters and ideas.</p>
-            <div class="row"><a class="btn btn-accent btn-sm" href="#" data-demo="Activity preview! Full creator tools unlock in the Red 5 Club."><span data-icon="play"></span> Open</a></div>
+        <article class="cz-card" style="--c:#2ba8e0">
+          <a class="cz-thumb" href="#" data-demo="Draw Studio is opening soon! Try Coloring World now — it's ready to play."><img src="assets/cz-draw.png" alt="Draw Studio"></a>
+          <div class="cz-body">
+            <div class="cz-info"><h3><span class="cz-emoji">✏️</span> Draw Studio</h3><p>Doodle, sketch and draw anything you can imagine!</p></div>
+            <a class="cz-open" href="#" data-demo="Draw Studio is opening soon! Try Coloring World now — it's ready to play.">Open</a>
           </div>
         </article>
 
-        <!-- Craft of the Week : scissors + glue + paper -->
-        <article class="media-card">
-          <div class="media-thumb"><svg class="gcov" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="czbg3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fdeee6"/><stop offset="1" stop-color="#fff9f5"/></linearGradient></defs><rect width="320" height="200" fill="url(#czbg3)"/><g transform="translate(198,118)"><rect x="-22" y="-22" width="46" height="46" rx="6" fill="#ffd23f" transform="rotate(10)"/><rect x="-26" y="-18" width="46" height="46" rx="6" fill="#b894ff" transform="rotate(-7)"/><rect x="-24" y="-24" width="46" height="46" rx="6" fill="#ff8fb0" transform="rotate(3)"/></g><g transform="translate(150,104)"><rect x="-12" y="-30" width="24" height="56" rx="6" fill="#ffffff" stroke="#e9ddd2" stroke-width="2"/><rect x="-12" y="-44" width="24" height="16" rx="5" fill="#ff8a3d"/><rect x="-12" y="-10" width="24" height="13" fill="#ffe3cf"/></g><g transform="translate(98,98) rotate(-12)"><path d="M-9,22 L4,-24" stroke="#cfd6de" stroke-width="7" stroke-linecap="round"/><path d="M9,22 L-4,-24" stroke="#b9c1ca" stroke-width="7" stroke-linecap="round"/><circle cx="-9" cy="32" r="11" fill="none" stroke="#ff7a45" stroke-width="6"/><circle cx="9" cy="32" r="11" fill="none" stroke="#ff9a3d" stroke-width="6"/></g><polygon points="48,46 49.5,49.5 53,51 49.5,52.5 48,56 46.5,52.5 43,51 46.5,49.5" fill="#ffb07a"/><polygon points="280,150 281.5,153.5 285,155 281.5,156.5 280,160 278.5,156.5 275,155 278.5,153.5" fill="#c9a0ff"/></svg></div>
-          <div class="media-body"><span class="tag">Craft</span><h3>Craft of the Week</h3>
-            <p>A new easy craft with simple steps every week.</p>
-            <div class="row"><a class="btn btn-accent btn-sm" href="#" data-demo="Activity preview! New crafts every week for Club members."><span data-icon="play"></span> View</a></div>
+        <article class="cz-card" style="--c:#ff5a8a">
+          <a class="cz-thumb" href="#" data-demo="Craft Lab is coming soon — new crafts every week for Club members!"><img src="assets/cz-craft.png" alt="Craft Lab"></a>
+          <div class="cz-body">
+            <div class="cz-info"><h3><span class="cz-emoji">✂️</span> Craft Lab</h3><p>Fun crafts with simple steps using things you love!</p></div>
+            <a class="cz-open" href="#" data-demo="Craft Lab is coming soon — new crafts every week for Club members!">View</a>
           </div>
         </article>
 
-        <!-- Printable Activity Packs : blue tray + sheets + star -->
-        <article class="media-card">
-          <div class="media-thumb"><svg class="gcov" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="czbg4" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fdeee6"/><stop offset="1" stop-color="#fff9f5"/></linearGradient></defs><rect width="320" height="200" fill="url(#czbg4)"/><g transform="translate(150,84)"><g transform="rotate(-9)"><rect x="-30" y="-36" width="54" height="66" rx="5" fill="#ffffff" stroke="#e6dccf" stroke-width="2"/><g stroke="#cfe0f0" stroke-width="3" stroke-linecap="round"><line x1="-18" y1="-22" x2="12" y2="-22"/><line x1="-18" y1="-12" x2="12" y2="-12"/></g><circle cx="-3" cy="8" r="9" fill="none" stroke="#ffb3c1" stroke-width="3"/></g><g transform="rotate(8) translate(20,0)"><rect x="-26" y="-40" width="54" height="66" rx="5" fill="#ffffff" stroke="#e6dccf" stroke-width="2"/><g stroke="#d6ead8" stroke-width="3" stroke-linecap="round"><line x1="-14" y1="-24" x2="16" y2="-24"/><line x1="-14" y1="-14" x2="16" y2="-14"/><line x1="-14" y1="-4" x2="8" y2="-4"/></g></g></g><g transform="translate(160,152)"><path d="M-62,-12 L62,-12 L50,30 L-50,30 Z" fill="#4aa3e0"/><rect x="-66" y="-20" width="132" height="14" rx="7" fill="#5fb0e8"/></g><polygon points="232,58 240,76 260,77 244,90 250,110 232,98 214,110 220,90 204,77 224,76" fill="#ffd23f" stroke="#fff" stroke-width="3" stroke-linejoin="round" transform="scale(.62) translate(140,30)"/><polygon points="48,46 49.5,49.5 53,51 49.5,52.5 48,56 46.5,52.5 43,51 46.5,49.5" fill="#ff9a5a"/></svg></div>
-          <div class="media-body"><span class="tag lock"><span data-icon="lock"></span> Club</span><h3>Printable Activity Packs</h3>
-            <p>Mazes, puzzles, coloring and more to print at home.</p>
-            <div class="row"><a class="btn btn-accent btn-sm" href="membership.html"><span data-icon="lock"></span> Unlock</a></div>
+        <article class="cz-card" style="--c:#2fae5f">
+          <a class="cz-thumb" href="#" data-demo="Printable Adventures is coming soon — mazes, coloring pages and certificates to print!"><img src="assets/cz-printable.png" alt="Printable Adventures"></a>
+          <div class="cz-body">
+            <div class="cz-info"><h3><span class="cz-emoji">🖨️</span> Printable Adventures</h3><p>Print fun mazes, coloring pages, certificates and more!</p></div>
+            <a class="cz-open" href="#" data-demo="Printable Adventures is coming soon — mazes, coloring pages and certificates to print!">Open</a>
           </div>
         </article>
 
-        <!-- Make a Card : envelope + card + hearts -->
-        <article class="media-card">
-          <div class="media-thumb"><svg class="gcov" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="czbg5" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fdeee6"/><stop offset="1" stop-color="#fff9f5"/></linearGradient></defs><rect width="320" height="200" fill="url(#czbg5)"/><g transform="translate(158,80) rotate(-5)"><rect x="-36" y="-34" width="72" height="58" rx="7" fill="#ffffff" stroke="#f0dccf" stroke-width="2"/><path d="M0,8 C-20,-12 -12,-32 0,-16 C12,-32 20,-12 0,8 Z" fill="#ff4f6d"/></g><g transform="translate(150,134)"><path d="M-60,-8 L60,-8 L60,46 L-60,46 Z" fill="#ff7a98"/><path d="M-60,46 L0,10 L60,46 Z" fill="#ff6486"/><path d="M-60,-8 L0,30 L60,-8 Z" fill="#ffb1c2"/></g><g transform="translate(96,58)"><path d="M0,5 C-9,-4 -5,-14 0,-7 C5,-14 9,-4 0,5 Z" fill="#ff5a73"/></g><g transform="translate(214,86) scale(.8)"><path d="M0,5 C-9,-4 -5,-14 0,-7 C5,-14 9,-4 0,5 Z" fill="#ff7a8f"/></g><polygon points="54,140 55.5,143.5 59,145 55.5,146.5 54,150 52.5,146.5 49,145 52.5,143.5" fill="#ffb07a"/><polygon points="270,150 271.5,153.5 275,155 271.5,156.5 270,160 268.5,156.5 265,155 268.5,153.5" fill="#c9a0ff"/></svg></div>
-          <div class="media-body"><span class="tag">Make</span><h3>Make a Card</h3>
-            <p>Design a sweet card for someone you care about.</p>
-            <div class="row"><a class="btn btn-accent btn-sm" href="#" data-demo="Activity preview! Card maker unlocks in the Red 5 Club."><span data-icon="play"></span> Open</a></div>
+        <article class="cz-card" style="--c:#ff5a73">
+          <a class="cz-thumb" href="#" data-demo="Kindness Cards is coming soon — make sweet cards to brighten someone's day!"><img src="assets/cz-kindness.png" alt="Kindness Cards"></a>
+          <div class="cz-body">
+            <div class="cz-info"><h3><span class="cz-emoji">💌</span> Kindness Cards</h3><p>Make and share kind cards to brighten someone's day!</p></div>
+            <a class="cz-open" href="#" data-demo="Kindness Cards is coming soon — make sweet cards to brighten someone's day!">Open</a>
           </div>
         </article>
 
-        <!-- Sticker Maker : smiling star + rainbow + heart -->
-        <article class="media-card">
-          <div class="media-thumb"><svg class="gcov" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="czbg6" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fdeee6"/><stop offset="1" stop-color="#fff9f5"/></linearGradient></defs><rect width="320" height="200" fill="url(#czbg6)"/><g transform="translate(214,80)"><g fill="none" stroke-width="7"><path d="M-34,18 a34,34 0 0 1 68,0" stroke="#ff6b6b"/><path d="M-26,18 a26,26 0 0 1 52,0" stroke="#ffb144"/><path d="M-18,18 a18,18 0 0 1 36,0" stroke="#5fc36a"/></g><ellipse cx="-34" cy="22" rx="13" ry="9" fill="#fff"/><ellipse cx="34" cy="22" rx="13" ry="9" fill="#fff"/></g><g transform="translate(108,98)"><polygon points="0,-40 11,-12 41,-12 17,7 26,36 0,18 -26,36 -17,7 -41,-12 -11,-12" fill="#ffd23f" stroke="#fff" stroke-width="5" stroke-linejoin="round"/><circle cx="-9" cy="-4" r="3" fill="#5a4634"/><circle cx="9" cy="-4" r="3" fill="#5a4634"/><path d="M-7,4 q7,7 14,0" stroke="#5a4634" stroke-width="2.6" fill="none" stroke-linecap="round"/><circle cx="-16" cy="3" r="4" fill="#ffb3b3"/><circle cx="16" cy="3" r="4" fill="#ffb3b3"/></g><g transform="translate(172,142)"><path d="M0,17 C-20,-3 -13,-24 0,-10 C13,-24 20,-3 0,17 Z" fill="#ff5a73" stroke="#fff" stroke-width="4" stroke-linejoin="round"/></g><polygon points="48,150 49.5,153.5 53,155 49.5,156.5 48,160 46.5,156.5 43,155 46.5,153.5" fill="#c9a0ff"/></svg></div>
-          <div class="media-body"><span class="tag lock"><span data-icon="lock"></span> Club</span><h3>Sticker Maker</h3>
-            <p>Create your own stickers from shapes and colors.</p>
-            <div class="row"><a class="btn btn-accent btn-sm" href="membership.html"><span data-icon="lock"></span> Unlock</a></div>
+        <article class="cz-card" style="--c:#9b59ff">
+          <a class="cz-thumb" href="#" data-demo="Sticker Studio is coming soon — design your own sticker collection!"><img src="assets/cz-sticker.png" alt="Sticker Studio"></a>
+          <div class="cz-body">
+            <div class="cz-info"><h3><span class="cz-emoji">⭐</span> Sticker Studio</h3><p>Design your own stickers and build your collection!</p></div>
+            <a class="cz-open" href="#" data-demo="Sticker Studio is coming soon — design your own sticker collection!">Open</a>
+          </div>
+        </article>
+
+        <article class="cz-card" style="--c:#2ba8e0">
+          <a class="cz-thumb" href="#" data-demo="Comic Creator is coming soon — make your own comic books with speech bubbles!"><img src="assets/cz-comic.png" alt="Comic Creator"></a>
+          <div class="cz-body">
+            <div class="cz-info"><h3><span class="cz-emoji">💬</span> Comic Creator</h3><p>Make your own comic books with speech bubbles and action!</p></div>
+            <a class="cz-open" href="#" data-demo="Comic Creator is coming soon — make your own comic books with speech bubbles!">Open</a>
+          </div>
+        </article>
+
+        <article class="cz-card" style="--c:#7c4dff">
+          <a class="cz-thumb" href="#" data-demo="Story Creator is coming soon — write stories and bring them to life with pictures!"><img src="assets/cz-story.png" alt="Story Creator"></a>
+          <div class="cz-body">
+            <div class="cz-info"><h3><span class="cz-emoji">📖</span> Story Creator</h3><p>Write stories and bring them to life with pictures!</p></div>
+            <a class="cz-open" href="#" data-demo="Story Creator is coming soon — write stories and bring them to life with pictures!">Open</a>
+          </div>
+        </article>
+
+        <article class="cz-card" style="--c:#ff7a45">
+          <a class="cz-thumb" href="#" data-demo="Animation Studio is coming soon — bring your characters to life!"><img src="assets/cz-animation.png" alt="Animation Studio"></a>
+          <div class="cz-body">
+            <div class="cz-info"><h3><span class="cz-emoji">🎬</span> Animation Studio</h3><p>Create fun animations and bring your characters to life!</p></div>
+            <a class="cz-open" href="#" data-demo="Animation Studio is coming soon — bring your characters to life!">Open</a>
+          </div>
+        </article>
+
+        <article class="cz-card" style="--c:#2ba8e0">
+          <a class="cz-thumb" href="#" data-demo="Build a Buddy is coming soon — create your own avatar and show off your style!"><img src="assets/cz-buddy.png" alt="Build a Buddy"></a>
+          <div class="cz-body">
+            <div class="cz-info"><h3><span class="cz-emoji">🧸</span> Build a Buddy</h3><p>Create your own avatar and show off your style!</p></div>
+            <a class="cz-open" href="#" data-demo="Build a Buddy is coming soon — create your own avatar and show off your style!">Open</a>
+          </div>
+        </article>
+
+        <article class="cz-card" style="--c:#ff8a3d">
+          <a class="cz-thumb" href="#" data-demo="Monthly Challenge is coming soon — join fun challenges and win prizes!"><img src="assets/cz-monthly.png" alt="Monthly Challenge"></a>
+          <div class="cz-body">
+            <div class="cz-info"><h3><span class="cz-emoji">🏆</span> Monthly Challenge</h3><p>Join fun challenges every month and win awesome prizes!</p></div>
+            <a class="cz-open" href="#" data-demo="Monthly Challenge is coming soon — join fun challenges and win prizes!">View</a>
+          </div>
+        </article>
+
+        <article class="cz-card" style="--c:#2fae5f">
+          <a class="cz-thumb" href="community.html"><img src="assets/cz-share.png" alt="Create &amp; Share"></a>
+          <div class="cz-body">
+            <div class="cz-info"><h3><span class="cz-emoji">🌟</span> Create &amp; Share</h3><p>Share your creations in the community and get awesome feedback!</p></div>
+            <a class="cz-open" href="community.html">Open</a>
           </div>
         </article>
 
@@ -85,8 +154,8 @@
 
       <div class="callout mt-3">
         <span class="ico" data-icon="gift"></span>
-        <div><h3>Printable packs delivered monthly</h3>
-          <p>Red 5 Club members get fresh printable activity packs every month — perfect for screen-free creativity. <a href="membership.html" style="color:var(--red);font-weight:700">Join for $4.99/month →</a></p>
+        <div><h3>New activities added all the time</h3>
+          <p>Red 5 Club members unlock the full creator toolbox plus fresh printable packs every month. <a href="membership.html" style="color:var(--red);font-weight:700">Join for $4.99/month →</a></p>
         </div>
       </div>
     </div>
@@ -95,7 +164,7 @@
   <section class="container">
     <div class="cta-band">
       <h2>Create even more with the Club</h2>
-      <p>Unlock printable packs, the full creator tools and a new craft every week.</p>
+      <p>Unlock every creator tool, printable packs and a new craft every week.</p>
       <div class="hero-actions">
         <a class="btn btn-yellow btn-lg" href="membership.html"><span data-icon="star"></span> Join Red 5 Club</a>
         <a class="btn btn-ghost btn-lg" href="play-zone.html">Go to Play Zone</a>
