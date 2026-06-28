@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Card Creator — Red 5</title>
+  <meta name="description" content="Design your very own Kindness Card — pick a background, add a sweet message and stickers, then print, save or share it!">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Baloo+2:wght@500;700&family=Caveat:wght@600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="assets/logo.png">
+  <style>
+    body{ margin:0; font-family:var(--font-body,'Nunito',sans-serif); background:#f3ecff; color:#2a2052; }
+    .cc-wrap{ min-height:100vh; display:flex; flex-direction:column; }
+
+    /* Top bar */
+    .cc-top{ display:flex; align-items:center; gap:.7rem; padding:.7rem 1rem;
+      background:linear-gradient(90deg,#ff5a8a,#7c4dff); color:#fff; flex-wrap:wrap;
+      box-shadow:0 4px 14px rgba(120,70,150,.25); position:sticky; top:0; z-index:20; }
+    .cc-back{ display:inline-flex; align-items:center; gap:.4rem; background:rgba(255,255,255,.2); color:#fff;
+      text-decoration:none; font-family:var(--font-display,'Fredoka'); font-weight:600; padding:.45rem .9rem;
+      border-radius:999px; font-size:.9rem; }
+    .cc-back:hover{ background:rgba(255,255,255,.32); }
+    .cc-title{ font-family:var(--font-display,'Fredoka'); font-weight:700; font-size:1.3rem; margin:0; letter-spacing:.4px; display:flex; align-items:center; gap:.4rem; }
+    .cc-spacer{ flex:1; }
+    .cc-btn{ border:none; cursor:pointer; font-family:var(--font-display,'Fredoka'); font-weight:600; font-size:.9rem;
+      padding:.55rem 1.1rem; border-radius:999px; color:#fff; display:inline-flex; align-items:center; gap:.4rem;
+      box-shadow:0 6px 14px rgba(0,0,0,.18); }
+    .cc-btn.save{ background:linear-gradient(135deg,#3ddc84,#22b566); }
+    .cc-btn.pdf{ background:linear-gradient(135deg,#ffb02e,#ff8a18); color:#4a3500; }
+    .cc-btn.print{ background:#fff; color:#e21f86; }
+    .cc-btn:hover{ filter:brightness(1.07); }
+
+    /* Layout */
+    .cc-main{ flex:1; display:grid; grid-template-columns:320px 1fr; gap:1.2rem; padding:1.2rem; align-items:start; }
+    @media (max-width:900px){ .cc-main{ grid-template-columns:1fr; } }
+
+    /* Stage */
+    .cc-stagewrap{ display:flex; flex-direction:column; align-items:center; gap:1rem; order:2; }
+    @media (max-width:900px){ .cc-stagewrap{ order:1; } .cc-panel{ order:2; } }
+    .cc-stage{ position:relative; width:min(420px,92vw); aspect-ratio:5 / 6; border-radius:24px; overflow:hidden;
+      box-shadow:0 24px 60px rgba(120,70,150,.32); background:#fff; touch-action:manipulation; }
+    .cc-card-face{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+      padding:8% 9%; box-sizing:border-box; text-align:center; gap:.5rem; transition:.2s; }
+    /* On image-art cards, drop the personal note into a soft panel near the bottom
+       so it never collides with the artwork's own lettering. */
+    .cc-stage.img-mode .cc-card-face{ justify-content:flex-end; padding-bottom:7%; }
+    .cc-stage.img-mode .cc-card-face.has-note{
+      background:linear-gradient(180deg,rgba(255,255,255,0) 45%, rgba(255,255,255,.86) 75%);
+    }
+    .cc-stage.img-mode .cc-card-face .cc-msg{ font-size:1.15rem; }
+    .cc-card-art{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+    .cc-to{ font-family:var(--cc-font,'Fredoka'); font-weight:700; font-size:1.05rem; opacity:.9; }
+    .cc-msg{ font-family:var(--cc-font,'Fredoka'); font-weight:700; font-size:1.55rem; line-height:1.2; white-space:pre-wrap; word-break:break-word; }
+    .cc-from{ font-family:var(--cc-font,'Fredoka'); font-weight:600; font-size:1rem; opacity:.9; margin-top:.3rem; }
+    .cc-stickers-layer{ position:absolute; inset:0; pointer-events:none; }
+    .cc-sticker{ position:absolute; font-size:2.2rem; transform:translate(-50%,-50%); pointer-events:auto; cursor:grab; user-select:none; line-height:1; filter:drop-shadow(0 2px 3px rgba(0,0,0,.2)); }
+    .cc-sticker.placing{ cursor:crosshair; }
+    .cc-hint{ font-size:.85rem; color:#7a6a8a; text-align:center; max-width:420px; }
+    .cc-hint b{ color:#e21f86; }
+    .cc-stage.aiming{ cursor:crosshair; outline:3px dashed #ff5a8a; outline-offset:-3px; }
+
+    /* Panel */
+    .cc-panel{ display:flex; flex-direction:column; gap:1rem; order:1; }
+    .cc-card{ background:#fff; border-radius:18px; padding:1rem 1.1rem; box-shadow:0 10px 26px rgba(120,90,130,.12); }
+    .cc-card h2{ font-family:var(--font-display,'Fredoka'); font-size:1rem; margin:0 0 .7rem; color:#7c4dff; display:flex; align-items:center; gap:.45rem; }
+    .cc-field{ margin-bottom:.7rem; }
+    .cc-field:last-child{ margin-bottom:0; }
+    .cc-field label{ display:block; font-size:.8rem; font-weight:700; color:#6a5a7a; margin-bottom:.3rem; }
+    .cc-field input[type=text], .cc-field textarea, .cc-field select{
+      width:100%; box-sizing:border-box; border:2px solid #efe3f4; border-radius:12px; padding:.55rem .7rem;
+      font-family:var(--font-body); font-size:.95rem; color:#2a2052; background:#fff; }
+    .cc-field textarea{ resize:vertical; min-height:64px; }
+    .cc-field input:focus, .cc-field textarea:focus, .cc-field select:focus{ outline:none; border-color:#ff5a8a; box-shadow:0 0 0 3px #ffe1ec; }
+
+    /* Design thumbnails */
+    .cc-designs{ display:grid; grid-template-columns:repeat(4,1fr); gap:.5rem; }
+    .cc-design{ aspect-ratio:5/6; border:3px solid transparent; border-radius:12px; cursor:pointer; overflow:hidden; padding:0; background:#eee; position:relative; }
+    .cc-design img{ width:100%; height:100%; object-fit:cover; display:block; }
+    .cc-design .lbl{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:1.4rem; }
+    .cc-design.sel{ border-color:#ff5a8a; box-shadow:0 0 0 2px #ffd0e0; }
+
+    /* Swatches */
+    .cc-swatches{ display:flex; flex-wrap:wrap; gap:.4rem; }
+    .cc-sw{ width:30px; height:30px; border-radius:50%; border:2px solid rgba(0,0,0,.08); cursor:pointer; padding:0; }
+    .cc-sw.sel{ border-color:#2a2052; box-shadow:0 0 0 2px #ffd23f; transform:scale(1.08); }
+    .cc-grad{ width:46px; height:30px; border-radius:8px; border:2px solid rgba(0,0,0,.08); cursor:pointer; padding:0; }
+    .cc-grad.sel{ border-color:#2a2052; box-shadow:0 0 0 2px #ffd23f; }
+
+    /* Fonts */
+    .cc-fonts{ display:flex; flex-wrap:wrap; gap:.4rem; }
+    .cc-fontbtn{ border:2px solid #efe3f4; background:#fff; cursor:pointer; padding:.35rem .7rem; border-radius:10px; font-size:1rem; color:#2a2052; }
+    .cc-fontbtn.sel{ border-color:#7c4dff; box-shadow:0 0 0 2px #e7deff; }
+
+    /* Sticker tray */
+    .cc-tray{ display:flex; flex-wrap:wrap; gap:.4rem; }
+    .cc-tray button{ width:42px; height:42px; font-size:1.5rem; background:#faf6ff; border:2px solid #efe3f4; border-radius:12px; cursor:pointer; line-height:1; }
+    .cc-tray button:hover{ border-color:#ff5a8a; }
+    .cc-tray button.armed{ border-color:#ff5a8a; background:#ffe9f1; box-shadow:0 0 0 2px #ffd0e0; }
+    .cc-clearstick{ margin-top:.5rem; background:none; border:none; color:#e21f86; font-weight:700; cursor:pointer; font-size:.85rem; padding:0; }
+
+    /* AI assistant */
+    .cc-ai{ background:linear-gradient(135deg,#f3ecff,#fde7ef); }
+    .cc-ai .row{ display:flex; gap:.5rem; align-items:flex-end; }
+    .cc-ai .row .cc-field{ flex:1; margin-bottom:0; }
+    .cc-suggest{ border:none; cursor:pointer; background:linear-gradient(135deg,#7c4dff,#5e40d8); color:#fff;
+      font-family:var(--font-display); font-weight:600; padding:.6rem .9rem; border-radius:12px; white-space:nowrap; box-shadow:0 6px 14px rgba(124,77,255,.3); }
+    .cc-suggest:hover{ filter:brightness(1.08); }
+    .cc-ai p.note{ font-size:.75rem; color:#8a7a9a; margin:.6rem 0 0; }
+
+    /* Finish prompt modal */
+    .cc-modal{ position:fixed; inset:0; background:rgba(40,20,60,.55); display:none; align-items:center; justify-content:center; z-index:60; padding:1rem; }
+    .cc-modal.show{ display:flex; }
+    .cc-modal-box{ background:#fff; border-radius:24px; max-width:460px; width:100%; padding:1.6rem 1.5rem; box-shadow:0 30px 70px rgba(0,0,0,.4); text-align:center; }
+    .cc-modal-box h3{ font-family:var(--font-display); color:#e21f86; font-size:1.4rem; margin:.2rem 0 .4rem; }
+    .cc-modal-box p{ color:#6a5a7a; margin:0 0 1rem; }
+    .cc-ideas{ display:flex; flex-wrap:wrap; gap:.45rem; justify-content:center; margin-bottom:1.2rem; }
+    .cc-ideas span{ background:#f3ecff; color:#7c4dff; font-weight:700; font-size:.82rem; padding:.4em .8em; border-radius:999px; }
+    .cc-modal-close{ border:none; cursor:pointer; background:linear-gradient(135deg,#ff5a8a,#e21f86); color:#fff; font-family:var(--font-display); font-weight:600; padding:.6rem 1.4rem; border-radius:999px; font-size:1rem; }
+
+    .toast{ position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(20px); background:#2b2150; color:#fff;
+      padding:.7rem 1.2rem; border-radius:999px; box-shadow:0 10px 30px rgba(0,0,0,.4); opacity:0; pointer-events:none; transition:.25s; font-weight:600; z-index:70; }
+    .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+    /* ===== Print: only the card, as a nice big printable ===== */
+    @media print{
+      .cc-top, .cc-panel, .cc-hint, .cc-stagewrap > .cc-hint, .toast, .cc-modal{ display:none !important; }
+      body{ background:#fff; }
+      .cc-main{ display:block; padding:0; }
+      .cc-stagewrap{ display:block; }
+      .cc-stage{ width:6.5in !important; height:auto !important; aspect-ratio:5/6; margin:0.4in auto; box-shadow:none !important; border:1px solid #ddd; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    }
+  </style>
+</head>
+<body>
+  <div class="cc-wrap">
+    <div class="cc-top">
+      <a class="cc-back" href="kindness-cards.html">← Back to Cards</a>
+      <h1 class="cc-title">💌 Card Creator</h1>
+      <div class="cc-spacer"></div>
+      <button class="cc-btn print" id="ccPrint" type="button">🖨 Print Card</button>
+      <button class="cc-btn save" id="ccSave" type="button">⬇ Save PNG</button>
+      <button class="cc-btn pdf" id="ccPdf" type="button">📄 Download PDF</button>
+    </div>
+
+    <div class="cc-main">
+      <!-- LEFT PANEL -->
+      <div class="cc-panel">
+        <div class="cc-card">
+          <h2>✍️ Your message</h2>
+          <div class="cc-field"><label for="ccTo">To (recipient name)</label><input type="text" id="ccTo" placeholder="e.g. Grandma" maxlength="30"></div>
+          <div class="cc-field"><label for="ccMsg">Message</label><textarea id="ccMsg" maxlength="200" placeholder="Write something kind…"></textarea></div>
+          <div class="cc-field"><label for="ccFrom">From (your name)</label><input type="text" id="ccFrom" placeholder="e.g. Sam" maxlength="30"></div>
+        </div>
+
+        <div class="cc-card cc-ai">
+          <h2>💡 Need help writing?</h2>
+          <div class="row">
+            <div class="cc-field"><label for="ccWho">Who is it for?</label>
+              <select id="ccWho">
+                <option value="Friend">A Friend</option>
+                <option value="Teacher">A Teacher</option>
+                <option value="Parent">A Parent</option>
+                <option value="Grandparent">A Grandparent</option>
+                <option value="Sibling">A Sibling</option>
+                <option value="Coach">A Coach</option>
+                <option value="Anyone">Anyone</option>
+              </select>
+            </div>
+            <button class="cc-suggest" id="ccSuggest" type="button">Suggest a message</button>
+          </div>
+          <p class="note">Kind, friendly ideas written just for you — tap again for a new one!</p>
+        </div>
+
+        <div class="cc-card">
+          <h2>🎨 Card design</h2>
+          <div class="cc-designs" id="ccDesigns"></div>
+        </div>
+
+        <div class="cc-card">
+          <h2>🅰️ Font &amp; text color</h2>
+          <div class="cc-field"><label>Font style</label><div class="cc-fonts" id="ccFonts"></div></div>
+          <div class="cc-field"><label>Text color</label><div class="cc-swatches" id="ccTextColors"></div></div>
+        </div>
+
+        <div class="cc-card">
+          <h2>🌈 Background</h2>
+          <div class="cc-field"><label>Pastel gradients</label><div class="cc-swatches" id="ccGrads"></div></div>
+          <div class="cc-field"><label>Solid colors</label><div class="cc-swatches" id="ccBgColors"></div></div>
+        </div>
+
+        <div class="cc-card">
+          <h2>✨ Add stickers</h2>
+          <p style="font-size:.8rem;color:#6a5a7a;margin:0 0 .6rem">Tap a sticker, then tap your card to place it. Drag stickers to move them.</p>
+          <div class="cc-tray" id="ccTray"></div>
+          <button class="cc-clearstick" id="ccClearStick" type="button">Clear stickers</button>
+        </div>
+      </div>
+
+      <!-- STAGE -->
+      <div class="cc-stagewrap">
+        <div class="cc-stage" id="ccStage">
+          <img class="cc-card-art" id="ccArt" alt="" style="display:none">
+          <div class="cc-card-face" id="ccFace">
+            <div class="cc-to" id="ccFaceTo"></div>
+            <div class="cc-msg" id="ccFaceMsg">Write something kind…</div>
+            <div class="cc-from" id="ccFaceFrom"></div>
+          </div>
+          <div class="cc-stickers-layer" id="ccStickers"></div>
+        </div>
+        <p class="cc-hint" id="ccHint">Pick a design, write a message, then <b>Print</b> or <b>Save</b> your card! Your work is saved automatically. 💛</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Finish prompt -->
+  <div class="cc-modal" id="ccModal">
+    <div class="cc-modal-box">
+      <div style="font-size:2.6rem">💛</div>
+      <h3>Who could smile because of this today?</h3>
+      <p>Your card is ready! Here are some people who would love a little kindness:</p>
+      <div class="cc-ideas">
+        <span>Parent</span><span>Grandparent</span><span>Teacher</span><span>Neighbor</span>
+        <span>Coach</span><span>Friend</span><span>Sibling</span><span>Hospital patient</span>
+        <span>Military member</span><span>Nursing home resident</span>
+      </div>
+      <button class="cc-modal-close" id="ccModalClose" type="button">Got it!</button>
+    </div>
+  </div>
+
+  <div class="toast" id="ccToast"></div>
+  <script src="kindness-cards.js" defer></script>
+  <script src="card-creator.js" defer></script>
+</body>
+</html>

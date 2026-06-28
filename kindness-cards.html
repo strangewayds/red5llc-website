@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kindness Cards — Red 5</title>
+  <meta name="description" content="Create, personalize and print beautiful Kindness Cards that brighten someone's day. Browse a library of sweet card designs for every occasion.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="assets/logo.png">
+  <script src="app.js" defer></script>
+  <style>
+    /* ===== Kindness Cards library — scoped to this page only ===== */
+    body[data-page="kindness"]{ --kc-pink:#ff5a8a; --kc-purple:#7c4dff; --kc-blue:#2ba8e0; }
+    body[data-page="kindness"] .page-hero{
+      background:linear-gradient(180deg,#fde7ef 0%, #f3ecff 45%, #ffffff 100%);
+    }
+    body[data-page="kindness"] .kc-hero-actions{ display:flex; flex-wrap:wrap; gap:.7rem; margin-top:1.1rem; }
+
+    /* Toolbar: search + chips */
+    body[data-page="kindness"] .kc-toolbar{ margin-bottom:1.4rem; }
+    body[data-page="kindness"] .kc-search{
+      position:relative; max-width:520px; margin:0 auto 1.1rem;
+    }
+    body[data-page="kindness"] .kc-search input{
+      width:100%; box-sizing:border-box; border:2px solid #f0d9e6; background:#fff;
+      border-radius:999px; padding:.85rem 1.1rem .85rem 2.9rem; font-size:1rem;
+      font-family:var(--font-body); color:var(--navy); box-shadow:0 8px 22px rgba(170,120,170,.12);
+    }
+    body[data-page="kindness"] .kc-search input:focus{ outline:none; border-color:var(--kc-pink); box-shadow:0 0 0 4px #ffe1ec; }
+    body[data-page="kindness"] .kc-search .kc-mag{ position:absolute; left:1.05rem; top:50%; transform:translateY(-50%); width:20px; height:20px; color:var(--kc-pink); }
+    body[data-page="kindness"] .kc-chips{
+      display:flex; flex-wrap:wrap; gap:.5rem; justify-content:center;
+    }
+    body[data-page="kindness"] .kc-chip{
+      border:2px solid #efe3f4; background:#fff; color:#6a5a7a; cursor:pointer;
+      font-family:var(--font-display); font-weight:600; font-size:.86rem;
+      padding:.45rem 1rem; border-radius:999px; transition:.15s;
+      display:inline-flex; align-items:center; gap:.35rem;
+    }
+    body[data-page="kindness"] .kc-chip:hover{ border-color:var(--kc-purple); color:var(--kc-purple); transform:translateY(-1px); }
+    body[data-page="kindness"] .kc-chip.active{
+      background:linear-gradient(135deg,var(--kc-pink),#e21f86); color:#fff; border-color:transparent;
+      box-shadow:0 8px 16px rgba(226,31,134,.28);
+    }
+
+    /* Card grid */
+    body[data-page="kindness"] .kc-grid{
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:1.3rem;
+    }
+    body[data-page="kindness"] .kc-card{
+      background:#fff; border:1px solid #f1e7ef; border-radius:22px; overflow:hidden;
+      display:flex; flex-direction:column; box-shadow:0 12px 30px rgba(150,110,150,.12);
+      transition:transform .16s ease, box-shadow .16s ease;
+    }
+    body[data-page="kindness"] .kc-card:hover{ transform:translateY(-5px); box-shadow:0 22px 46px rgba(150,110,150,.22); }
+    body[data-page="kindness"] .kc-preview{
+      position:relative; aspect-ratio:5 / 6; overflow:hidden;
+      background:var(--kc-bg, linear-gradient(160deg,#fff5f9,#f3ecff));
+      display:flex; align-items:center; justify-content:center;
+    }
+    body[data-page="kindness"] .kc-preview img{ width:100%; height:100%; object-fit:cover; display:block; }
+    /* Generated (no-image) pastel previews */
+    body[data-page="kindness"] .kc-art{
+      width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center;
+      text-align:center; padding:1rem; box-sizing:border-box; gap:.4rem;
+    }
+    body[data-page="kindness"] .kc-art .kc-emoji{ font-size:2.6rem; line-height:1; filter:drop-shadow(0 4px 6px rgba(0,0,0,.12)); }
+    body[data-page="kindness"] .kc-art .kc-line{
+      font-family:var(--font-display); font-weight:700; font-size:1.15rem; line-height:1.15;
+      color:var(--kc-fg,#5b3fb0); text-shadow:0 1px 0 rgba(255,255,255,.6);
+    }
+    /* Favorite heart */
+    body[data-page="kindness"] .kc-fav{
+      position:absolute; top:.6rem; right:.6rem; width:38px; height:38px; border:none; cursor:pointer;
+      border-radius:50%; background:rgba(255,255,255,.85); backdrop-filter:blur(3px);
+      display:grid; place-items:center; box-shadow:0 4px 10px rgba(0,0,0,.14); transition:.15s;
+    }
+    body[data-page="kindness"] .kc-fav:hover{ transform:scale(1.1); }
+    body[data-page="kindness"] .kc-fav svg{ width:20px; height:20px; color:#cdbcd0; transition:.15s; }
+    body[data-page="kindness"] .kc-fav.on svg{ color:var(--kc-pink); }
+    body[data-page="kindness"] .kc-fav.on{ animation:kcpop .3s ease; }
+    @keyframes kcpop{ 0%{transform:scale(1);} 50%{transform:scale(1.25);} 100%{transform:scale(1);} }
+    /* Card body */
+    body[data-page="kindness"] .kc-body{ padding:.85rem 1rem 1.05rem; display:flex; flex-direction:column; gap:.55rem; flex:1; }
+    body[data-page="kindness"] .kc-cat{
+      align-self:flex-start; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.03em;
+      color:var(--kc-purple); background:#f1ebff; padding:.22em .7em; border-radius:999px;
+    }
+    body[data-page="kindness"] .kc-title{ margin:0; font-family:var(--font-display); font-weight:700; font-size:1.05rem; color:var(--navy); }
+    body[data-page="kindness"] .kc-personalize{
+      margin-top:auto; text-decoration:none; text-align:center; cursor:pointer; border:none;
+      font-family:var(--font-display); font-weight:600; font-size:.92rem; color:#fff;
+      background:linear-gradient(135deg,var(--kc-purple),#5e40d8); padding:.6rem 1rem; border-radius:999px;
+      box-shadow:0 8px 16px rgba(124,77,255,.3); transition:.15s; display:inline-flex; align-items:center; justify-content:center; gap:.4rem;
+    }
+    body[data-page="kindness"] .kc-personalize:hover{ filter:brightness(1.07); transform:translateY(-1px); }
+
+    body[data-page="kindness"] .kc-empty{ text-align:center; color:var(--muted); padding:3rem 1rem; font-size:1.05rem; display:none; }
+    body[data-page="kindness"] .kc-count{ text-align:center; color:var(--muted); font-size:.9rem; margin-top:1.2rem; }
+
+    /* "Why kindness" strip */
+    body[data-page="kindness"] .kc-why{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem; }
+    body[data-page="kindness"] .kc-why .tile h3{ display:flex; align-items:center; gap:.5rem; }
+    body[data-page="kindness"] .kc-why .dot{ font-size:1.4rem; }
+  </style>
+</head>
+<body data-page="kindness" class="accent-red">
+
+  <section class="page-hero">
+    <div class="container">
+      <div class="breadcrumb"><a href="index.html">Home</a> / <a href="create-zone.html">Create Zone</a> / Kindness Cards</div>
+      <span class="eyebrow"><span data-icon="heart"></span> Kindness Cards</span>
+      <h1>Kindness Cards</h1>
+      <p>Create, personalize and print beautiful cards that brighten someone's day.</p>
+      <div class="kc-hero-actions">
+        <a class="btn btn-red btn-lg" href="card-creator.html"><span data-icon="pencil"></span> Create Your Own Card</a>
+        <a class="btn btn-outline btn-lg" href="#kc-library">Browse Cards</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="kc-library">
+    <div class="container">
+      <div class="kc-toolbar">
+        <div class="kc-search">
+          <span class="kc-mag" data-icon-raw="search"></span>
+          <input type="search" id="kcSearch" placeholder="Search kindness cards…" aria-label="Search cards">
+        </div>
+        <div class="kc-chips" id="kcChips"></div>
+      </div>
+
+      <div class="kc-grid" id="kcGrid"></div>
+      <p class="kc-empty" id="kcEmpty">No cards match that yet — try another category or search. 💛</p>
+      <p class="kc-count" id="kcCount"></p>
+    </div>
+  </section>
+
+  <section class="section alt">
+    <div class="container">
+      <div class="section-head"><h2>Why kindness matters</h2><p>Little notes make a big difference.</p></div>
+      <div class="kc-why">
+        <div class="tile"><h3><span class="dot">💪</span> Builds confidence</h3><p>Sharing kind words helps you and others feel brave and valued.</p></div>
+        <div class="tile"><h3><span class="dot">🌟</span> Spreads positivity</h3><p>One happy card can turn somebody's whole day around.</p></div>
+        <div class="tile"><h3><span class="dot">🤝</span> Creates connections</h3><p>Kindness brings friends, family and neighbors closer together.</p></div>
+        <div class="tile"><h3><span class="dot">🌍</span> Makes the world better</h3><p>Small acts of kindness add up to a kinder world for everyone.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container">
+    <div class="cta-band">
+      <h2>Ready to make someone smile?</h2>
+      <p>Design your very own card, add a sweet message, and print it to share.</p>
+      <div class="hero-actions">
+        <a class="btn btn-yellow btn-lg" href="card-creator.html"><span data-icon="star"></span> Open the Card Creator</a>
+        <a class="btn btn-ghost btn-lg" href="create-zone.html">Back to Create Zone</a>
+      </div>
+    </div>
+  </section>
+
+  <script src="kindness-cards.js" defer></script>
+</body>
+</html>
