@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Craft — Red 5</title>
+  <meta name="description" content="Follow easy step-by-step instructions to make a fun craft at home.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="assets/logo.png">
+  <script src="app.js" defer></script>
+  <script src="craft-lab.js" defer></script>
+  <style>
+    body[data-page="craft"]{ --accent:#ff5a8a; --accent-soft:#ffe6ef; }
+
+    body[data-page="craft"] .cd-layout{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.05fr); gap:2rem; align-items:start; }
+    @media (max-width:880px){ body[data-page="craft"] .cd-layout{ grid-template-columns:1fr; } }
+
+    /* left: hero image + facts */
+    body[data-page="craft"] .cd-hero{
+      border-radius:24px; overflow:hidden; box-shadow:0 18px 44px rgba(170,110,140,.2);
+      background:var(--accent-soft); aspect-ratio:258 / 152;
+    }
+    body[data-page="craft"] .cd-hero img{ width:100%; height:100%; object-fit:cover; display:block; }
+    body[data-page="craft"] .cd-meta{ display:flex; flex-wrap:wrap; gap:.5rem; margin:1rem 0 1.1rem; }
+    body[data-page="craft"] .cd-pill{
+      display:inline-flex; align-items:center; gap:.35rem; font-family:var(--font-display,'Fredoka');
+      font-weight:700; font-size:.85rem; padding:.4em .85em; border-radius:999px;
+    }
+    body[data-page="craft"] .cd-pill.easy{ background:#e3f6e6; color:#1c7c34; }
+    body[data-page="craft"] .cd-pill.medium{ background:#ffece0; color:#c2611a; }
+    body[data-page="craft"] .cd-pill.time{ background:var(--accent-soft); color:#c0376a; }
+    body[data-page="craft"] .cd-actions{ display:flex; flex-wrap:wrap; gap:.6rem; margin:1.2rem 0; }
+    body[data-page="craft"] .cd-btn{
+      border:none; cursor:pointer; font-family:var(--font-display,'Fredoka'); font-weight:600;
+      font-size:.92rem; padding:.6rem 1.15rem; border-radius:999px; display:inline-flex; align-items:center;
+      gap:.45rem; transition:.15s ease;
+    }
+    body[data-page="craft"] .cd-btn.primary{ background:linear-gradient(135deg,#ff7aa6,#ff4f8b); color:#fff; box-shadow:0 8px 18px rgba(255,90,138,.32); }
+    body[data-page="craft"] .cd-btn.ghost{ background:#fff; color:#b03667; border:2px solid #ffd3e1; }
+    body[data-page="craft"] .cd-btn:hover{ filter:brightness(1.04); transform:translateY(-1px); }
+    body[data-page="craft"] .cd-btn svg{ width:18px; height:18px; }
+    body[data-page="craft"] .cd-fav.on{ background:#ff3d7f; color:#fff; border-color:transparent; }
+
+    body[data-page="craft"] .cd-parents{
+      background:#fff; border:1px solid #f2e7ec; border-radius:16px; padding:1rem 1.1rem; margin-top:.5rem;
+      box-shadow:0 8px 22px rgba(170,110,140,.1);
+    }
+    body[data-page="craft"] .cd-parents h4{ margin:0 0 .5rem; font-size:.95rem; color:#4a2e44; display:flex; align-items:center; gap:.4rem; }
+    body[data-page="craft"] .cd-parents ul{ margin:0; padding:0; list-style:none; display:grid; gap:.35rem; }
+    body[data-page="craft"] .cd-parents li{ font-size:.88rem; color:var(--muted); }
+    body[data-page="craft"] .cd-parents li b{ color:#4a2e44; }
+
+    /* right: materials + steps */
+    body[data-page="craft"] .cd-card{
+      background:#fff; border:1px solid #f2e7ec; border-radius:20px; padding:1.3rem 1.4rem; margin-bottom:1.4rem;
+      box-shadow:0 12px 30px rgba(170,110,140,.12);
+    }
+    body[data-page="craft"] .cd-card h2{ margin:0 0 .9rem; font-size:1.2rem; color:#4a2e44; display:flex; align-items:center; gap:.5rem; }
+    body[data-page="craft"] .cd-card h2 .n{ background:var(--accent-soft); color:var(--accent); width:1.7em; height:1.7em; border-radius:50%; display:grid; place-items:center; font-size:.9rem; }
+
+    body[data-page="craft"] .cd-check{ list-style:none; margin:0; padding:0; display:grid; gap:.55rem; }
+    body[data-page="craft"] .cd-check li{ }
+    body[data-page="craft"] .cd-check label{
+      display:flex; align-items:flex-start; gap:.7rem; cursor:pointer; font-size:.95rem; color:#4a3a45;
+      padding:.55rem .7rem; border-radius:12px; background:#fff7fa; border:1px solid #fbe7ef;
+    }
+    body[data-page="craft"] .cd-check input{ width:20px; height:20px; margin-top:1px; accent-color:#ff4f8b; flex:none; }
+    body[data-page="craft"] .cd-check input:checked + span{ text-decoration:line-through; color:#a98c9a; }
+    body[data-page="craft"] .cd-supplyhint{ font-size:.82rem; color:var(--muted); margin:.8rem 0 0; }
+
+    /* progress tracker */
+    body[data-page="craft"] .cd-progress{ display:flex; align-items:center; gap:.8rem; margin-bottom:1rem; }
+    body[data-page="craft"] .cd-bar{ flex:1; height:12px; border-radius:999px; background:#fbe7ef; overflow:hidden; }
+    body[data-page="craft"] .cd-bar i{ display:block; height:100%; width:0; border-radius:999px; background:linear-gradient(90deg,#ff7aa6,#ff4f8b); transition:width .3s ease; }
+    body[data-page="craft"] .cd-progress span{ font-family:var(--font-display,'Fredoka'); font-weight:700; font-size:.85rem; color:#b03667; white-space:nowrap; }
+
+    body[data-page="craft"] .cd-steps{ list-style:none; margin:0; padding:0; counter-reset:step; display:grid; gap:.8rem; }
+    body[data-page="craft"] .cd-step{
+      display:flex; align-items:flex-start; gap:.9rem; padding:.85rem 1rem; border-radius:14px;
+      background:#fff7fa; border:1px solid #fbe7ef; transition:.15s ease;
+    }
+    body[data-page="craft"] .cd-step.done{ background:#eafaef; border-color:#cdeed5; }
+    body[data-page="craft"] .cd-step .num{
+      flex:none; width:30px; height:30px; border-radius:50%; background:var(--accent); color:#fff;
+      display:grid; place-items:center; font-family:var(--font-display,'Fredoka'); font-weight:700; font-size:.9rem;
+    }
+    body[data-page="craft"] .cd-step.done .num{ background:#2eae5f; }
+    body[data-page="craft"] .cd-step p{ margin:0; flex:1; font-size:.95rem; color:#4a3a45; line-height:1.45; }
+    body[data-page="craft"] .cd-step button{
+      flex:none; border:none; cursor:pointer; font-family:var(--font-display,'Fredoka'); font-weight:700;
+      font-size:.78rem; padding:.4rem .8rem; border-radius:999px; background:var(--accent-soft); color:#b03667;
+    }
+    body[data-page="craft"] .cd-step.done button{ background:#cdeed5; color:#1c7c34; }
+
+    body[data-page="craft"] .cd-done-banner{
+      display:none; margin-top:1rem; text-align:center; padding:1rem; border-radius:16px;
+      background:linear-gradient(135deg,#fff0f6,#ffe6ef); border:1px dashed #ffaecb;
+      font-family:var(--font-display,'Fredoka'); font-weight:700; color:#c0376a;
+    }
+    body[data-page="craft"] .cd-done-banner.show{ display:block; }
+
+    body[data-page="craft"] .cd-notfound{ text-align:center; padding:3rem 1rem; }
+
+    /* clean printable view (only shows on print) */
+    .cd-print{ display:none; }
+    @media print{
+      body{ background:#fff !important; }
+      body * { visibility:hidden; }
+      .cd-print, .cd-print * { visibility:visible; }
+      .cd-print{ display:block; position:absolute; left:0; top:0; width:100%; padding:1.5rem 2rem; color:#000; font-family:'Nunito',sans-serif; }
+      .cd-print h1{ font-family:'Fredoka',sans-serif; margin:0 0 .2rem; }
+      .cd-print .sub{ color:#555; margin:0 0 1.2rem; }
+      .cd-print h2{ font-family:'Fredoka',sans-serif; border-bottom:2px solid #ff4f8b; padding-bottom:.2rem; margin:1.2rem 0 .6rem; }
+      .cd-print ul, .cd-print ol{ margin:0; padding-left:1.4rem; line-height:1.7; }
+      .cd-print .foot{ margin-top:1.5rem; font-size:.8rem; color:#777; }
+    }
+  </style>
+</head>
+<body data-page="craft" class="accent-red">
+
+  <section class="page-hero">
+    <div class="container">
+      <div class="breadcrumb"><a href="index.html">Home</a> / <a href="craft-lab.html">Craft Lab</a> / <span id="cdCrumb">Craft</span></div>
+      <span class="eyebrow"><span data-icon="palette"></span> Craft Lab</span>
+      <h1 id="cdTitle">Loading…</h1>
+      <p id="cdDesc"></p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container" id="cdContainer"><!-- filled by JS --></div>
+  </section>
+
+  <!-- Clean printable version (hidden on screen, shown on print / save-as-PDF) -->
+  <div class="cd-print" id="cdPrint"></div>
+
+  <script>
+  (function () {
+    function ready(fn){ if(document.readyState!=="loading"){ fn(); } else { document.addEventListener("DOMContentLoaded", fn); } }
+    function param(name){
+      var m = new RegExp("[?&]" + name + "=([^&]*)").exec(window.location.search);
+      return m ? decodeURIComponent(m[1].replace(/\+/g, " ")) : null;
+    }
+    function toast(msg){ if (window.RED5_TOAST) window.RED5_TOAST(msg); else alert(msg); }
+    function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]; }); }
+
+    ready(function () {
+      var data = window.CraftLab;
+      var container = document.getElementById("cdContainer");
+      if (!data) return;
+
+      var id = param("craft");
+      var craft = id ? data.getCraft(id) : null;
+
+      if (!craft) {
+        document.getElementById("cdTitle").textContent = "Craft not found";
+        document.getElementById("cdDesc").textContent = "We couldn't find that craft.";
+        container.innerHTML = '<div class="cd-notfound"><p style="font-size:1.1rem;font-weight:800;color:#4a2e44">Hmm, that craft is missing.</p><p><a class="cd-btn primary" href="craft-lab.html">← Back to Craft Lab</a></p></div>';
+        return;
+      }
+
+      // ---- hero text ----
+      document.title = craft.title + " — Red 5";
+      document.getElementById("cdCrumb").textContent = craft.title;
+      document.getElementById("cdTitle").textContent = craft.title;
+      document.getElementById("cdDesc").textContent = craft.description;
+
+      var diffClass = craft.difficulty.toLowerCase() === "easy" ? "easy" : "medium";
+      var favOn = data.isFavorite(craft.id);
+      var HEART_SVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-10-9.1C.4 8.6 2 5 5.4 5c2 0 3.4 1.1 4.3 2.4l.3.4.3-.4C11.2 6.1 12.6 5 14.6 5 18 5 19.6 8.6 22 11.9 19.5 16.4 12 21 12 21z"/></svg>';
+
+      // ---- build layout ----
+      var matsHtml = craft.materials.map(function (m, i) {
+        return '<li><label><input type="checkbox" data-mat="' + i + '"><span>' + esc(m) + '</span></label></li>';
+      }).join("");
+
+      var stepsHtml = craft.steps.map(function (s, i) {
+        return '<li class="cd-step" data-step="' + i + '">' +
+          '<span class="num">' + (i + 1) + '</span>' +
+          '<p>' + esc(s) + '</p>' +
+          '<button type="button" class="cd-mark">Done</button>' +
+        '</li>';
+      }).join("");
+
+      container.innerHTML =
+        '<div class="cd-layout">' +
+          '<div class="cd-left">' +
+            '<div class="cd-hero"><img src="' + craft.image + '" alt="' + esc(craft.title) + '"></div>' +
+            '<div class="cd-meta">' +
+              '<span class="cd-pill ' + diffClass + '">' + craft.difficulty + '</span>' +
+              '<span class="cd-pill time">⏱ ' + craft.time + ' min</span>' +
+            '</div>' +
+            '<div class="cd-actions">' +
+              '<button type="button" class="cd-btn ghost cd-fav' + (favOn ? " on" : "") + '" id="cdFav">' + HEART_SVG + '<span>' + (favOn ? "Saved" : "Save") + '</span></button>' +
+              '<button type="button" class="cd-btn primary" id="cdPrintBtn">🖨 Print Instructions</button>' +
+              '<button type="button" class="cd-btn ghost" id="cdVideoBtn">▶ Watch Video</button>' +
+              '<button type="button" class="cd-btn ghost" id="cdPdfBtn">⬇ Download PDF</button>' +
+            '</div>' +
+            '<div class="cd-parents">' +
+              '<h4><span data-icon="shield"></span> For grown-ups</h4>' +
+              '<ul>' +
+                '<li><b>Recommended age:</b> ' + esc(craft.age) + '</li>' +
+                '<li><b>Adult supervision:</b> ' + esc(craft.supervision) + '</li>' +
+                '<li><b>Mess level:</b> ' + esc(craft.mess) + '</li>' +
+                '<li><b>Time:</b> about ' + craft.time + ' minutes</li>' +
+                '<li><b>Safety:</b> uses only child-safe materials — no fire, no harsh chemicals.</li>' +
+              '</ul>' +
+            '</div>' +
+          '</div>' +
+
+          '<div class="cd-right">' +
+            '<div class="cd-card">' +
+              '<h2><span class="n">1</span> Supplies Checklist</h2>' +
+              '<ul class="cd-check" id="cdMats">' + matsHtml + '</ul>' +
+              '<p class="cd-supplyhint">Tap each item once you have it ready. We\'ll remember for you!</p>' +
+            '</div>' +
+            '<div class="cd-card">' +
+              '<h2><span class="n">2</span> Step-by-Step</h2>' +
+              '<div class="cd-progress"><div class="cd-bar"><i id="cdBar"></i></div><span id="cdProgText">Step 0 of ' + craft.steps.length + '</span></div>' +
+              '<ol class="cd-steps" id="cdSteps">' + stepsHtml + '</ol>' +
+              '<div class="cd-done-banner" id="cdDoneBanner">🎉 You did it! Great job making your ' + esc(craft.title) + '!</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+
+      // hydrate any data-icon we injected above (app.js only runs once on load)
+      if (window.RED5_ICONS) {
+        container.querySelectorAll("[data-icon]").forEach(function (el) {
+          var n = el.getAttribute("data-icon");
+          if (window.RED5_ICONS[n]) el.innerHTML = window.RED5_ICONS[n];
+        });
+      }
+
+      // ---- favorite ----
+      var favBtn = document.getElementById("cdFav");
+      favBtn.addEventListener("click", function () {
+        var on = data.toggleFavorite(craft.id);
+        favBtn.classList.toggle("on", on);
+        favBtn.querySelector("span").textContent = on ? "Saved" : "Save";
+      });
+
+      // ---- materials checklist (persist per craft) ----
+      var MAT_KEY = "red5.craft.mats." + craft.id;
+      function getMats(){ try { return JSON.parse(localStorage.getItem(MAT_KEY)) || {}; } catch(e){ return {}; } }
+      function saveMats(o){ try { localStorage.setItem(MAT_KEY, JSON.stringify(o)); } catch(e){} }
+      var matState = getMats();
+      document.querySelectorAll("#cdMats input[type=checkbox]").forEach(function (cb) {
+        var i = cb.getAttribute("data-mat");
+        cb.checked = !!matState[i];
+        cb.addEventListener("change", function () {
+          matState[i] = cb.checked;
+          saveMats(matState);
+        });
+      });
+
+      // ---- step progress (persist per craft) ----
+      var STEP_KEY = "red5.craft.steps." + craft.id;
+      function getSteps(){ try { return JSON.parse(localStorage.getItem(STEP_KEY)) || {}; } catch(e){ return {}; } }
+      function saveSteps(o){ try { localStorage.setItem(STEP_KEY, JSON.stringify(o)); } catch(e){} }
+      var stepState = getSteps();
+      var total = craft.steps.length;
+      var bar = document.getElementById("cdBar");
+      var progText = document.getElementById("cdProgText");
+      var doneBanner = document.getElementById("cdDoneBanner");
+
+      function refreshProgress() {
+        var done = 0;
+        document.querySelectorAll("#cdSteps .cd-step").forEach(function (li) {
+          var i = li.getAttribute("data-step");
+          var isDone = !!stepState[i];
+          li.classList.toggle("done", isDone);
+          li.querySelector(".cd-mark").textContent = isDone ? "✓ Done" : "Done";
+          if (isDone) done++;
+        });
+        bar.style.width = Math.round((done / total) * 100) + "%";
+        progText.textContent = "Step " + done + " of " + total;
+        doneBanner.classList.toggle("show", done === total);
+      }
+
+      document.querySelectorAll("#cdSteps .cd-step .cd-mark").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var li = btn.closest(".cd-step");
+          var i = li.getAttribute("data-step");
+          stepState[i] = !stepState[i];
+          saveSteps(stepState);
+          refreshProgress();
+        });
+      });
+      refreshProgress();
+
+      // ---- printable view ----
+      var printEl = document.getElementById("cdPrint");
+      printEl.innerHTML =
+        '<h1>' + esc(craft.title) + '</h1>' +
+        '<p class="sub">' + esc(craft.description) + '</p>' +
+        '<p class="sub"><b>Difficulty:</b> ' + craft.difficulty + '  •  <b>Time:</b> about ' + craft.time + ' min  •  <b>Ages:</b> ' + esc(craft.age) + '</p>' +
+        '<h2>Materials</h2>' +
+        '<ul>' + craft.materials.map(function (m) { return '<li>' + esc(m) + '</li>'; }).join("") + '</ul>' +
+        '<h2>Steps</h2>' +
+        '<ol>' + craft.steps.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join("") + '</ol>' +
+        '<p class="foot">Adult supervision: ' + esc(craft.supervision) + '. Mess level: ' + esc(craft.mess) + '. Uses only child-safe materials. — Red 5 Craft Lab</p>';
+
+      document.getElementById("cdPrintBtn").addEventListener("click", function () { window.print(); });
+      document.getElementById("cdPdfBtn").addEventListener("click", function () {
+        toast("Tip: choose “Save as PDF” in the print window to download it!");
+        setTimeout(function(){ window.print(); }, 700);
+      });
+      document.getElementById("cdVideoBtn").addEventListener("click", function () {
+        toast("Rosie video coming soon! 🎥");
+      });
+    });
+  })();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Craft Lab — Red 5</title>
+  <meta name="description" content="Craft Lab — a library of fun real-world crafts you can make at home with simple supplies. Pick a craft and follow easy step-by-step instructions.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="assets/logo.png">
+  <script src="app.js" defer></script>
+  <script src="craft-lab.js" defer></script>
+  <style>
+    /* ---- Craft Lab library — scoped so it can't affect other pages ---- */
+    body[data-page="craft"]{ --accent:#ff5a8a; --accent-soft:#ffe6ef; }
+
+    /* search + chips toolbar */
+    body[data-page="craft"] .craft-toolbar{ margin-bottom:1.4rem; }
+    body[data-page="craft"] .craft-search{
+      position:relative; max-width:520px; margin:0 0 1rem;
+    }
+    body[data-page="craft"] .craft-search input{
+      width:100%; box-sizing:border-box; font-family:var(--font-body,'Nunito',sans-serif);
+      font-size:1rem; padding:.85rem 1.1rem .85rem 2.7rem; border-radius:999px;
+      border:2px solid #f0e2e8; background:#fff; color:#3a2b3a;
+      box-shadow:0 6px 18px rgba(180,120,150,.10);
+    }
+    body[data-page="craft"] .craft-search input:focus{
+      outline:none; border-color:var(--accent); box-shadow:0 0 0 4px var(--accent-soft);
+    }
+    body[data-page="craft"] .craft-search .ico{
+      position:absolute; left:1rem; top:50%; transform:translateY(-50%);
+      width:18px; height:18px; opacity:.5;
+    }
+    body[data-page="craft"] .craft-chips{ display:flex; flex-wrap:wrap; gap:.5rem; }
+    body[data-page="craft"] .craft-chip{
+      border:2px solid #f0e2e8; background:#fff; color:#7a5c6c; cursor:pointer;
+      font-family:var(--font-display,'Fredoka'); font-weight:600; font-size:.9rem;
+      padding:.45rem 1rem; border-radius:999px; transition:.15s ease; white-space:nowrap;
+    }
+    body[data-page="craft"] .craft-chip:hover{ border-color:var(--accent); color:var(--accent); }
+    body[data-page="craft"] .craft-chip.active{
+      background:linear-gradient(135deg,#ff7aa6,#ff4f8b); color:#fff; border-color:transparent;
+      box-shadow:0 8px 18px rgba(255,90,138,.35);
+    }
+
+    /* grid + cards */
+    body[data-page="craft"] .craft-grid{
+      display:grid; grid-template-columns:repeat(auto-fill, minmax(250px, 1fr)); gap:1.4rem;
+    }
+    body[data-page="craft"] .craft-card{
+      position:relative; background:#fff; border:1px solid #f2e7ec; border-radius:22px;
+      overflow:hidden; display:flex; flex-direction:column; text-decoration:none; color:inherit;
+      box-shadow:0 12px 30px rgba(170,110,140,.12);
+      transition:transform .16s ease, box-shadow .16s ease;
+    }
+    body[data-page="craft"] .craft-card:hover{
+      transform:translateY(-5px); box-shadow:0 22px 48px rgba(170,110,140,.22);
+    }
+    body[data-page="craft"] .craft-thumb{ position:relative; aspect-ratio:258 / 152; overflow:hidden; background:var(--accent-soft); }
+    body[data-page="craft"] .craft-thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+    body[data-page="craft"] .craft-badge{
+      position:absolute; left:.7rem; bottom:.7rem; display:inline-flex; align-items:center; gap:.3rem;
+      font-family:var(--font-display,'Fredoka'); font-weight:700; font-size:.78rem;
+      padding:.28em .7em; border-radius:999px; color:#fff; backdrop-filter:blur(2px);
+    }
+    body[data-page="craft"] .craft-badge.easy{ background:rgba(46,174,95,.92); }
+    body[data-page="craft"] .craft-badge.medium{ background:rgba(255,138,61,.95); }
+    body[data-page="craft"] .craft-time{
+      position:absolute; right:.7rem; bottom:.7rem; display:inline-flex; align-items:center; gap:.3rem;
+      font-family:var(--font-display,'Fredoka'); font-weight:600; font-size:.78rem;
+      padding:.28em .7em; border-radius:999px; color:#fff; background:rgba(40,30,45,.6);
+    }
+    body[data-page="craft"] .craft-fav{
+      position:absolute; right:.6rem; top:.6rem; width:38px; height:38px; border-radius:50%;
+      border:none; cursor:pointer; background:rgba(255,255,255,.92); display:grid; place-items:center;
+      box-shadow:0 4px 12px rgba(0,0,0,.18); transition:transform .12s ease; z-index:2; padding:0;
+    }
+    body[data-page="craft"] .craft-fav:hover{ transform:scale(1.1); }
+    body[data-page="craft"] .craft-fav svg{ width:20px; height:20px; }
+    body[data-page="craft"] .craft-fav .heart{ fill:none; stroke:#ff5a8a; stroke-width:2.2; }
+    body[data-page="craft"] .craft-fav.on .heart{ fill:#ff3d7f; stroke:#ff3d7f; }
+    body[data-page="craft"] .craft-cbody{ padding:.9rem 1.05rem 1.1rem; display:flex; flex-direction:column; flex:1; }
+    body[data-page="craft"] .craft-cbody h3{ margin:0 0 .3rem; font-size:1.08rem; color:#4a2e44; }
+    body[data-page="craft"] .craft-cbody p{ margin:0 0 .9rem; font-size:.88rem; color:var(--muted); line-height:1.4; flex:1; }
+    body[data-page="craft"] .craft-make{
+      align-self:flex-start; background:linear-gradient(135deg,#ff7aa6,#ff4f8b); color:#fff;
+      font-family:var(--font-display,'Fredoka'); font-weight:600; font-size:.88rem;
+      padding:.5rem 1.1rem; border-radius:999px; box-shadow:0 6px 14px rgba(255,90,138,.3);
+    }
+    body[data-page="craft"] .craft-empty{
+      display:none; text-align:center; padding:3rem 1rem; color:var(--muted);
+    }
+    body[data-page="craft"] .craft-empty.show{ display:block; }
+    body[data-page="craft"] .craft-count{ font-size:.9rem; color:var(--muted); margin:0 0 1rem; font-weight:700; }
+  </style>
+</head>
+<body data-page="craft" class="accent-red">
+
+  <section class="page-hero">
+    <div class="container">
+      <div class="breadcrumb"><a href="index.html">Home</a> / <a href="create-zone.html">Create Zone</a> / Craft Lab</div>
+      <span class="eyebrow"><span data-icon="palette"></span> Craft Lab</span>
+      <h1>Craft Lab</h1>
+      <p>Fun crafts you can make at home with simple supplies. Pick one and let's get creating!</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+
+      <div class="craft-toolbar">
+        <div class="craft-search">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="search" id="craftSearch" placeholder="Search crafts..." aria-label="Search crafts">
+        </div>
+        <div class="craft-chips" id="craftChips"></div>
+      </div>
+
+      <p class="craft-count" id="craftCount"></p>
+      <div class="craft-grid" id="craftGrid"></div>
+      <div class="craft-empty" id="craftEmpty">
+        <p style="font-size:1.1rem;font-weight:800;color:#4a2e44;margin:.2rem 0">No crafts found</p>
+        <p>Try another category or clear your search.</p>
+      </div>
+
+      <div class="callout mt-3">
+        <span class="ico" data-icon="gift"></span>
+        <div><h3>New crafts added every week!</h3>
+          <p>Red 5 Club members unlock fresh craft packs and printable instructions every month. <a href="membership.html" style="color:var(--red);font-weight:700">Join for $4.99/month →</a></p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <script>
+  (function () {
+    function ready(fn){ if(document.readyState!=="loading"){ fn(); } else { document.addEventListener("DOMContentLoaded", fn); } }
+    ready(function () {
+      var data = window.CraftLab;
+      if (!data) return;
+      var grid   = document.getElementById("craftGrid");
+      var chips  = document.getElementById("craftChips");
+      var empty  = document.getElementById("craftEmpty");
+      var count  = document.getElementById("craftCount");
+      var search = document.getElementById("craftSearch");
+
+      var activeCat = "all";
+      var query = "";
+
+      var HEART = '<svg viewBox="0 0 24 24"><path class="heart" d="M12 21s-7.5-4.6-10-9.1C.4 8.6 2 5 5.4 5c2 0 3.4 1.1 4.3 2.4l.3.4.3-.4C11.2 6.1 12.6 5 14.6 5 18 5 19.6 8.6 22 11.9 19.5 16.4 12 21 12 21z"/></svg>';
+
+      // --- build chips ---
+      data.CATEGORIES.forEach(function (c) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "craft-chip" + (c.value === "all" ? " active" : "");
+        b.textContent = c.label;
+        b.setAttribute("data-cat", c.value);
+        b.addEventListener("click", function () {
+          activeCat = c.value;
+          chips.querySelectorAll(".craft-chip").forEach(function (el) { el.classList.remove("active"); });
+          b.classList.add("active");
+          render();
+        });
+        chips.appendChild(b);
+      });
+
+      // --- build cards once ---
+      data.CRAFTS.forEach(function (craft) {
+        var card = document.createElement("a");
+        card.className = "craft-card";
+        card.href = "craft-detail.html?craft=" + encodeURIComponent(craft.id);
+        card.setAttribute("data-id", craft.id);
+
+        var diffClass = craft.difficulty.toLowerCase() === "easy" ? "easy" : "medium";
+        var favOn = data.isFavorite(craft.id);
+
+        card.innerHTML =
+          '<div class="craft-thumb">' +
+            '<img src="' + craft.image + '" alt="' + craft.title + '" loading="lazy">' +
+            '<button type="button" class="craft-fav' + (favOn ? " on" : "") + '" aria-label="Add to My Crafts" aria-pressed="' + favOn + '">' + HEART + '</button>' +
+            '<span class="craft-badge ' + diffClass + '">' + craft.difficulty + '</span>' +
+            '<span class="craft-time">' + craft.time + ' min</span>' +
+          '</div>' +
+          '<div class="craft-cbody">' +
+            '<h3>' + craft.title + '</h3>' +
+            '<p>' + craft.blurb + '</p>' +
+            '<span class="craft-make">Make it →</span>' +
+          '</div>';
+
+        // favorite toggle (don't follow the card link)
+        var favBtn = card.querySelector(".craft-fav");
+        favBtn.addEventListener("click", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var on = data.toggleFavorite(craft.id);
+          favBtn.classList.toggle("on", on);
+          favBtn.setAttribute("aria-pressed", on);
+        });
+
+        grid.appendChild(card);
+      });
+
+      // --- filtering ---
+      function render() {
+        var visible = 0;
+        grid.querySelectorAll(".craft-card").forEach(function (card) {
+          var craft = data.getCraft(card.getAttribute("data-id"));
+          var matchCat = activeCat === "all" || (craft.categories.indexOf(activeCat) !== -1);
+          var hay = (craft.title + " " + craft.blurb + " " + craft.description).toLowerCase();
+          var matchQuery = !query || hay.indexOf(query) !== -1;
+          var show = matchCat && matchQuery;
+          card.style.display = show ? "" : "none";
+          if (show) visible++;
+        });
+        empty.classList.toggle("show", visible === 0);
+        count.textContent = visible + (visible === 1 ? " craft" : " crafts") + " to make";
+      }
+
+      search.addEventListener("input", function () {
+        query = search.value.trim().toLowerCase();
+        render();
+      });
+
+      render();
+    });
+  })();
+  </script>
+
+</body>
+</html>
