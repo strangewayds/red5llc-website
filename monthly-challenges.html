@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Monthly Challenge — Red 5</title>
+  <meta name="description" content="A brand new adventure begins every month! Take on fun, kind, creative real-world challenges, earn stars, unlock badges and become a Red 5 Challenge Champion.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="assets/logo.png">
+  <script src="app.js" defer></script>
+  <style>
+    /* ===== Monthly Challenge — scoped to this page only ===== */
+    body[data-page="challenges"]{ --mc-purple:#6c5ce7; --mc-pink:#ff5a8a; --mc-blue:#2ba8e0; --mc-gold:#f2a828; }
+    body[data-page="challenges"] .page-hero{
+      background:
+        radial-gradient(120% 90% at 90% 0%, rgba(108,92,231,.16), transparent 55%),
+        linear-gradient(180deg,#efeaff 0%, #f4ecff 40%, #ffffff 100%);
+      position:relative; overflow:hidden;
+    }
+    body[data-page="challenges"] .mc-hero-grid{
+      display:grid; grid-template-columns:1.15fr .85fr; gap:1.6rem; align-items:center;
+    }
+    body[data-page="challenges"] .mc-hero-actions{ display:flex; flex-wrap:wrap; gap:.7rem; margin-top:1.2rem; }
+    body[data-page="challenges"] .mc-hero-art{
+      position:relative; min-height:230px; display:flex; align-items:flex-end; justify-content:center; gap:.2rem;
+    }
+    body[data-page="challenges"] .mc-hero-art img{ filter:drop-shadow(0 14px 26px rgba(60,40,120,.28)); }
+    body[data-page="challenges"] .mc-hero-art .mc-trophy{ width:42%; max-width:175px; z-index:2; }
+    body[data-page="challenges"] .mc-hero-art .mc-mascots{ width:56%; max-width:240px; margin-left:-6%; }
+    body[data-page="challenges"] .mc-hero-art .mc-spark{ position:absolute; color:var(--mc-gold); opacity:.85; }
+    body[data-page="challenges"] .mc-hero-art .s1{ top:6%; left:8%; font-size:1.6rem; }
+    body[data-page="challenges"] .mc-hero-art .s2{ top:18%; right:6%; font-size:1.2rem; }
+    body[data-page="challenges"] .mc-hero-art .s3{ bottom:24%; left:2%; font-size:1.1rem; }
+
+    /* Theme month banner */
+    body[data-page="challenges"] .mc-theme{
+      position:relative; overflow:hidden; color:#fff; border-radius:var(--radius-lg);
+      background:
+        radial-gradient(110% 130% at 100% 0%, rgba(255,255,255,.16), transparent 55%),
+        linear-gradient(135deg,#1f6fb2 0%, #2ba8e0 45%, #12b5a5 100%);
+      padding:1.8rem 1.9rem; box-shadow:var(--shadow);
+      display:grid; grid-template-columns:auto 1fr; gap:1.3rem; align-items:center;
+    }
+    body[data-page="challenges"] .mc-theme .mc-theme-emoji{ font-size:3.4rem; line-height:1; filter:drop-shadow(0 6px 10px rgba(0,0,0,.18)); }
+    body[data-page="challenges"] .mc-theme .mc-pill{
+      display:inline-flex; align-items:center; gap:.4rem; background:rgba(255,255,255,.2);
+      font-family:var(--font-display); font-weight:700; font-size:.72rem; letter-spacing:.06em; text-transform:uppercase;
+      padding:.3em .8em; border-radius:999px; margin-bottom:.5rem;
+    }
+    body[data-page="challenges"] .mc-theme h2{ color:#fff; font-size:1.9rem; margin:0 0 .3rem; }
+    body[data-page="challenges"] .mc-theme p{ color:#eafbff; margin:0; font-size:1rem; max-width:62ch; }
+    body[data-page="challenges"] .mc-theme .mc-wave{ position:absolute; left:0; right:0; bottom:-2px; height:34px; opacity:.4; }
+
+    /* Stat strip */
+    body[data-page="challenges"] .mc-stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-top:1.4rem; }
+    body[data-page="challenges"] .mc-stat{
+      background:#fff; border:1px solid var(--line); border-radius:18px; padding:1rem 1.1rem;
+      box-shadow:var(--shadow-sm); display:flex; align-items:center; gap:.8rem;
+    }
+    body[data-page="challenges"] .mc-stat .mc-stat-ic{
+      width:48px; height:48px; flex:0 0 auto; border-radius:14px; display:grid; place-items:center; font-size:1.5rem;
+      background:var(--accent-soft);
+    }
+    body[data-page="challenges"] .mc-stat b{ font-family:var(--font-display); font-size:1.5rem; color:var(--navy); display:block; line-height:1; }
+    body[data-page="challenges"] .mc-stat small{ color:var(--muted); font-size:.82rem; }
+
+    /* Layout: main column + side rail */
+    body[data-page="challenges"] .mc-layout{ display:grid; grid-template-columns:1fr 340px; gap:1.6rem; align-items:start; }
+
+    /* Cards / panels */
+    body[data-page="challenges"] .mc-panel{
+      background:#fff; border:1px solid var(--line); border-radius:22px; padding:1.4rem 1.5rem;
+      box-shadow:var(--shadow-sm); margin-bottom:1.4rem;
+    }
+    body[data-page="challenges"] .mc-panel-head{ display:flex; align-items:center; gap:.7rem; margin-bottom:.4rem; }
+    body[data-page="challenges"] .mc-panel-head .mc-ph-ic{
+      width:42px; height:42px; border-radius:12px; display:grid; place-items:center; font-size:1.3rem; flex:0 0 auto;
+      background:var(--accent-soft);
+    }
+    body[data-page="challenges"] .mc-panel-head h2{ margin:0; font-size:1.4rem; }
+    body[data-page="challenges"] .mc-panel-head .mc-frac{
+      margin-left:auto; font-family:var(--font-display); font-weight:700; color:var(--accent);
+      background:var(--accent-soft); padding:.25em .8em; border-radius:999px; font-size:.92rem; white-space:nowrap;
+    }
+    body[data-page="challenges"] .mc-panel > p.mc-sub{ color:var(--muted); margin:.1rem 0 1rem; font-size:.95rem; }
+
+    /* Big progress bar + map */
+    body[data-page="challenges"] .mc-progress-wrap{ margin:.3rem 0 1.1rem; }
+    body[data-page="challenges"] .mc-bar{
+      position:relative; height:20px; border-radius:999px; background:#eef0f6; overflow:hidden; box-shadow:inset 0 2px 4px rgba(20,30,60,.08);
+    }
+    body[data-page="challenges"] .mc-bar-fill{
+      height:100%; width:0%; border-radius:999px; transition:width .55s cubic-bezier(.22,1,.36,1);
+      background:linear-gradient(90deg,#2ba8e0,#12b5a5,#5da130);
+      background-size:200% 100%; animation:mcShine 3s linear infinite;
+    }
+    @keyframes mcShine{ to{ background-position:200% 0; } }
+    body[data-page="challenges"] .mc-bar-top{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:.45rem; }
+    body[data-page="challenges"] .mc-bar-top b{ font-family:var(--font-display); color:var(--navy); }
+    body[data-page="challenges"] #mcBarPct{ font-family:var(--font-display); font-weight:700; color:var(--mc-blue); font-size:1.1rem; }
+
+    body[data-page="challenges"] .mc-map{
+      display:flex; justify-content:space-between; align-items:flex-start; margin-top:1rem; position:relative;
+    }
+    body[data-page="challenges"] .mc-map::before{
+      content:""; position:absolute; left:6%; right:6%; top:17px; height:4px; background:#e7eaf2; border-radius:4px; z-index:0;
+    }
+    body[data-page="challenges"] .mc-map-node{ position:relative; z-index:1; text-align:center; width:18%; }
+    body[data-page="challenges"] .mc-map-node .dot{
+      width:38px; height:38px; margin:0 auto .35rem; border-radius:50%; display:grid; place-items:center;
+      background:#eef0f6; color:#aab2c4; font-size:1.15rem; border:3px solid #fff; box-shadow:0 3px 8px rgba(20,30,60,.12);
+      transition:transform .25s ease, background .25s ease, color .25s ease;
+    }
+    body[data-page="challenges"] .mc-map-node small{ font-size:.72rem; color:var(--muted); font-weight:700; }
+    body[data-page="challenges"] .mc-map-node.reached .dot{
+      background:linear-gradient(135deg,var(--mc-gold),#ffb300); color:#fff; transform:scale(1.12);
+      box-shadow:0 6px 16px rgba(242,168,40,.5);
+    }
+    body[data-page="challenges"] .mc-map-node.reached small{ color:var(--navy); }
+
+    /* Win banner */
+    body[data-page="challenges"] .mc-win{
+      display:none; margin-top:1rem; border-radius:18px; padding:1rem 1.2rem; text-align:center;
+      background:linear-gradient(135deg,#fff3cf,#ffe39e); border:1px solid #ffd778; color:#7a5600;
+      font-family:var(--font-display); font-weight:600; animation:mcPopIn .4s ease;
+    }
+    body[data-page="challenges"] .mc-win.show{ display:block; }
+    @keyframes mcPopIn{ from{ transform:scale(.9); opacity:0; } to{ transform:scale(1); opacity:1; } }
+
+    /* Quest lists */
+    body[data-page="challenges"] .mc-quests{ list-style:none; margin:0; padding:0; display:grid; gap:.6rem; }
+    body[data-page="challenges"] .mc-quest{
+      display:flex; align-items:center; gap:.8rem; padding:.75rem .9rem; border-radius:16px;
+      background:#fbfbfe; border:1px solid #eef0f6; transition:background .15s ease, border-color .15s ease, transform .12s ease;
+    }
+    body[data-page="challenges"] .mc-quest:hover{ transform:translateY(-1px); border-color:#dfe3ee; }
+    body[data-page="challenges"] .mc-quest.is-done{ background:#eefaf0; border-color:#cdeccf; }
+    body[data-page="challenges"] .mc-q-check{ position:relative; flex:0 0 auto; cursor:pointer; display:grid; place-items:center; }
+    body[data-page="challenges"] .mc-q-check input{ position:absolute; opacity:0; width:100%; height:100%; cursor:pointer; margin:0; }
+    body[data-page="challenges"] .mc-q-box{
+      width:30px; height:30px; border-radius:10px; border:2.5px solid #cdd3e2; background:#fff;
+      display:grid; place-items:center; transition:.18s; position:relative;
+    }
+    body[data-page="challenges"] .mc-q-box::after{
+      content:"✓"; color:#fff; font-weight:900; font-size:1.05rem; transform:scale(0); transition:transform .18s ease;
+    }
+    body[data-page="challenges"] .mc-q-check input:checked + .mc-q-box{
+      background:linear-gradient(135deg,#5da130,#3f8a1e); border-color:#3f8a1e;
+    }
+    body[data-page="challenges"] .mc-q-check input:checked + .mc-q-box::after{ transform:scale(1); }
+    body[data-page="challenges"] .mc-q-check input:focus-visible + .mc-q-box{ box-shadow:0 0 0 4px var(--accent-soft); }
+    body[data-page="challenges"] .mc-q-emoji{ font-size:1.5rem; flex:0 0 auto; line-height:1; }
+    body[data-page="challenges"] .mc-q-text{ flex:1; min-width:0; }
+    body[data-page="challenges"] .mc-q-text b{ display:block; color:var(--navy); font-family:var(--font-display); font-weight:600; font-size:1rem; line-height:1.2; }
+    body[data-page="challenges"] .mc-quest.is-done .mc-q-text b{ text-decoration:line-through; color:#5a8a5e; }
+    body[data-page="challenges"] .mc-q-text small{ color:var(--muted); font-size:.83rem; }
+    body[data-page="challenges"] .mc-q-stars{
+      flex:0 0 auto; font-family:var(--font-display); font-weight:700; font-size:.82rem; color:var(--mc-gold);
+      background:#fff7e3; padding:.25em .6em; border-radius:999px; white-space:nowrap;
+    }
+    body[data-page="challenges"] .mc-q-go{
+      flex:0 0 auto; font-family:var(--font-display); font-weight:600; font-size:.82rem; color:var(--mc-purple);
+      background:#efecff; padding:.35em .75em; border-radius:999px; transition:.15s; white-space:nowrap;
+    }
+    body[data-page="challenges"] .mc-q-go:hover{ background:var(--mc-purple); color:#fff; }
+    body[data-page="challenges"] .mc-tag-real{
+      display:inline-flex; align-items:center; gap:.3em; font-family:var(--font-display); font-weight:700;
+      font-size:.66rem; text-transform:uppercase; letter-spacing:.04em; color:#1f6fb2; background:#e1f2fb;
+      padding:.2em .6em; border-radius:999px; margin-left:.5rem; vertical-align:middle;
+    }
+
+    /* Side rail */
+    body[data-page="challenges"] .mc-rail .mc-panel{ padding:1.2rem 1.3rem; }
+    body[data-page="challenges"] .mc-stars-card{
+      text-align:center; color:#fff; border-radius:22px; padding:1.5rem 1.3rem; margin-bottom:1.4rem;
+      background:radial-gradient(120% 130% at 0% 0%, rgba(255,255,255,.14), transparent 50%),
+                 linear-gradient(150deg,#6c5ce7,#4b3bcb); box-shadow:var(--shadow);
+    }
+    body[data-page="challenges"] .mc-stars-card .mc-bigstars{ font-family:var(--font-display); font-weight:700; font-size:2.8rem; line-height:1; }
+    body[data-page="challenges"] .mc-stars-card .mc-bigstars span{ color:#ffd84d; }
+    body[data-page="challenges"] .mc-stars-card .mc-of{ color:#dcd7ff; font-size:.95rem; }
+    body[data-page="challenges"] .mc-stars-card .mc-mini-bar{ height:10px; border-radius:999px; background:rgba(255,255,255,.22); overflow:hidden; margin:.9rem 0 .2rem; }
+    body[data-page="challenges"] .mc-stars-card .mc-mini-fill{ height:100%; width:0%; border-radius:999px; background:linear-gradient(90deg,#ffd84d,#ffb300); transition:width .55s ease; }
+    body[data-page="challenges"] .mc-stars-card small{ color:#cfc8ff; }
+
+    /* Badges */
+    body[data-page="challenges"] .mc-badges{ display:grid; grid-template-columns:repeat(2,1fr); gap:.8rem; }
+    body[data-page="challenges"] .mc-badge{ text-align:center; }
+    body[data-page="challenges"] .mc-badge-coin{
+      position:relative; width:62px; height:62px; margin:0 auto .45rem; border-radius:50%;
+      display:grid; place-items:center; background:#eef0f6; box-shadow:inset 0 0 0 3px #fff, 0 4px 10px rgba(20,30,60,.12);
+      transition:transform .3s ease;
+    }
+    body[data-page="challenges"] .mc-badge-icon{ font-size:1.7rem; filter:grayscale(1) opacity(.45); transition:.3s; }
+    body[data-page="challenges"] .mc-badge-lock{ position:absolute; right:-2px; bottom:-2px; font-size:.85rem; background:#fff; border-radius:50%; padding:1px 2px; box-shadow:0 2px 5px rgba(0,0,0,.15); }
+    body[data-page="challenges"] .mc-badge b{ display:block; font-size:.84rem; color:#9aa2b4; font-family:var(--font-display); }
+    body[data-page="challenges"] .mc-badge small{ display:block; font-size:.72rem; color:var(--muted); line-height:1.2; }
+    body[data-page="challenges"] .mc-badge.unlocked .mc-badge-coin{
+      background:radial-gradient(circle at 35% 30%, #fff3cf, var(--mc-gold)); box-shadow:inset 0 0 0 3px #fff, 0 6px 16px rgba(242,168,40,.45);
+    }
+    body[data-page="challenges"] .mc-badge.unlocked .mc-badge-icon{ filter:none; }
+    body[data-page="challenges"] .mc-badge.unlocked .mc-badge-lock{ display:none; }
+    body[data-page="challenges"] .mc-badge.unlocked b{ color:var(--navy); }
+    body[data-page="challenges"] .mc-badge.unlocked small{ color:var(--green); font-weight:700; }
+    body[data-page="challenges"] .mc-badge.just-unlocked .mc-badge-coin{ animation:mcBadgePop .6s ease; }
+    @keyframes mcBadgePop{ 0%{ transform:scale(.7) rotate(-12deg);} 50%{ transform:scale(1.25) rotate(8deg);} 100%{ transform:scale(1) rotate(0);} }
+
+    /* Leaderboard */
+    body[data-page="challenges"] .mc-lb{ list-style:none; margin:0; padding:0; display:grid; gap:.5rem; }
+    body[data-page="challenges"] .mc-lb li{ display:flex; align-items:center; gap:.7rem; padding:.55rem .7rem; border-radius:14px; background:#fbfbfe; border:1px solid #eef0f6; }
+    body[data-page="challenges"] .mc-lb .mc-rank{ width:26px; height:26px; flex:0 0 auto; border-radius:50%; display:grid; place-items:center; font-family:var(--font-display); font-weight:700; font-size:.8rem; background:#eef0f6; color:var(--muted); }
+    body[data-page="challenges"] .mc-lb li:nth-child(1) .mc-rank{ background:#ffe39e; color:#7a5600; }
+    body[data-page="challenges"] .mc-lb li:nth-child(2) .mc-rank{ background:#e6e8ef; color:#5b6678; }
+    body[data-page="challenges"] .mc-lb li:nth-child(3) .mc-rank{ background:#ffd9bf; color:#a04a16; }
+    body[data-page="challenges"] .mc-lb .mc-av{ width:34px; height:34px; flex:0 0 auto; border-radius:50%; display:grid; place-items:center; font-size:1.1rem; }
+    body[data-page="challenges"] .mc-lb .mc-lb-meta{ flex:1; min-width:0; }
+    body[data-page="challenges"] .mc-lb .mc-lb-meta b{ display:block; font-size:.92rem; color:var(--navy); }
+    body[data-page="challenges"] .mc-lb .mc-lb-meta small{ font-size:.74rem; color:var(--muted); }
+    body[data-page="challenges"] .mc-lb .mc-lb-stars{ font-family:var(--font-display); font-weight:700; color:var(--mc-gold); font-size:.86rem; white-space:nowrap; }
+    body[data-page="challenges"] .mc-lb-note{ font-size:.78rem; color:var(--muted); margin:.8rem 0 0; line-height:1.45; }
+
+    /* Coming soon themes */
+    body[data-page="challenges"] .mc-soon{ display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:1rem; }
+    body[data-page="challenges"] .mc-soon-card{
+      background:#fff; border:1px solid var(--line); border-radius:18px; padding:1.1rem; box-shadow:var(--shadow-sm); text-align:center;
+      transition:transform .15s ease, box-shadow .15s ease;
+    }
+    body[data-page="challenges"] .mc-soon-card:hover{ transform:translateY(-4px); box-shadow:var(--shadow); }
+    body[data-page="challenges"] .mc-soon-card .mc-soon-emoji{ font-size:2.2rem; }
+    body[data-page="challenges"] .mc-soon-card h3{ font-size:1.05rem; margin:.4rem 0 .15rem; }
+    body[data-page="challenges"] .mc-soon-card p{ font-size:.82rem; color:var(--muted); margin:0 0 .6rem; }
+    body[data-page="challenges"] .mc-soon-card .mc-when{ font-family:var(--font-display); font-weight:700; font-size:.74rem; color:var(--mc-purple); background:#efecff; padding:.25em .8em; border-radius:999px; }
+
+    /* Reset control */
+    body[data-page="challenges"] .mc-reset{
+      border:none; cursor:pointer; font-family:var(--font-display); font-weight:600; font-size:.84rem;
+      color:var(--muted); background:#f4f5f9; padding:.5em 1em; border-radius:999px; transition:.15s;
+    }
+    body[data-page="challenges"] .mc-reset:hover{ background:#ececf3; color:var(--navy); }
+
+    /* Confetti */
+    body[data-page="challenges"] .mc-confetti{ position:fixed; inset:0; pointer-events:none; z-index:300; overflow:hidden; display:none; }
+    body[data-page="challenges"] .mc-confetti.go{ display:block; }
+    body[data-page="challenges"] .mc-confetti i{ position:absolute; top:-20px; border-radius:2px; animation:mcFall linear forwards; }
+    @keyframes mcFall{ to{ transform:translateY(105vh) rotate(720deg); opacity:.9; } }
+
+    @media (max-width:920px){
+      body[data-page="challenges"] .mc-layout{ grid-template-columns:1fr; }
+      body[data-page="challenges"] .mc-hero-grid{ grid-template-columns:1fr; }
+      body[data-page="challenges"] .mc-hero-art{ order:-1; max-width:420px; margin-inline:auto; }
+      body[data-page="challenges"] .mc-theme{ grid-template-columns:1fr; text-align:center; }
+      body[data-page="challenges"] .mc-theme .mc-theme-emoji{ margin-inline:auto; }
+    }
+    @media (max-width:560px){
+      body[data-page="challenges"] .mc-stats{ grid-template-columns:1fr; }
+      body[data-page="challenges"] .mc-map-node small{ display:none; }
+      body[data-page="challenges"] .mc-q-go{ display:none; }
+    }
+  </style>
+</head>
+<body data-page="challenges" class="accent-indigo">
+
+  <!-- ===== Hero ===== -->
+  <section class="page-hero">
+    <div class="container">
+      <div class="mc-hero-grid">
+        <div class="mc-hero-copy">
+          <div class="breadcrumb"><a href="index.html">Home</a> / Monthly Challenge</div>
+          <span class="eyebrow"><span data-icon="trophy"></span> New Challenge Every Month</span>
+          <h1>Monthly Challenge</h1>
+          <p>A brand new adventure begins every month. Take on fun, kind and creative challenges, earn stars, unlock badges — and become a Red 5 Challenge Champion!</p>
+          <div class="mc-hero-actions">
+            <a class="btn btn-accent btn-lg" href="#mcMainQuest"><span data-icon="check"></span> Join Challenge</a>
+            <a class="btn btn-outline btn-lg" href="#mcRewards"><span data-icon="star"></span> View Rewards</a>
+          </div>
+        </div>
+        <div class="mc-hero-art">
+          <span class="mc-spark s1">✨</span><span class="mc-spark s2">⭐</span><span class="mc-spark s3">✨</span>
+          <img class="mc-trophy" src="assets/mc-trophy.png" alt="Golden trophy">
+          <img class="mc-mascots" src="assets/mc-mascots.png" alt="Rosie's friends cheering you on">
+        </div>
+      </div>
+
+      <!-- Live stat strip -->
+      <div class="mc-stats">
+        <div class="mc-stat">
+          <span class="mc-stat-ic">⭐</span>
+          <span><b><span data-stars-count>0</span></b><small>Stars earned this month</small></span>
+        </div>
+        <div class="mc-stat">
+          <span class="mc-stat-ic">✅</span>
+          <span><b><span id="mcAllDone">0</span>/<span id="mcAllTotal">0</span></b><small>Challenges completed</small></span>
+        </div>
+        <div class="mc-stat">
+          <span class="mc-stat-ic">🏅</span>
+          <span><b>7</b><small>Badges to collect</small></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Theme month banner ===== -->
+  <section class="section" style="padding-top:2rem;">
+    <div class="container">
+      <div class="mc-theme">
+        <div class="mc-theme-emoji">🌊</div>
+        <div>
+          <span class="mc-pill">★ This Month's Theme</span>
+          <h2>Ocean Adventure Month</h2>
+          <p>"Dive in, explorers! This month we're making a splash with kindness, stories and real-world adventures. Finish challenges to earn stars, unlock shiny badges, and help me fill the whole treasure map. Ready? Let's go make waves!" — Rosie 🐬</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Main layout ===== -->
+  <section class="section" style="padding-top:0;">
+    <div class="container">
+      <div class="mc-layout">
+
+        <!-- Main column -->
+        <div class="mc-main">
+
+          <!-- MAIN QUEST -->
+          <div class="mc-panel" id="mcMainQuest">
+            <div class="mc-panel-head">
+              <span class="mc-ph-ic">🗺️</span>
+              <h2>Main Quest</h2>
+              <span class="mc-frac" id="mcMainFrac">0 / 8</span>
+            </div>
+            <p class="mc-sub">Complete these to fill the treasure map and become this month's Challenge Champion. Check off each one as you finish — your progress saves automatically!</p>
+
+            <div class="mc-progress-wrap">
+              <div class="mc-bar-top">
+                <b>Treasure Map Progress</b>
+                <span id="mcBarPct">0%</span>
+              </div>
+              <div class="mc-bar"><div class="mc-bar-fill" id="mcBarFill"></div></div>
+
+              <div class="mc-map" id="mcMap">
+                <div class="mc-map-node" data-at="1"><div class="dot">🚩</div><small>Start</small></div>
+                <div class="mc-map-node" data-at="25"><div class="dot">🐚</div><small>Reef</small></div>
+                <div class="mc-map-node" data-at="50"><div class="dot">🐠</div><small>Lagoon</small></div>
+                <div class="mc-map-node" data-at="75"><div class="dot">🐬</div><small>Deep Sea</small></div>
+                <div class="mc-map-node" data-at="100"><div class="dot">🏆</div><small>Treasure</small></div>
+              </div>
+
+              <div class="mc-win" id="mcWinBanner">🎉 Main Quest complete! You're a Red 5 Challenge Champion! Your Golden Trophy badge is unlocked. 🏆</div>
+            </div>
+
+            <ul class="mc-quests" id="mcMainList"></ul>
+          </div>
+
+          <!-- SIDE QUESTS -->
+          <div class="mc-panel">
+            <div class="mc-panel-head">
+              <span class="mc-ph-ic">⚡</span>
+              <h2>Side Quests</h2>
+            </div>
+            <p class="mc-sub">Optional daily &amp; weekly bonus quests — do them anytime for extra stars. No pressure, just for fun!</p>
+            <ul class="mc-quests" id="mcSideList"></ul>
+          </div>
+
+          <!-- REAL WORLD MISSIONS -->
+          <div class="mc-panel">
+            <div class="mc-panel-head">
+              <span class="mc-ph-ic">🌳</span>
+              <h2>Real-World Missions <span class="mc-tag-real">Offline</span></h2>
+            </div>
+            <p class="mc-sub">Step away from the screen! These adventures happen out in the real world. Ask a grown-up before heading outside.</p>
+            <ul class="mc-quests" id="mcRealList"></ul>
+          </div>
+
+          <!-- FAMILY MISSIONS -->
+          <div class="mc-panel">
+            <div class="mc-panel-head">
+              <span class="mc-ph-ic">🏡</span>
+              <h2>Family Missions</h2>
+            </div>
+            <p class="mc-sub">Adventures are better together! Team up with your family to earn these stars.</p>
+            <ul class="mc-quests" id="mcFamilyList"></ul>
+            <div style="margin-top:1.1rem; display:flex; justify-content:flex-end;">
+              <button class="mc-reset" id="mcReset" type="button">↺ Reset this month (no penalty)</button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Side rail -->
+        <aside class="mc-rail" id="mcRewards">
+
+          <!-- Stars total -->
+          <div class="mc-stars-card">
+            <div class="mc-bigstars"><span data-stars-count>0</span><span> ★</span></div>
+            <div class="mc-of">of <span id="mcStarsTotal">0</span> stars</div>
+            <div class="mc-mini-bar"><div class="mc-mini-fill" id="mcStarsBar"></div></div>
+            <small id="mcStatus">Pick any challenge to begin — there's no wrong place to start! 🌊</small>
+          </div>
+
+          <!-- Badges -->
+          <div class="mc-panel">
+            <div class="mc-panel-head">
+              <span class="mc-ph-ic">🏅</span>
+              <h2 style="font-size:1.2rem;">Badges</h2>
+            </div>
+            <p class="mc-sub" style="margin-bottom:.9rem;">Unlock these as you complete challenges.</p>
+            <div class="mc-badges" id="mcBadges"></div>
+          </div>
+
+          <!-- Leaderboard -->
+          <div class="mc-panel">
+            <div class="mc-panel-head">
+              <span class="mc-ph-ic">😊</span>
+              <h2 style="font-size:1.2rem;">Friendly Stars</h2>
+            </div>
+            <p class="mc-sub" style="margin-bottom:.9rem;">A cheerful look at club members having fun this month — just for smiles, never a competition.</p>
+            <ul class="mc-lb">
+              <li><span class="mc-rank">1</span><span class="mc-av" style="background:#ffe1ec;">🦄</span><span class="mc-lb-meta"><b>SunnyStar</b><small>Buddy: Coral the dolphin</small></span><span class="mc-lb-stars">230 ★</span></li>
+              <li><span class="mc-rank">2</span><span class="mc-av" style="background:#e1f2fb;">🐙</span><span class="mc-lb-meta"><b>CreativeCat</b><small>Buddy: Finn the fish</small></span><span class="mc-lb-stars">215 ★</span></li>
+              <li><span class="mc-rank">3</span><span class="mc-av" style="background:#eafbe6;">🐢</span><span class="mc-lb-meta"><b>BuddyLoom</b><small>Buddy: Shelly the turtle</small></span><span class="mc-lb-stars">200 ★</span></li>
+              <li><span class="mc-rank">4</span><span class="mc-av" style="background:#fff3cf;">🐠</span><span class="mc-lb-meta"><b>DreamMaker</b><small>Buddy: Bubbles</small></span><span class="mc-lb-stars">185 ★</span></li>
+              <li><span class="mc-rank">5</span><span class="mc-av" style="background:#efecff;">🐳</span><span class="mc-lb-meta"><b>SuperKind</b><small>Buddy: Splash</small></span><span class="mc-lb-stars">170 ★</span></li>
+            </ul>
+            <p class="mc-lb-note">💛 No messaging, no profiles — just first-name nicknames &amp; buddies. Parents can turn this off anytime in the <a href="parent-dashboard.html">Parent Dashboard</a>.</p>
+          </div>
+
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Coming soon themes ===== -->
+  <section class="section alt">
+    <div class="container">
+      <div class="section-head">
+        <h2>More Adventures Coming Soon!</h2>
+        <p>A fresh theme arrives at the start of every month. Here's a peek at what's ahead.</p>
+      </div>
+      <div class="mc-soon">
+        <div class="mc-soon-card"><div class="mc-soon-emoji">🧭</div><h3>Explorer Quest</h3><p>Discover, map and adventure!</p><span class="mc-when">Next Month</span></div>
+        <div class="mc-soon-card"><div class="mc-soon-emoji">🌍</div><h3>Planet Protector</h3><p>Be a hero for the Earth.</p><span class="mc-when">August</span></div>
+        <div class="mc-soon-card"><div class="mc-soon-emoji">🎒</div><h3>Back to School</h3><p>Get ready, stay curious!</p><span class="mc-when">September</span></div>
+        <div class="mc-soon-card"><div class="mc-soon-emoji">🎃</div><h3>Spooky Fun</h3><p>Spooky, silly &amp; kind.</p><span class="mc-when">October</span></div>
+        <div class="mc-soon-card"><div class="mc-soon-emoji">🎁</div><h3>Holiday Magic</h3><p>Giving, joy &amp; gratitude.</p><span class="mc-when">December</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA ===== -->
+  <section class="container">
+    <div class="cta-band">
+      <h2>Every challenge makes you shine ✨</h2>
+      <p>It's not about being first — it's about trying new things, being kind, and having fun. Check one off and watch your stars grow!</p>
+      <div class="hero-actions">
+        <a class="btn btn-yellow btn-lg" href="#mcMainQuest"><span data-icon="star"></span> Start the Main Quest</a>
+        <a class="btn btn-ghost btn-lg" href="create-zone.html">Back to Create Zone</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="mc-confetti" id="mcConfetti" aria-hidden="true"></div>
+
+  <script src="monthly-challenges.js" defer></script>
+</body>
+</html>
