@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Creator Gallery — Red 5</title>
+  <meta name="description" content="The Red 5 Creator Gallery — a fully moderated, parent-approved showcase where kids proudly display the artwork, stories, comics, crafts and designs they made in Red 5.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="assets/logo.png">
+  <script src="app.js" defer></script>
+  <script src="creator-gallery.js" defer></script>
+  <style>
+    /* ===========================================================
+       Creator Gallery — a premium "digital art museum" showcase.
+       FULLY scoped to body[data-page="gallery"]. No social features:
+       no followers, friends, messaging, comments or profiles. Only
+       safe reactions + a simulated, parent-approved submit flow.
+       =========================================================== */
+    body[data-page="gallery"]{ --c:var(--accent); }
+
+    /* hero buttons row */
+    body[data-page="gallery"] .gal-hero-actions{ display:flex; flex-wrap:wrap; gap:.7rem; margin-top:1.1rem; }
+
+    /* safety reassurance ribbon */
+    body[data-page="gallery"] .gal-safe{
+      display:flex; align-items:center; gap:.85rem; flex-wrap:wrap;
+      background:#eef9f1; border:1px solid #cdebd4; border-radius:16px;
+      padding:.85rem 1.1rem; margin-top:1.4rem; font-size:.92rem; color:#2c6b41;
+    }
+    body[data-page="gallery"] .gal-safe .sicon{
+      flex:0 0 auto; width:38px; height:38px; border-radius:11px; background:#d4f0db;
+      display:grid; place-items:center; font-size:1.2rem;
+    }
+    body[data-page="gallery"] .gal-safe b{ color:#1f5230; }
+    body[data-page="gallery"] .gal-safe-tags{ display:flex; gap:.4rem; flex-wrap:wrap; margin-left:auto; }
+    body[data-page="gallery"] .gal-safe-tags span{
+      background:#fff; border:1px solid #cdebd4; color:#2c6b41; border-radius:999px;
+      padding:.2rem .65rem; font-size:.76rem; font-weight:700; font-family:var(--font-display);
+    }
+
+    /* Rosie Picks featured strip */
+    body[data-page="gallery"] .rosie-strip{
+      background:linear-gradient(135deg,#fff4e9,#fdecf3);
+      border:1px solid #ffe0cf; border-radius:24px; padding:1.4rem 1.4rem 1.5rem;
+    }
+    body[data-page="gallery"] .rosie-strip-head{ display:flex; align-items:center; gap:.7rem; margin-bottom:1rem; }
+    body[data-page="gallery"] .rosie-strip-head .ravatar{
+      width:46px; height:46px; border-radius:50%; object-fit:cover; border:3px solid #fff;
+      box-shadow:0 4px 10px rgba(0,0,0,.12); flex:0 0 auto;
+    }
+    body[data-page="gallery"] .rosie-strip-head h2{ margin:0; font-size:1.35rem; }
+    body[data-page="gallery"] .rosie-strip-head p{ margin:.1rem 0 0; font-size:.88rem; color:var(--muted); }
+    body[data-page="gallery"] .rosie-row{
+      display:grid; grid-auto-flow:column; grid-auto-columns:minmax(190px,1fr);
+      gap:1rem; overflow-x:auto; padding-bottom:.4rem; scroll-snap-type:x mandatory;
+    }
+    body[data-page="gallery"] .rosie-row > *{ scroll-snap-align:start; }
+
+    /* toolbar: tabs + sort + search */
+    body[data-page="gallery"] .gal-tabs{ display:flex; gap:.4rem; flex-wrap:wrap; margin-bottom:1.1rem; }
+    body[data-page="gallery"] .gal-tab{
+      border:1.5px solid #e7dff2; background:#fff; color:var(--navy); cursor:pointer;
+      font-family:var(--font-display); font-weight:600; font-size:.95rem; padding:.5rem 1.15rem;
+      border-radius:999px; transition:all .14s ease; display:inline-flex; align-items:center; gap:.4rem;
+    }
+    body[data-page="gallery"] .gal-tab:hover{ border-color:var(--c); color:var(--c); }
+    body[data-page="gallery"] .gal-tab.active{ background:var(--c); border-color:var(--c); color:#fff; box-shadow:0 6px 16px rgba(108,92,231,.30); }
+
+    body[data-page="gallery"] .gal-toolbar{
+      display:flex; gap:.7rem; flex-wrap:wrap; align-items:center; margin-bottom:1.1rem;
+    }
+    body[data-page="gallery"] .gal-chips{ display:flex; gap:.45rem; flex-wrap:wrap; flex:1; min-width:240px; }
+    body[data-page="gallery"] .chip{
+      border:1.5px solid #e7dff2; background:#fff; color:var(--navy); cursor:pointer;
+      font-family:var(--font-display); font-weight:500; font-size:.84rem; padding:.38rem .85rem;
+      border-radius:999px; transition:all .14s ease; white-space:nowrap;
+    }
+    body[data-page="gallery"] .chip:hover{ border-color:var(--c); color:var(--c); }
+    body[data-page="gallery"] .chip.active{ background:var(--accent-soft); border-color:var(--c); color:var(--c); }
+    body[data-page="gallery"] .gal-search{
+      position:relative; flex:0 0 auto;
+    }
+    body[data-page="gallery"] .gal-search input{
+      border:1.5px solid #e7dff2; border-radius:999px; padding:.5rem 1rem .5rem 2.2rem;
+      font-family:var(--font-body); font-size:.9rem; width:210px; max-width:46vw;
+    }
+    body[data-page="gallery"] .gal-search input:focus{ outline:none; border-color:var(--c); box-shadow:0 0 0 3px var(--accent-soft); }
+    body[data-page="gallery"] .gal-search .si{ position:absolute; left:.8rem; top:50%; transform:translateY(-50%); opacity:.5; }
+    body[data-page="gallery"] .gal-sort{
+      border:1.5px solid #e7dff2; border-radius:999px; padding:.5rem 1.6rem .5rem .9rem;
+      font-family:var(--font-display); font-weight:500; font-size:.88rem; color:var(--navy);
+      background:#fff url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2212%22 height=%2212%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23999%22 stroke-width=%223%22><path d=%22M6 9l6 6 6-6%22/></svg>') no-repeat right .8rem center;
+      -webkit-appearance:none; appearance:none; cursor:pointer;
+    }
+    body[data-page="gallery"] .gal-sort:focus{ outline:none; border-color:var(--c); }
+
+    body[data-page="gallery"] .gal-count{ font-size:.85rem; color:var(--muted); margin:0 0 1rem; }
+
+    /* masonry grid */
+    body[data-page="gallery"] .gal-grid{
+      columns:4 230px; column-gap:1.1rem;
+    }
+    body[data-page="gallery"] .gal-card{
+      break-inside:avoid; margin:0 0 1.1rem; background:#fff; border:1px solid #efe7df;
+      border-radius:18px; overflow:hidden; box-shadow:0 8px 22px rgba(80,60,120,.10);
+      transition:transform .15s ease, box-shadow .15s ease; position:relative;
+    }
+    body[data-page="gallery"] .gal-card:hover{ transform:translateY(-4px); box-shadow:0 18px 40px rgba(80,60,120,.18); }
+    body[data-page="gallery"] .gal-thumb{ display:block; width:100%; background:var(--accent-soft); }
+    body[data-page="gallery"] .gal-thumb img{ width:100%; display:block; object-fit:cover; }
+    body[data-page="gallery"] .ribbon{
+      position:absolute; top:.7rem; left:.7rem; z-index:2;
+      font-family:var(--font-display); font-weight:700; font-size:.72rem; color:#5a3b00;
+      background:linear-gradient(135deg,#ffd86b,#ffb43d); padding:.28rem .7rem; border-radius:999px;
+      box-shadow:0 4px 10px rgba(0,0,0,.18); display:inline-flex; align-items:center; gap:.25rem;
+    }
+    body[data-page="gallery"] .ribbon.rosie{ background:linear-gradient(135deg,#ff8ab5,#ff5a8a); color:#fff; }
+    body[data-page="gallery"] .gal-body{ padding:.85rem .95rem 1rem; }
+    body[data-page="gallery"] .gal-cat{
+      font-family:var(--font-display); font-weight:600; font-size:.7rem; text-transform:uppercase;
+      letter-spacing:.04em; color:var(--c); background:var(--accent-soft); padding:.2rem .6rem;
+      border-radius:999px; display:inline-block; margin-bottom:.5rem;
+    }
+    body[data-page="gallery"] .gal-card h3{ margin:0 0 .55rem; font-size:1.02rem; color:var(--navy); }
+    body[data-page="gallery"] .gal-creator{ display:flex; align-items:center; gap:.5rem; margin-bottom:.7rem; }
+    body[data-page="gallery"] .gal-creator .ava{
+      width:30px; height:30px; flex:0 0 auto; border-radius:50%; background:var(--accent-soft);
+      display:grid; place-items:center; font-size:1rem; border:2px solid #fff; box-shadow:0 2px 5px rgba(0,0,0,.1);
+    }
+    body[data-page="gallery"] .gal-creator .cname{ font-size:.84rem; color:var(--muted); font-weight:700; font-family:var(--font-display); }
+
+    /* reactions */
+    body[data-page="gallery"] .reacts{ display:flex; gap:.35rem; flex-wrap:wrap; }
+    body[data-page="gallery"] .react{
+      border:1.5px solid #eee; background:#fafafa; border-radius:999px; cursor:pointer;
+      padding:.28rem .55rem; font-size:.82rem; font-family:var(--font-display); font-weight:700;
+      color:var(--navy); display:inline-flex; align-items:center; gap:.25rem; transition:all .12s ease;
+      line-height:1;
+    }
+    body[data-page="gallery"] .react:hover{ border-color:var(--c); transform:translateY(-1px); }
+    body[data-page="gallery"] .react.on{ background:var(--accent-soft); border-color:var(--c); color:var(--c); }
+    body[data-page="gallery"] .react .n{ font-variant-numeric:tabular-nums; }
+    body[data-page="gallery"] .react .em{ font-size:.95rem; }
+    body[data-page="gallery"] .react-title{ font-size:.74rem; color:var(--muted); margin:0 0 .4rem; font-weight:700; font-family:var(--font-display); }
+
+    body[data-page="gallery"] .gal-empty{
+      text-align:center; padding:3rem 1rem; color:var(--muted); font-size:1.05rem;
+      background:#faf8fd; border:1px dashed #e1d6f0; border-radius:18px;
+    }
+    body[data-page="gallery"] .gal-empty .big{ font-size:2.4rem; display:block; margin-bottom:.4rem; }
+
+    /* ===== My Gallery ===== */
+    body[data-page="gallery"] .mygal-stats{ display:flex; gap:.8rem; flex-wrap:wrap; margin-bottom:1.3rem; }
+    body[data-page="gallery"] .mstat{
+      flex:1; min-width:130px; background:#fff; border:1px solid #efe7df; border-radius:16px;
+      padding:.9rem 1.1rem; box-shadow:0 6px 16px rgba(80,60,120,.08);
+    }
+    body[data-page="gallery"] .mstat .num{ font-family:var(--font-display); font-weight:700; font-size:1.7rem; color:var(--c); line-height:1; }
+    body[data-page="gallery"] .mstat .lab{ font-size:.82rem; color:var(--muted); margin-top:.2rem; }
+    body[data-page="gallery"] .mygal-grid{ columns:4 230px; column-gap:1.1rem; }
+    body[data-page="gallery"] .badge-status{
+      position:absolute; top:.7rem; right:.7rem; z-index:2; font-family:var(--font-display);
+      font-weight:700; font-size:.7rem; padding:.24rem .6rem; border-radius:999px; color:#fff;
+      box-shadow:0 3px 8px rgba(0,0,0,.18);
+    }
+    body[data-page="gallery"] .badge-status.published{ background:#2fae5f; }
+    body[data-page="gallery"] .badge-status.pending{ background:#f2a828; }
+    body[data-page="gallery"] .badge-status.draft{ background:#8a93a5; }
+    body[data-page="gallery"] .mygal-actions{ display:flex; gap:.45rem; margin-top:.6rem; flex-wrap:wrap; }
+    body[data-page="gallery"] .mini-btn{
+      border:1.5px solid #e7dff2; background:#fff; color:var(--navy); cursor:pointer;
+      font-family:var(--font-display); font-weight:600; font-size:.8rem; padding:.35rem .8rem;
+      border-radius:999px; transition:all .12s ease;
+    }
+    body[data-page="gallery"] .mini-btn:hover{ border-color:var(--c); color:var(--c); }
+    body[data-page="gallery"] .mini-btn.danger:hover{ border-color:var(--red); color:var(--red); }
+
+    /* hide/show sections by tab */
+    body[data-page="gallery"] [data-view]{ display:none; }
+    body[data-page="gallery"] [data-view].active{ display:block; }
+
+    /* ===== Submit modal ===== */
+    body[data-page="gallery"] .gmodal{
+      position:fixed; inset:0; z-index:120; background:rgba(20,12,40,.55);
+      display:none; align-items:center; justify-content:center; padding:1.2rem;
+      backdrop-filter:blur(3px);
+    }
+    body[data-page="gallery"] .gmodal.open{ display:flex; }
+    body[data-page="gallery"] .gmodal-panel{
+      width:min(560px,96vw); max-height:92vh; overflow:auto; background:#fff;
+      border-radius:24px; box-shadow:0 30px 80px rgba(0,0,0,.4); position:relative;
+    }
+    body[data-page="gallery"] .gmodal-head{
+      background:linear-gradient(135deg,var(--c),#5b3fb0); color:#fff; padding:1.3rem 1.5rem;
+      border-radius:24px 24px 0 0;
+    }
+    body[data-page="gallery"] .gmodal-head h2{ color:#fff; margin:0; font-size:1.4rem; }
+    body[data-page="gallery"] .gmodal-head p{ margin:.25rem 0 0; font-size:.9rem; color:rgba(255,255,255,.85); }
+    body[data-page="gallery"] .gmodal-close{
+      position:absolute; top:1rem; right:1rem; width:36px; height:36px; border-radius:50%;
+      border:none; background:rgba(255,255,255,.22); color:#fff; font-size:1.3rem; cursor:pointer; line-height:1;
+    }
+    body[data-page="gallery"] .gmodal-close:hover{ background:rgba(255,255,255,.35); }
+    body[data-page="gallery"] .gmodal-body{ padding:1.4rem 1.5rem 1.6rem; }
+    body[data-page="gallery"] .step-label{ font-family:var(--font-display); font-weight:700; font-size:.95rem; color:var(--navy); margin:0 0 .7rem; }
+    body[data-page="gallery"] .type-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(95px,1fr)); gap:.6rem; margin-bottom:1.2rem; }
+    body[data-page="gallery"] .type-opt{
+      border:1.5px solid #e7dff2; background:#fff; border-radius:14px; padding:.7rem .4rem; cursor:pointer;
+      text-align:center; font-family:var(--font-display); font-weight:600; font-size:.8rem; color:var(--navy);
+      transition:all .12s ease;
+    }
+    body[data-page="gallery"] .type-opt:hover{ border-color:var(--c); }
+    body[data-page="gallery"] .type-opt.sel{ border-color:var(--c); background:var(--accent-soft); color:var(--c); }
+    body[data-page="gallery"] .type-opt .te{ font-size:1.5rem; display:block; margin-bottom:.25rem; }
+    body[data-page="gallery"] .gfield{ margin-bottom:1.1rem; }
+    body[data-page="gallery"] .gfield label{ display:block; font-family:var(--font-display); font-weight:600; font-size:.88rem; margin-bottom:.35rem; color:var(--navy); }
+    body[data-page="gallery"] .gfield input, body[data-page="gallery"] .gfield select{
+      width:100%; border:1.5px solid #e7dff2; border-radius:12px; padding:.65rem .9rem;
+      font-family:var(--font-body); font-size:.95rem;
+    }
+    body[data-page="gallery"] .gfield input:focus, body[data-page="gallery"] .gfield select:focus{ outline:none; border-color:var(--c); box-shadow:0 0 0 3px var(--accent-soft); }
+    body[data-page="gallery"] .upload-zone{
+      border:2px dashed #d9cdf0; border-radius:16px; padding:1.3rem; text-align:center; cursor:pointer;
+      transition:all .12s ease; background:#faf8fd;
+    }
+    body[data-page="gallery"] .upload-zone:hover{ border-color:var(--c); background:var(--accent-soft); }
+    body[data-page="gallery"] .upload-zone .uemoji{ font-size:2rem; display:block; margin-bottom:.3rem; }
+    body[data-page="gallery"] .upload-zone small{ color:var(--muted); }
+    body[data-page="gallery"] .sample-pick{ display:flex; gap:.5rem; flex-wrap:wrap; margin-top:.7rem; justify-content:center; }
+    body[data-page="gallery"] .sample-pick img{
+      width:54px; height:54px; object-fit:cover; border-radius:10px; cursor:pointer;
+      border:2px solid transparent; transition:all .12s ease;
+    }
+    body[data-page="gallery"] .sample-pick img:hover{ transform:scale(1.06); }
+    body[data-page="gallery"] .sample-pick img.sel{ border-color:var(--c); box-shadow:0 0 0 3px var(--accent-soft); }
+
+    /* moderation animation step */
+    body[data-page="gallery"] .mod-step{ text-align:center; padding:1.5rem .5rem; }
+    body[data-page="gallery"] .mod-line{
+      display:flex; align-items:center; gap:.7rem; justify-content:flex-start; max-width:330px; margin:0 auto .8rem;
+      font-family:var(--font-display); font-weight:600; font-size:1rem; color:var(--navy); opacity:.35; transition:opacity .3s ease;
+    }
+    body[data-page="gallery"] .mod-line.done{ opacity:1; }
+    body[data-page="gallery"] .mod-line .dot{
+      width:30px; height:30px; flex:0 0 auto; border-radius:50%; background:#e7dff2; color:#fff;
+      display:grid; place-items:center; font-size:1rem; transition:background .3s ease;
+    }
+    body[data-page="gallery"] .mod-line.done .dot{ background:#2fae5f; }
+    body[data-page="gallery"] .mod-note{
+      font-size:.82rem; color:var(--muted); background:#f6f3fb; border-radius:12px; padding:.7rem .9rem; margin-top:1rem; line-height:1.45;
+    }
+    body[data-page="gallery"] .gbtn-row{ display:flex; gap:.6rem; justify-content:flex-end; margin-top:.4rem; flex-wrap:wrap; }
+
+    @media(max-width:640px){
+      body[data-page="gallery"] .gal-grid, body[data-page="gallery"] .mygal-grid{ columns:2 150px; }
+      body[data-page="gallery"] .gal-safe-tags{ margin-left:0; }
+    }
+  </style>
+</head>
+<body data-page="gallery" class="accent-indigo">
+
+  <section class="page-hero">
+    <div class="container">
+      <div class="breadcrumb"><a href="index.html">Home</a> / <a href="create-zone.html">Create Zone</a> / Creator Gallery</div>
+      <span class="eyebrow"><span data-icon="star"></span> Creator Gallery</span>
+      <h1>Creator Gallery</h1>
+      <p>Inspire others with your imagination. A proud showcase of amazing creations kids made right here in Red 5 — every one checked for kindness and approved by a parent.</p>
+      <div class="gal-hero-actions">
+        <button class="btn btn-accent btn-lg" data-go="browse"><span data-icon="palette"></span> Browse Gallery</button>
+        <button class="btn btn-yellow btn-lg" id="openSubmit"><span data-icon="star"></span> Submit Creation</button>
+        <button class="btn btn-outline btn-lg" data-go="mine">My Gallery</button>
+      </div>
+
+      <div class="gal-safe">
+        <span class="sicon">🛡️</span>
+        <div>
+          <b>A safe place to share.</b> Everything here is fully moderated and parent-approved.
+          No followers, no friend requests, no messaging, and no public comments — just kind reactions.
+        </div>
+        <div class="gal-safe-tags">
+          <span>✓ Moderated</span>
+          <span>✓ Parent-approved</span>
+          <span>✓ No messaging</span>
+          <span>✓ No comments</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BROWSE VIEW ============ -->
+  <div data-view="browse" class="active">
+
+    <!-- Rosie Picks featured strip -->
+    <section class="section" style="padding-bottom:1rem">
+      <div class="container">
+        <div class="rosie-strip">
+          <div class="rosie-strip-head">
+            <img class="ravatar" src="assets/rosie-avatar.png" alt="Rosie">
+            <div>
+              <h2>🌟 Rosie's Picks</h2>
+              <p>A few creations Rosie loves this week — chosen to inspire you!</p>
+            </div>
+          </div>
+          <div class="rosie-row" id="rosieRow"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top:1.2rem">
+      <div class="container">
+        <!-- category chips + sort + search -->
+        <div class="gal-toolbar">
+          <div class="gal-chips" id="galChips"></div>
+          <div class="gal-search">
+            <span class="si"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span>
+            <input type="search" id="galSearch" placeholder="Search creations…" aria-label="Search creations">
+          </div>
+          <select class="gal-sort" id="galSort" aria-label="Sort creations">
+            <option value="newest">Newest</option>
+            <option value="featured">Featured</option>
+            <option value="appreciated">Most Appreciated</option>
+          </select>
+        </div>
+
+        <p class="gal-count" id="galCount"></p>
+        <div class="gal-grid" id="galGrid"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============ MY GALLERY VIEW ============ -->
+  <div data-view="mine">
+    <section class="section">
+      <div class="container">
+        <div class="gal-tabs" style="margin-bottom:1.4rem">
+          <button class="gal-tab active" data-go="browse">← Back to Gallery</button>
+        </div>
+        <h2 style="font-size:1.6rem;margin-bottom:.3rem">🎨 My Gallery</h2>
+        <p class="muted" style="margin-bottom:1.4rem">Your own creations — Drafts, items waiting for a parent's approval, and ones that are Published in the gallery. Saved right on this device.</p>
+
+        <div class="mygal-stats" id="myStats"></div>
+
+        <div class="gal-tabs" id="myFilterTabs">
+          <button class="gal-tab active" data-mine="all">All</button>
+          <button class="gal-tab" data-mine="published">Published</button>
+          <button class="gal-tab" data-mine="pending">Pending</button>
+          <button class="gal-tab" data-mine="draft">Drafts</button>
+        </div>
+
+        <div class="mygal-grid" id="myGrid"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- CTA band -->
+  <section class="container">
+    <div class="cta-band">
+      <h2>Made something wonderful?</h2>
+      <p>Share it with the Red 5 gallery. We'll check it's kind and safe, then send it to your parent for the final thumbs-up.</p>
+      <div class="hero-actions">
+        <button class="btn btn-yellow btn-lg" id="openSubmit2"><span data-icon="star"></span> Submit a Creation</button>
+        <a class="btn btn-ghost btn-lg" href="create-zone.html">Back to Create Zone</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SUBMIT MODAL ============ -->
+  <div class="gmodal" id="submitModal" aria-hidden="true">
+    <div class="gmodal-panel" role="dialog" aria-modal="true" aria-labelledby="smTitle">
+      <div class="gmodal-head">
+        <button class="gmodal-close" id="smClose" aria-label="Close">×</button>
+        <h2 id="smTitle">Submit a Creation</h2>
+        <p>Show off something you made in Red 5!</p>
+      </div>
+      <div class="gmodal-body">
+
+        <!-- STEP 1: pick + details -->
+        <div id="smStep1">
+          <p class="step-label">1. What did you make?</p>
+          <div class="type-grid" id="typeGrid"></div>
+
+          <div class="gfield">
+            <label for="smTitleInput">Give it a title</label>
+            <input type="text" id="smTitleInput" maxlength="50" placeholder="e.g. My Space Adventure">
+          </div>
+
+          <div class="gfield">
+            <label for="smNick">Your gallery name (first name or nickname only — never your full name)</label>
+            <input type="text" id="smNick" maxlength="20" placeholder="e.g. Alex, StarKid, Luna">
+          </div>
+
+          <div class="gfield">
+            <label>Add your creation</label>
+            <div class="upload-zone" id="uploadZone">
+              <span class="uemoji">🖼️</span>
+              <strong>Tap to choose a picture</strong><br>
+              <small>(This is a demo — pick one of the samples below)</small>
+            </div>
+            <div class="sample-pick" id="samplePick"></div>
+          </div>
+
+          <div class="gbtn-row">
+            <button class="btn btn-outline" id="smCancel">Cancel</button>
+            <button class="btn btn-accent" id="smNext">Next →</button>
+          </div>
+        </div>
+
+        <!-- STEP 2: simulated moderation + parent approval -->
+        <div id="smStep2" style="display:none">
+          <div class="mod-step">
+            <div class="mod-line" id="mod1"><span class="dot">1</span> Checking your creation is kind &amp; safe…</div>
+            <div class="mod-line" id="mod2"><span class="dot">2</span> Making sure there's no personal info…</div>
+            <div class="mod-line" id="mod3"><span class="dot">3</span> Sending to your parent for approval…</div>
+          </div>
+          <div class="mod-note" id="modNote">
+            <b>How sharing really works:</b> In Red 5, a creation is only published after a real
+            grown-up reviews it and a parent approves it. This demo shows those steps on your device —
+            true moderation needs a secure backend plus human review, so nothing here is posted publicly.
+          </div>
+          <div class="gbtn-row" id="modButtons" style="display:none">
+            <button class="btn btn-outline" id="smSaveDraft">Save as Draft</button>
+            <button class="btn btn-green" id="smApprove">Parent Approves ✓</button>
+          </div>
+        </div>
+
+        <!-- STEP 3: result -->
+        <div id="smStep3" style="display:none">
+          <div class="mod-step">
+            <div style="font-size:3rem;margin-bottom:.4rem">🎉</div>
+            <h2 style="font-size:1.4rem;margin-bottom:.4rem" id="smResultTitle">Published to your gallery!</h2>
+            <p class="muted" id="smResultMsg" style="max-width:38ch;margin:0 auto"></p>
+          </div>
+          <div class="gbtn-row">
+            <button class="btn btn-accent" id="smViewMine">Go to My Gallery</button>
+            <button class="btn btn-outline" id="smDone">Done</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
