@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sticker Studio — Red 5</title>
+  <meta name="description" content="Sticker Studio — create awesome stickers, decorate your world, and print them at home! Browse sticker packs or make your own.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="assets/logo.png">
+  <script src="app.js" defer></script>
+  <script src="sticker-studio.js" defer></script>
+  <style>
+    /* ===== Sticker Studio library — scoped to this page only ============ */
+    body[data-page="stickers"]{ --accent:#9b59ff; --accent-soft:#f0e8ff; }
+
+    /* hero art panel */
+    body[data-page="stickers"] .ss-hero{ display:grid; grid-template-columns:1.15fr .85fr; gap:1.6rem; align-items:center; }
+    @media (max-width:840px){ body[data-page="stickers"] .ss-hero{ grid-template-columns:1fr; } }
+    body[data-page="stickers"] .ss-heroart{
+      border-radius:24px; overflow:hidden; box-shadow:0 18px 44px rgba(120,70,200,.22);
+      border:4px solid #fff; background:var(--accent-soft);
+    }
+    body[data-page="stickers"] .ss-heroart img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+    /* "how it works" mini steps */
+    body[data-page="stickers"] .ss-steps{ display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin:0 0 2.2rem; }
+    @media (max-width:760px){ body[data-page="stickers"] .ss-steps{ grid-template-columns:repeat(2,1fr); } }
+    body[data-page="stickers"] .ss-step{
+      background:#fff; border:1px solid #efe4ff; border-radius:18px; padding:1rem 1.1rem;
+      box-shadow:0 10px 24px rgba(120,70,200,.10);
+    }
+    body[data-page="stickers"] .ss-step .n{
+      width:34px; height:34px; border-radius:11px; display:grid; place-items:center;
+      background:linear-gradient(135deg,#a06bff,#7c4dff); color:#fff; font-family:var(--font-display);
+      font-weight:700; margin-bottom:.55rem;
+    }
+    body[data-page="stickers"] .ss-step h3{ margin:0 0 .25rem; font-size:1rem; color:#5b3fb0; }
+    body[data-page="stickers"] .ss-step p{ margin:0; font-size:.84rem; color:var(--muted); line-height:1.4; }
+
+    /* toolbar: search + chips */
+    body[data-page="stickers"] .ss-search{ position:relative; max-width:540px; margin:0 0 1rem; }
+    body[data-page="stickers"] .ss-search input{
+      width:100%; box-sizing:border-box; font-family:var(--font-body,'Nunito',sans-serif);
+      font-size:1rem; padding:.85rem 1.1rem .85rem 2.8rem; border-radius:999px;
+      border:2px solid #ece0ff; background:#fff; color:#3a2b50;
+      box-shadow:0 6px 18px rgba(140,100,220,.10);
+    }
+    body[data-page="stickers"] .ss-search input:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 4px var(--accent-soft); }
+    body[data-page="stickers"] .ss-search svg{ position:absolute; left:1rem; top:50%; transform:translateY(-50%); width:18px; height:18px; }
+
+    body[data-page="stickers"] .ss-chips{ display:flex; flex-wrap:wrap; gap:.5rem; margin-bottom:1.4rem; }
+    body[data-page="stickers"] .ss-chip{
+      border:2px solid #ece0ff; background:#fff; color:#7a64a8; cursor:pointer;
+      font-family:var(--font-display,'Fredoka'); font-weight:600; font-size:.9rem;
+      padding:.42rem 1rem; border-radius:999px; transition:.15s ease; white-space:nowrap;
+    }
+    body[data-page="stickers"] .ss-chip:hover{ border-color:var(--accent); color:var(--accent); }
+    body[data-page="stickers"] .ss-chip.active{
+      background:linear-gradient(135deg,#a06bff,#7c4dff); color:#fff; border-color:transparent;
+      box-shadow:0 8px 18px rgba(124,77,255,.35);
+    }
+
+    body[data-page="stickers"] .ss-count{ font-size:.9rem; color:var(--muted); margin:0 0 1rem; font-weight:700; }
+
+    /* pack grid */
+    body[data-page="stickers"] .ss-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:1.4rem; }
+    body[data-page="stickers"] .ss-card{
+      position:relative; background:#fff; border:1px solid #efe4ff; border-radius:22px; overflow:hidden;
+      display:flex; flex-direction:column; text-decoration:none; color:inherit;
+      box-shadow:0 12px 30px rgba(130,90,200,.13); transition:transform .16s ease, box-shadow .16s ease;
+    }
+    body[data-page="stickers"] .ss-card:hover{ transform:translateY(-5px); box-shadow:0 22px 48px rgba(130,90,200,.24); }
+    body[data-page="stickers"] .ss-thumb{ position:relative; aspect-ratio:1/1; overflow:hidden; background:var(--accent-soft); }
+    body[data-page="stickers"] .ss-thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+    body[data-page="stickers"] .ss-tier{
+      position:absolute; left:.65rem; top:.65rem; display:inline-flex; align-items:center; gap:.3rem;
+      font-family:var(--font-display,'Fredoka'); font-weight:700; font-size:.72rem;
+      padding:.28em .7em; border-radius:999px; color:#fff;
+    }
+    body[data-page="stickers"] .ss-tier.free{ background:rgba(46,174,95,.95); }
+    body[data-page="stickers"] .ss-tier.club{ background:linear-gradient(135deg,#ffb43d,#ff8a3d); }
+    body[data-page="stickers"] .ss-fav{
+      position:absolute; right:.6rem; top:.6rem; width:38px; height:38px; border-radius:50%; border:none;
+      cursor:pointer; background:rgba(255,255,255,.92); display:grid; place-items:center;
+      box-shadow:0 4px 12px rgba(0,0,0,.18); transition:transform .12s ease; z-index:2; padding:0;
+    }
+    body[data-page="stickers"] .ss-fav:hover{ transform:scale(1.1); }
+    body[data-page="stickers"] .ss-fav svg{ width:20px; height:20px; }
+    body[data-page="stickers"] .ss-fav .heart{ fill:none; stroke:#9b59ff; stroke-width:2.2; }
+    body[data-page="stickers"] .ss-fav.on .heart{ fill:#9b59ff; stroke:#9b59ff; }
+    body[data-page="stickers"] .ss-cbody{ padding:.85rem 1rem 1rem; display:flex; flex-direction:column; flex:1; }
+    body[data-page="stickers"] .ss-cbody h3{ margin:0 0 .25rem; font-size:1.05rem; color:#4a2e74; }
+    body[data-page="stickers"] .ss-meta{ display:flex; align-items:center; justify-content:space-between; gap:.5rem; margin-top:.7rem; }
+    body[data-page="stickers"] .ss-num{ font-size:.82rem; color:var(--muted); font-weight:700; }
+    body[data-page="stickers"] .ss-make{
+      background:linear-gradient(135deg,#a06bff,#7c4dff); color:#fff;
+      font-family:var(--font-display,'Fredoka'); font-weight:600; font-size:.84rem;
+      padding:.45rem 1rem; border-radius:999px; box-shadow:0 6px 14px rgba(124,77,255,.3); white-space:nowrap;
+    }
+    body[data-page="stickers"] .ss-empty{ display:none; text-align:center; padding:3rem 1rem; color:var(--muted); }
+    body[data-page="stickers"] .ss-empty.show{ display:block; }
+  </style>
+</head>
+<body data-page="stickers" class="accent-indigo">
+
+  <section class="page-hero">
+    <div class="container">
+      <div class="breadcrumb"><a href="index.html">Home</a> / <a href="create-zone.html">Create Zone</a> / Sticker Studio</div>
+      <div class="ss-hero">
+        <div>
+          <span class="eyebrow"><span data-icon="sparkle"></span> Sticker Studio</span>
+          <h1>Sticker Studio</h1>
+          <p>Create awesome stickers, decorate your world, and print them at home.</p>
+          <div class="hero-actions">
+            <a class="btn btn-accent btn-lg" href="sticker-maker.html"><span data-icon="pencil"></span> Create Sticker</a>
+            <a class="btn btn-ghost btn-lg" href="#packs" style="color:#5b3fb0;border-color:#d9c7ff;background:#fff"><span data-icon="star"></span> Browse Sticker Packs</a>
+          </div>
+        </div>
+        <div class="ss-heroart"><img src="assets/ss-hero.png" alt="Sticker book and sticker press"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+
+      <div class="ss-steps">
+        <div class="ss-step"><div class="n">1</div><h3>Design Your Own</h3><p>Draw, place stickers and add text from scratch.</p></div>
+        <div class="ss-step"><div class="n">2</div><h3>Pick a Pack</h3><p>Start from a sticker pack you love.</p></div>
+        <div class="ss-step"><div class="n">3</div><h3>Add Awesome Stuff</h3><p>Colors, effects, glow and fun backgrounds.</p></div>
+        <div class="ss-step"><div class="n">4</div><h3>Print &amp; Stick</h3><p>Print a whole sheet and stick them everywhere!</p></div>
+      </div>
+
+      <h2 id="packs" style="font-size:1.6rem;color:#4a2e74;margin:0 0 1rem">Popular Sticker Packs</h2>
+
+      <div class="ss-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#9b59ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="search" id="ssSearch" placeholder="Search sticker packs..." aria-label="Search sticker packs">
+      </div>
+      <div class="ss-chips" id="ssChips"></div>
+
+      <p class="ss-count" id="ssCount"></p>
+      <div class="ss-grid" id="ssGrid"></div>
+      <div class="ss-empty" id="ssEmpty">
+        <p style="font-size:1.1rem;font-weight:800;color:#4a2e74;margin:.2rem 0">No packs found</p>
+        <p>Try another category or clear your search.</p>
+      </div>
+
+      <div class="callout mt-3">
+        <span class="ico" data-icon="gift"></span>
+        <div><h3>New sticker packs every month!</h3>
+          <p>Red 5 Club members unlock every Club pack plus fresh sticker drops. <a href="membership.html" style="color:var(--red);font-weight:700">Join for $4.99/month →</a></p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="container">
+    <div class="cta-band">
+      <h2>Make your own from scratch</h2>
+      <p>Draw it, decorate it, and print a full sheet of cut-out stickers.</p>
+      <div class="hero-actions">
+        <a class="btn btn-yellow btn-lg" href="sticker-maker.html"><span data-icon="pencil"></span> Open the Sticker Maker</a>
+        <a class="btn btn-ghost btn-lg" href="create-zone.html">Back to Create Zone</a>
+      </div>
+    </div>
+  </section>
+
+  <script>
+  (function () {
+    function ready(fn){ if(document.readyState!=="loading"){ fn(); } else { document.addEventListener("DOMContentLoaded", fn); } }
+    ready(function () {
+      var data = window.StickerStudio;
+      if (!data) return;
+      var grid   = document.getElementById("ssGrid");
+      var chips  = document.getElementById("ssChips");
+      var empty  = document.getElementById("ssEmpty");
+      var count  = document.getElementById("ssCount");
+      var search = document.getElementById("ssSearch");
+
+      var activeCat = "all";
+      var query = "";
+
+      var HEART = '<svg viewBox="0 0 24 24"><path class="heart" d="M12 21s-7.5-4.6-10-9.1C.4 8.6 2 5 5.4 5c2 0 3.4 1.1 4.3 2.4l.3.4.3-.4C11.2 6.1 12.6 5 14.6 5 18 5 19.6 8.6 22 11.9 19.5 16.4 12 21 12 21z"/></svg>';
+
+      // chips
+      data.CATEGORIES.forEach(function (c) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "ss-chip" + (c.value === "all" ? " active" : "");
+        b.textContent = c.label;
+        b.setAttribute("data-cat", c.value);
+        b.addEventListener("click", function () {
+          activeCat = c.value;
+          chips.querySelectorAll(".ss-chip").forEach(function (el){ el.classList.remove("active"); });
+          b.classList.add("active");
+          render();
+        });
+        chips.appendChild(b);
+      });
+
+      // cards
+      data.PACKS.forEach(function (pack) {
+        var card = document.createElement("a");
+        card.className = "ss-card";
+        card.href = "sticker-maker.html?pack=" + encodeURIComponent(pack.id);
+        card.setAttribute("data-id", pack.id);
+
+        var favOn = data.isFavorite(pack.id);
+        var tierLabel = pack.tier === "club" ? "Club" : "Free";
+
+        card.innerHTML =
+          '<div class="ss-thumb">' +
+            '<img src="' + pack.image + '" alt="' + pack.name + '" loading="lazy">' +
+            '<span class="ss-tier ' + pack.tier + '">' + tierLabel + '</span>' +
+            '<button type="button" class="ss-fav' + (favOn ? " on" : "") + '" aria-label="Add to favorites" aria-pressed="' + favOn + '">' + HEART + '</button>' +
+          '</div>' +
+          '<div class="ss-cbody">' +
+            '<h3>' + pack.name + '</h3>' +
+            '<p style="margin:0;font-size:.85rem;color:#8a7aad;line-height:1.4">' + pack.blurb + '</p>' +
+            '<div class="ss-meta">' +
+              '<span class="ss-num">' + pack.count + ' stickers</span>' +
+              '<span class="ss-make">Open →</span>' +
+            '</div>' +
+          '</div>';
+
+        var favBtn = card.querySelector(".ss-fav");
+        favBtn.addEventListener("click", function (e) {
+          e.preventDefault(); e.stopPropagation();
+          var on = data.toggleFavorite(pack.id);
+          favBtn.classList.toggle("on", on);
+          favBtn.setAttribute("aria-pressed", on);
+        });
+
+        grid.appendChild(card);
+      });
+
+      function render() {
+        var visible = 0;
+        grid.querySelectorAll(".ss-card").forEach(function (card) {
+          var pack = data.getPack(card.getAttribute("data-id"));
+          var matchCat = activeCat === "all" || (pack.cats.indexOf(activeCat) !== -1);
+          var hay = (pack.name + " " + pack.blurb + " " + pack.cats.join(" ")).toLowerCase();
+          var matchQuery = !query || hay.indexOf(query) !== -1;
+          var show = matchCat && matchQuery;
+          card.style.display = show ? "" : "none";
+          if (show) visible++;
+        });
+        empty.classList.toggle("show", visible === 0);
+        count.textContent = visible + (visible === 1 ? " pack" : " packs");
+      }
+
+      search.addEventListener("input", function () {
+        query = search.value.trim().toLowerCase();
+        render();
+      });
+
+      render();
+    });
+  })();
+  </script>
+
+</body>
+</html>

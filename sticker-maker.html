@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sticker Maker — Red 5</title>
+  <meta name="description" content="Make your own sticker — draw, place fun stickers, add text and effects, then print a whole sheet to cut out at home!">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="assets/logo.png">
+  <style>
+    body{ margin:0; font-family:var(--font-body,'Nunito',sans-serif); background:#2a2052; color:#fff; }
+    .sm-wrap{ min-height:100vh; display:flex; flex-direction:column; }
+
+    /* top bar */
+    .sm-top{ display:flex; align-items:center; gap:.7rem; padding:.7rem 1rem; background:linear-gradient(90deg,#3a2d6b,#2a2052); border-bottom:1px solid rgba(255,255,255,.08); flex-wrap:wrap; }
+    .sm-back{ display:inline-flex; align-items:center; gap:.4rem; background:rgba(255,255,255,.12); color:#fff; text-decoration:none; font-family:var(--font-display,'Fredoka'); font-weight:600; padding:.45rem .9rem; border-radius:999px; font-size:.92rem; }
+    .sm-back:hover{ background:rgba(255,255,255,.2); }
+    .sm-title{ font-family:var(--font-display,'Fredoka'); font-weight:700; font-size:1.3rem; margin:0; letter-spacing:.5px; }
+    .sm-title .a{ color:#ffd23f; }
+    .sm-spacer{ flex:1; }
+    .sm-btn{ border:none; cursor:pointer; font-family:var(--font-display,'Fredoka'); font-weight:600; font-size:.9rem; padding:.5rem 1rem; border-radius:999px; color:#fff; display:inline-flex; align-items:center; gap:.4rem; box-shadow:0 6px 14px rgba(0,0,0,.2); }
+    .sm-btn.idea{ background:linear-gradient(135deg,#ffb43d,#ff8a3d); color:#3a2400; }
+    .sm-btn.save{ background:linear-gradient(135deg,#3ddc84,#22b566); }
+    .sm-btn:hover{ filter:brightness(1.07); }
+
+    /* layout: tools | canvas | panel */
+    .sm-main{ flex:1; display:grid; grid-template-columns:230px 1fr 290px; gap:1rem; padding:1rem; align-items:start; }
+    @media (max-width:1080px){ .sm-main{ grid-template-columns:1fr; } }
+    .sm-col{ background:#241b48; border-radius:18px; padding:1rem; box-shadow:inset 0 0 0 1px rgba(255,255,255,.06); }
+    .sm-col h2{ font-family:var(--font-display,'Fredoka'); font-size:.95rem; margin:0 0 .6rem; color:#cfc6ff; text-transform:uppercase; letter-spacing:.04em; }
+    .sm-col h2:not(:first-child){ margin-top:1.2rem; }
+
+    /* tool buttons */
+    .sm-tools{ display:flex; flex-wrap:wrap; gap:.45rem; }
+    .sm-tool{ border:none; cursor:pointer; background:rgba(255,255,255,.1); color:#fff; font-family:var(--font-display,'Fredoka'); font-weight:600; font-size:.85rem; padding:.45rem .7rem; border-radius:12px; display:inline-flex; align-items:center; gap:.35rem; }
+    .sm-tool.active{ background:linear-gradient(135deg,#7c4dff,#5e40d8); box-shadow:0 4px 12px rgba(124,77,255,.5); }
+    .sm-tool:hover{ filter:brightness(1.1); }
+
+    /* color swatches */
+    .sm-swatches{ display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
+    .sm-sw{ width:100%; aspect-ratio:1; border-radius:8px; border:2px solid rgba(255,255,255,.15); cursor:pointer; padding:0; }
+    .sm-sw.sel{ border-color:#fff; box-shadow:0 0 0 2px #ffd23f; transform:scale(1.06); }
+
+    .sm-size label{ font-size:.82rem; color:#cfc6ff; font-weight:700; display:block; margin-bottom:.3rem; }
+    .sm-size input{ width:100%; }
+
+    /* canvas stage */
+    .sm-stagewrap{ display:flex; flex-direction:column; align-items:center; gap:.9rem; }
+    .sm-stagebar{ display:flex; flex-wrap:wrap; gap:.45rem; justify-content:center; }
+    .sm-canvas-shell{
+      position:relative; border-radius:26px; background:#fff; padding:14px;
+      box-shadow:0 20px 50px rgba(0,0,0,.4); border:3px dashed #d8d0f0;
+    }
+    #smCanvas{ display:block; border-radius:16px; touch-action:none; cursor:crosshair; max-width:100%; }
+    .sm-hint{ font-size:.82rem; color:#b3a9e0; text-align:center; max-width:420px; line-height:1.4; }
+
+    /* sticker tray */
+    .sm-traycats{ display:flex; flex-wrap:wrap; gap:.35rem; margin-bottom:.6rem; }
+    .sm-traycat{ border:none; cursor:pointer; background:rgba(255,255,255,.1); color:#e7e1ff; font-family:var(--font-display,'Fredoka'); font-weight:600; font-size:.78rem; padding:.3rem .6rem; border-radius:999px; }
+    .sm-traycat.active{ background:#7c4dff; color:#fff; }
+    .sm-tray{ display:grid; grid-template-columns:repeat(6,1fr); gap:5px; max-height:150px; overflow-y:auto; }
+    .sm-stk{ font-size:1.35rem; line-height:1; aspect-ratio:1; border:none; border-radius:10px; background:rgba(255,255,255,.07); cursor:pointer; display:grid; place-items:center; padding:0; }
+    .sm-stk.sel{ background:#7c4dff; box-shadow:0 0 0 2px #ffd23f; }
+    .sm-stk:hover{ background:rgba(255,255,255,.18); }
+
+    /* text + effects */
+    .sm-row{ display:flex; gap:.5rem; align-items:center; flex-wrap:wrap; }
+    .sm-input{ flex:1; min-width:120px; box-sizing:border-box; padding:.5rem .7rem; border-radius:10px; border:2px solid rgba(255,255,255,.15); background:rgba(255,255,255,.06); color:#fff; font-family:var(--font-body); font-size:.9rem; }
+    .sm-input::placeholder{ color:#9b90c8; }
+    .sm-input:focus{ outline:none; border-color:#7c4dff; }
+    .sm-chiprow{ display:flex; flex-wrap:wrap; gap:.4rem; }
+    .sm-bg{ border:2px solid rgba(255,255,255,.15); cursor:pointer; font-family:var(--font-display); font-weight:600; font-size:.78rem; color:#fff; padding:.35rem .7rem; border-radius:999px; background:rgba(255,255,255,.06); }
+    .sm-bg.sel{ border-color:#ffd23f; background:rgba(124,77,255,.4); }
+
+    /* print center */
+    .sm-print{ display:grid; gap:.5rem; }
+    .sm-print .sm-btn{ justify-content:center; width:100%; box-sizing:border-box; }
+    .sm-print .print{ background:linear-gradient(135deg,#7c4dff,#5e40d8); }
+    .sm-print .single{ background:rgba(255,255,255,.12); }
+    .sm-print .png{ background:rgba(255,255,255,.12); }
+
+    /* my stickers strip */
+    .sm-saved{ background:#241b48; border-radius:18px; margin:0 1rem 1rem; padding:.9rem 1rem 1rem; box-shadow:inset 0 0 0 1px rgba(255,255,255,.06); }
+    .sm-saved h2{ font-family:var(--font-display,'Fredoka'); font-size:.95rem; margin:0 0 .6rem; color:#cfc6ff; text-transform:uppercase; letter-spacing:.04em; }
+    .sm-savedrow{ display:flex; gap:.7rem; overflow-x:auto; padding-bottom:.4rem; min-height:84px; }
+    .sm-saveditem{ position:relative; flex:none; width:84px; height:84px; border-radius:14px; overflow:hidden; border:3px solid transparent; background:#fff; cursor:pointer; padding:0; }
+    .sm-saveditem img{ width:100%; height:100%; object-fit:contain; display:block; }
+    .sm-saveditem .del{ position:absolute; top:2px; right:2px; width:20px; height:20px; border:none; border-radius:50%; background:rgba(40,20,60,.85); color:#fff; font-size:.8rem; line-height:1; cursor:pointer; display:grid; place-items:center; padding:0; }
+    .sm-savedempty{ font-size:.84rem; color:#9b90c8; align-self:center; }
+
+    .toast{ position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(20px); background:#3a2d6b; color:#fff; padding:.7rem 1.2rem; border-radius:999px; box-shadow:0 10px 30px rgba(0,0,0,.4); opacity:0; pointer-events:none; transition:.25s; font-weight:600; z-index:50; }
+    .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+    /* ===== print sheet (hidden on screen, shown only when printing) ===== */
+    #smSheet{ display:none; }
+    @media print{
+      body *{ visibility:hidden !important; }
+      #smSheet, #smSheet *{ visibility:visible !important; }
+      #smSheet{ display:block !important; position:absolute; inset:0; margin:0; padding:0; background:#fff; }
+    }
+  </style>
+</head>
+<body>
+  <div class="sm-wrap">
+    <div class="sm-top">
+      <a class="sm-back" href="sticker-studio.html">← Back to Sticker Studio</a>
+      <h1 class="sm-title">STICKER <span class="a">MAKER</span></h1>
+      <div class="sm-spacer"></div>
+      <button class="sm-btn idea" id="smIdea" type="button">💡 Sticker Idea</button>
+      <button class="sm-btn save" id="smSave" type="button">⭐ Save to My Stickers</button>
+    </div>
+
+    <div class="sm-main">
+      <!-- LEFT: tools -->
+      <div class="sm-col">
+        <h2>Draw Tools</h2>
+        <div class="sm-tools" id="smTools">
+          <button class="sm-tool active" data-tool="pencil" type="button">✏️ Pencil</button>
+          <button class="sm-tool" data-tool="brush" type="button">🖌 Brush</button>
+          <button class="sm-tool" data-tool="marker" type="button">🖊 Marker</button>
+          <button class="sm-tool" data-tool="neon" type="button">✨ Neon</button>
+          <button class="sm-tool" data-tool="eraser" type="button">🧽 Eraser</button>
+        </div>
+
+        <h2>Colors</h2>
+        <div class="sm-swatches" id="smSwatches"></div>
+
+        <h2>Size</h2>
+        <div class="sm-size">
+          <label>Brush / sticker size: <b id="smSizeVal">14</b></label>
+          <input type="range" id="smSize" min="4" max="120" value="14">
+        </div>
+
+        <h2>Undo</h2>
+        <div class="sm-tools">
+          <button class="sm-tool" id="smUndo" type="button">↶ Undo</button>
+          <button class="sm-tool" id="smClear" type="button">🗑 Clear</button>
+        </div>
+      </div>
+
+      <!-- CENTER: canvas -->
+      <div class="sm-stagewrap">
+        <div class="sm-stagebar">
+          <button class="sm-bg sel" data-bg="white" type="button">Transparent</button>
+          <button class="sm-bg" data-bg="pastel" type="button">Pastel</button>
+          <button class="sm-bg" data-bg="galaxy" type="button">Galaxy</button>
+          <button class="sm-bg" data-bg="rainbow" type="button">Rainbow</button>
+          <button class="sm-bg" id="smGlow" type="button">✨ Glow: Off</button>
+        </div>
+        <div class="sm-canvas-shell">
+          <canvas id="smCanvas" width="480" height="480"></canvas>
+        </div>
+        <p class="sm-hint" id="smHint">Pick a draw tool and doodle, or tap a sticker on the right then tap the canvas to place it. Add text and a fun background, then print!</p>
+      </div>
+
+      <!-- RIGHT: stickers + text + print -->
+      <div class="sm-col">
+        <h2>Sticker Elements</h2>
+        <div class="sm-traycats" id="smTrayCats"></div>
+        <div class="sm-tray" id="smTray"></div>
+
+        <h2>Add Text</h2>
+        <div class="sm-row" style="margin-bottom:.5rem">
+          <input class="sm-input" id="smText" type="text" maxlength="22" placeholder="Type a word...">
+        </div>
+        <div class="sm-row">
+          <button class="sm-tool" id="smAddText" type="button">➕ Place Text</button>
+          <span style="font-size:.78rem;color:#9b90c8">uses current color &amp; size</span>
+        </div>
+
+        <h2>Print Center</h2>
+        <div class="sm-print">
+          <button class="sm-btn print" id="smPrintSheet" type="button">🖨 Print Sticker Sheet</button>
+          <button class="sm-btn single" id="smPrintSingle" type="button">🖨 Print Single</button>
+          <button class="sm-btn png" id="smDownload" type="button">⬇ Download PNG</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MY STICKERS strip -->
+    <div class="sm-saved">
+      <h2>My Stickers</h2>
+      <div class="sm-savedrow" id="smSavedRow"></div>
+    </div>
+  </div>
+
+  <!-- print-only sheet target -->
+  <div id="smSheet"></div>
+
+  <div class="toast" id="smToast"></div>
+
+  <script>
+  (function () {
+    "use strict";
+    function ready(fn){ if(document.readyState!=="loading"){ fn(); } else { document.addEventListener("DOMContentLoaded", fn); } }
+
+    /* ---- kid-safe sticker idea prompts (NOT real AI) ------------------- */
+    var IDEAS = [
+      "A happy dinosaur eating pizza",
+      "A cat astronaut floating in space",
+      "A rainbow with a smiley face",
+      "A puppy wearing cool sunglasses",
+      "A unicorn jumping over a star",
+      "A friendly robot waving hello",
+      "A taco doing a little dance",
+      "A sleepy sloth hugging a heart",
+      "A rocket ship zooming past planets",
+      "A cupcake with a big smile",
+      "A panda holding a balloon",
+      "A turtle surfing on a wave",
+      "A bee buzzing around a flower",
+      "A frog wearing a tiny crown",
+      "A ghost that is super friendly",
+      "A star giving a thumbs up",
+      "A penguin sliding on ice",
+      "A monster made of jellybeans",
+      "A fox reading a comic book",
+      "A donut wearing roller skates"
+    ];
+
+    /* ---- sticker element trays (emoji = the actual product) ----------- */
+    var TRAYS = {
+      Animals: ["🐶","🐱","🦊","🐼","🐯","🦁","🐸","🐢","🐰","🐨","🐥","🦄","🐝","🐬","🦋","🐙"],
+      Space:   ["🚀","🪐","⭐","🌟","✨","🌙","☄️","👽","🛸","🌍","☀️","💫"],
+      Food:    ["🍕","🍔","🍟","🌮","🍩","🍦","🍪","🧁","🍓","🍉","🍭","🍿","🥤","🍇","🍌"],
+      Hearts:  ["❤️","🧡","💛","💚","💙","💜","🩷","💖","💝","💕","💗","💓"],
+      Stars:   ["⭐","🌟","✨","💫","🌈","☀️","⚡","🔥","❄️","🎆","🎇","🏆"],
+      Fun:     ["😀","😎","🤩","😺","🥳","👍","✌️","🙌","👑","💎","🎈","🎉","🎮","⚽","🎸","🦖"]
+    };
+
+    var COLORS = ["#ff3b3b","#ff8a3d","#ffc83d","#3ddc84","#2ba8e0","#7c4dff","#ff5ba6",
+                  "#000000","#ffffff","#8a5a2b","#00c2b2","#ff5fb0","#5da130","#222244"];
+
+    ready(function () {
+      var canvas = document.getElementById("smCanvas");
+      var ctx = canvas.getContext("2d");
+      var W = canvas.width, H = canvas.height;
+
+      var state = {
+        tool: "pencil",
+        color: "#7c4dff",
+        size: 14,
+        bg: "white",
+        glow: false,
+        placeMode: null,   // emoji string to place on tap, or null
+        textToPlace: null  // text to place on tap, or null
+      };
+
+      var undoStack = [];
+
+      /* ---- background painting ---------------------------------------- */
+      function paintBg() {
+        ctx.save();
+        ctx.globalCompositeOperation = "source-over";
+        if (state.bg === "white") {
+          ctx.clearRect(0,0,W,H); // transparent
+        } else if (state.bg === "pastel") {
+          var g = ctx.createLinearGradient(0,0,W,H);
+          g.addColorStop(0,"#ffe3f3"); g.addColorStop(.5,"#e7f0ff"); g.addColorStop(1,"#e9fff5");
+          ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+        } else if (state.bg === "galaxy") {
+          var gg = ctx.createLinearGradient(0,0,W,H);
+          gg.addColorStop(0,"#241b48"); gg.addColorStop(1,"#5a2a82");
+          ctx.fillStyle = gg; ctx.fillRect(0,0,W,H);
+          for (var i=0;i<70;i++){
+            ctx.globalAlpha = Math.random()*0.8+0.2;
+            ctx.fillStyle = "#fff";
+            var r = Math.random()*1.8+0.4;
+            ctx.beginPath(); ctx.arc(Math.random()*W, Math.random()*H, r, 0, 7); ctx.fill();
+          }
+          ctx.globalAlpha = 1;
+        } else if (state.bg === "rainbow") {
+          var rg = ctx.createLinearGradient(0,0,W,0);
+          var cs = ["#ff5b5b","#ffb13d","#ffe23d","#5ddc7a","#3db5e0","#7c6bff","#ff6bd6"];
+          for (var c=0;c<cs.length;c++){ rg.addColorStop(c/(cs.length-1), cs[c]); }
+          ctx.fillStyle = rg; ctx.fillRect(0,0,W,H);
+          ctx.fillStyle = "rgba(255,255,255,.35)"; ctx.fillRect(0,0,W,H);
+        }
+        ctx.restore();
+      }
+
+      function pushUndo() {
+        try { undoStack.push(ctx.getImageData(0,0,W,H)); if (undoStack.length>30) undoStack.shift(); } catch(e){}
+      }
+
+      function redrawBgKeepArt() {
+        // Re-paint background under existing artwork: snapshot art, repaint bg, restore art on top.
+        var snap = ctx.getImageData(0,0,W,H);
+        paintBg();
+        ctx.putImageData(snap,0,0); // note: simple overlay; bg used at clear/start mainly
+      }
+
+      /* ---- drawing ---------------------------------------------------- */
+      var drawing = false, lastX=0, lastY=0;
+
+      function pos(e){
+        var r = canvas.getBoundingClientRect();
+        var cx = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
+        var cy = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
+        return { x: cx * (W/r.width), y: cy * (H/r.height) };
+      }
+
+      function applyStroke(){
+        ctx.lineCap = "round"; ctx.lineJoin = "round";
+        ctx.shadowBlur = 0; ctx.shadowColor = "transparent";
+        ctx.globalAlpha = 1;
+        if (state.tool === "eraser"){
+          ctx.globalCompositeOperation = "destination-out";
+          ctx.strokeStyle = "rgba(0,0,0,1)";
+          ctx.lineWidth = state.size;
+        } else {
+          ctx.globalCompositeOperation = "source-over";
+          ctx.strokeStyle = state.color;
+          if (state.tool === "pencil"){ ctx.lineWidth = Math.max(2, state.size*0.4); }
+          else if (state.tool === "brush"){ ctx.lineWidth = state.size; }
+          else if (state.tool === "marker"){ ctx.lineWidth = state.size*1.1; ctx.globalAlpha = 0.55; }
+          else if (state.tool === "neon"){ ctx.lineWidth = state.size*0.8; ctx.shadowBlur = state.size; ctx.shadowColor = state.color; }
+        }
+      }
+
+      function startDraw(e){
+        // placing a sticker / text takes priority over drawing
+        var p = pos(e);
+        if (state.placeMode){ placeEmoji(state.placeMode, p.x, p.y); return; }
+        if (state.textToPlace){ placeText(state.textToPlace, p.x, p.y); state.textToPlace=null; setHint("Text placed! Add more or print your sticker."); return; }
+        e.preventDefault();
+        pushUndo();
+        drawing = true; lastX = p.x; lastY = p.y;
+        applyStroke();
+        ctx.beginPath(); ctx.moveTo(lastX,lastY); ctx.lineTo(lastX+0.01,lastY+0.01); ctx.stroke();
+      }
+      function moveDraw(e){
+        if(!drawing) return;
+        e.preventDefault();
+        var p = pos(e);
+        applyStroke();
+        ctx.beginPath(); ctx.moveTo(lastX,lastY); ctx.lineTo(p.x,p.y); ctx.stroke();
+        lastX = p.x; lastY = p.y;
+      }
+      function endDraw(){ drawing = false; ctx.globalCompositeOperation="source-over"; ctx.globalAlpha=1; ctx.shadowBlur=0; autosave(); }
+
+      canvas.addEventListener("mousedown", startDraw);
+      canvas.addEventListener("mousemove", moveDraw);
+      window.addEventListener("mouseup", endDraw);
+      canvas.addEventListener("touchstart", startDraw, {passive:false});
+      canvas.addEventListener("touchmove", moveDraw, {passive:false});
+      window.addEventListener("touchend", endDraw);
+
+      /* ---- place emoji / text ----------------------------------------- */
+      function placeEmoji(emoji, x, y){
+        pushUndo();
+        ctx.save();
+        ctx.globalCompositeOperation = "source-over";
+        var fs = Math.max(18, state.size*2.2);
+        ctx.font = fs + "px 'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif";
+        ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        if (state.glow){ ctx.shadowColor = "#fff"; ctx.shadowBlur = 14; }
+        ctx.fillText(emoji, x, y);
+        ctx.restore();
+        autosave();
+      }
+      function placeText(text, x, y){
+        pushUndo();
+        ctx.save();
+        ctx.globalCompositeOperation = "source-over";
+        var fs = Math.max(16, state.size*1.6);
+        ctx.font = "700 " + fs + "px 'Fredoka','Nunito',sans-serif";
+        ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        ctx.lineJoin = "round";
+        // white outline so text reads on any background
+        ctx.lineWidth = Math.max(3, fs*0.16);
+        ctx.strokeStyle = (state.color === "#ffffff") ? "#222244" : "#ffffff";
+        ctx.strokeText(text, x, y);
+        if (state.glow){ ctx.shadowColor = state.color; ctx.shadowBlur = 12; }
+        ctx.fillStyle = state.color;
+        ctx.fillText(text, x, y);
+        ctx.restore();
+        autosave();
+      }
+
+      /* ---- build UI: swatches ----------------------------------------- */
+      var swWrap = document.getElementById("smSwatches");
+      COLORS.forEach(function(col){
+        var b = document.createElement("button");
+        b.type="button"; b.className = "sm-sw" + (col===state.color?" sel":"");
+        b.style.background = col; b.setAttribute("aria-label","color "+col);
+        b.addEventListener("click", function(){
+          state.color = col;
+          swWrap.querySelectorAll(".sm-sw").forEach(function(s){ s.classList.remove("sel"); });
+          b.classList.add("sel");
+        });
+        swWrap.appendChild(b);
+      });
+
+      /* ---- tools ------------------------------------------------------ */
+      var toolsWrap = document.getElementById("smTools");
+      toolsWrap.querySelectorAll(".sm-tool[data-tool]").forEach(function(btn){
+        btn.addEventListener("click", function(){
+          state.tool = btn.getAttribute("data-tool");
+          state.placeMode = null; state.textToPlace = null;
+          toolsWrap.querySelectorAll(".sm-tool[data-tool]").forEach(function(b){ b.classList.remove("active"); });
+          btn.classList.add("active");
+          clearStickerSel();
+          canvas.style.cursor = (state.tool==="eraser") ? "cell" : "crosshair";
+          setHint("Drawing with " + btn.textContent.trim().replace(/^[^ ]+ /,"") + ". Click and drag on the canvas!");
+        });
+      });
+
+      /* ---- size ------------------------------------------------------- */
+      var sizeInput = document.getElementById("smSize");
+      var sizeVal = document.getElementById("smSizeVal");
+      sizeInput.addEventListener("input", function(){ state.size = +sizeInput.value; sizeVal.textContent = sizeInput.value; });
+
+      /* ---- undo / clear ----------------------------------------------- */
+      document.getElementById("smUndo").addEventListener("click", function(){
+        if(undoStack.length){ ctx.putImageData(undoStack.pop(),0,0); autosave(); }
+        else { toast("Nothing to undo"); }
+      });
+      document.getElementById("smClear").addEventListener("click", function(){
+        pushUndo(); paintBg(); autosave(); toast("Cleared");
+      });
+
+      /* ---- background buttons ----------------------------------------- */
+      var bgBtns = document.querySelectorAll(".sm-bg[data-bg]");
+      bgBtns.forEach(function(btn){
+        btn.addEventListener("click", function(){
+          state.bg = btn.getAttribute("data-bg");
+          bgBtns.forEach(function(b){ b.classList.remove("sel"); });
+          btn.classList.add("sel");
+          // repaint background but keep artwork on top
+          var snap = ctx.getImageData(0,0,W,H);
+          paintBg();
+          ctx.putImageData(snap,0,0);
+          // for transparent we already cleared; re-overlay art handled above
+          autosave();
+        });
+      });
+
+      /* ---- glow toggle ------------------------------------------------ */
+      var glowBtn = document.getElementById("smGlow");
+      glowBtn.addEventListener("click", function(){
+        state.glow = !state.glow;
+        glowBtn.textContent = "✨ Glow: " + (state.glow ? "On" : "Off");
+        glowBtn.classList.toggle("sel", state.glow);
+      });
+
+      /* ---- sticker tray ----------------------------------------------- */
+      var trayCats = document.getElementById("smTrayCats");
+      var tray = document.getElementById("smTray");
+      var catNames = Object.keys(TRAYS);
+      var activeCat = catNames[0];
+
+      function clearStickerSel(){ tray.querySelectorAll(".sm-stk").forEach(function(s){ s.classList.remove("sel"); }); }
+
+      function buildTray(cat){
+        tray.innerHTML = "";
+        TRAYS[cat].forEach(function(em){
+          var b = document.createElement("button");
+          b.type="button"; b.className="sm-stk"; b.textContent = em;
+          b.addEventListener("click", function(){
+            clearStickerSel();
+            b.classList.add("sel");
+            state.placeMode = em; state.textToPlace = null;
+            setHint("Tap the canvas to stamp your " + em + " sticker. Bigger size = bigger sticker!");
+          });
+          tray.appendChild(b);
+        });
+      }
+      catNames.forEach(function(cat){
+        var b = document.createElement("button");
+        b.type="button"; b.className="sm-traycat" + (cat===activeCat?" active":"");
+        b.textContent = cat;
+        b.addEventListener("click", function(){
+          activeCat = cat;
+          trayCats.querySelectorAll(".sm-traycat").forEach(function(x){ x.classList.remove("active"); });
+          b.classList.add("active");
+          buildTray(cat);
+        });
+        trayCats.appendChild(b);
+      });
+      buildTray(activeCat);
+
+      /* ---- text ------------------------------------------------------- */
+      document.getElementById("smAddText").addEventListener("click", function(){
+        var t = document.getElementById("smText").value.trim();
+        if(!t){ toast("Type a word first"); return; }
+        state.textToPlace = t; state.placeMode = null; clearStickerSel();
+        setHint('Tap the canvas to place "' + t + '".');
+      });
+
+      /* ---- AI sticker idea (curated, NOT real AI) --------------------- */
+      document.getElementById("smIdea").addEventListener("click", function(){
+        var idea = IDEAS[Math.floor(Math.random()*IDEAS.length)];
+        setHint("💡 Idea: " + idea + " — try drawing it or use the stickers!");
+        toast("💡 " + idea);
+      });
+
+      /* ---- helpers ---------------------------------------------------- */
+      var hint = document.getElementById("smHint");
+      function setHint(t){ hint.textContent = t; }
+      var toastEl = document.getElementById("smToast");
+      var toastTimer;
+      function toast(msg){
+        toastEl.textContent = msg; toastEl.classList.add("show");
+        clearTimeout(toastTimer); toastTimer = setTimeout(function(){ toastEl.classList.remove("show"); }, 1800);
+      }
+
+      /* ---- autosave current sticker ----------------------------------- */
+      var AUTO_KEY = "red5_sticker_current";
+      var LIST_KEY = "red5_sticker_saved";
+      var saveTimer;
+      function autosave(){
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(function(){
+          try { localStorage.setItem(AUTO_KEY, canvas.toDataURL("image/png")); } catch(e){}
+        }, 400);
+      }
+      function loadAutosave(){
+        try {
+          var d = localStorage.getItem(AUTO_KEY);
+          if(d){ var img = new Image(); img.onload = function(){ ctx.drawImage(img,0,0,W,H); }; img.src = d; return true; }
+        } catch(e){}
+        return false;
+      }
+
+      /* ---- My Stickers (saved list) ----------------------------------- */
+      var savedRow = document.getElementById("smSavedRow");
+      function readSaved(){ try { return JSON.parse(localStorage.getItem(LIST_KEY))||[]; } catch(e){ return []; } }
+      function writeSaved(l){ try { localStorage.setItem(LIST_KEY, JSON.stringify(l)); } catch(e){} }
+
+      function renderSaved(){
+        var list = readSaved();
+        savedRow.innerHTML = "";
+        if(!list.length){ savedRow.innerHTML = '<span class="sm-savedempty">No saved stickers yet — tap ⭐ Save to keep your favorites here.</span>'; return; }
+        list.forEach(function(dataUrl, idx){
+          var item = document.createElement("button");
+          item.type="button"; item.className="sm-saveditem"; item.title="Load this sticker";
+          item.innerHTML = '<img src="'+dataUrl+'" alt="Saved sticker '+(idx+1)+'">' +
+                           '<span class="del" title="Delete">×</span>';
+          item.addEventListener("click", function(e){
+            if(e.target.classList.contains("del")){
+              e.stopPropagation();
+              var l = readSaved(); l.splice(idx,1); writeSaved(l); renderSaved(); toast("Deleted");
+              return;
+            }
+            var img = new Image();
+            img.onload = function(){ pushUndo(); ctx.clearRect(0,0,W,H); ctx.drawImage(img,0,0,W,H); autosave(); toast("Loaded!"); };
+            img.src = dataUrl;
+          });
+          savedRow.appendChild(item);
+        });
+      }
+
+      document.getElementById("smSave").addEventListener("click", function(){
+        var list = readSaved();
+        list.unshift(canvas.toDataURL("image/png"));
+        if(list.length>24) list = list.slice(0,24);
+        writeSaved(list); renderSaved(); toast("⭐ Saved to My Stickers!");
+      });
+
+      /* ---- download PNG ----------------------------------------------- */
+      document.getElementById("smDownload").addEventListener("click", function(){
+        var a = document.createElement("a");
+        a.download = "my-sticker.png";
+        a.href = canvas.toDataURL("image/png");
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        toast("Downloaded PNG");
+      });
+
+      /* ---- print: sheet of cut-out stickers --------------------------- */
+      var sheet = document.getElementById("smSheet");
+      function buildSheet(cols, rows){
+        var url = canvas.toDataURL("image/png");
+        var cells = "";
+        for(var i=0;i<cols*rows;i++){
+          cells += '<div class="psc"><img src="'+url+'" alt="sticker"></div>';
+        }
+        sheet.innerHTML =
+          '<style>' +
+            '@page{ size: letter; margin: 0.5in; }' +
+            '#smSheet .pshead{ text-align:center; font-family:Fredoka,Nunito,sans-serif; color:#5b3fb0; margin:0 0 .25in; }' +
+            '#smSheet .pshead h2{ margin:0; font-size:20pt; }' +
+            '#smSheet .pshead p{ margin:.05in 0 0; font-size:9pt; color:#888; }' +
+            '#smSheet .psgrid{ display:grid; grid-template-columns:repeat('+cols+',1fr); gap:0.18in; }' +
+            '#smSheet .psc{ border:1.5px dashed #c9b8ee; border-radius:14px; padding:6px; aspect-ratio:1; display:flex; align-items:center; justify-content:center; }' +
+            '#smSheet .psc img{ max-width:100%; max-height:100%; }' +
+          '</style>' +
+          '<div class="pshead"><h2>My Sticker Sheet — Red 5</h2><p>Cut along the dashed lines and stick them everywhere!</p></div>' +
+          '<div class="psgrid">' + cells + '</div>';
+      }
+      document.getElementById("smPrintSheet").addEventListener("click", function(){
+        buildSheet(3, 4); // 12 cut-out stickers on a Letter page
+        window.print();
+      });
+      document.getElementById("smPrintSingle").addEventListener("click", function(){
+        buildSheet(1, 1);
+        window.print();
+      });
+
+      /* ---- init ------------------------------------------------------- */
+      paintBg();
+      var hadAuto = loadAutosave();
+
+      // If opened from a pack, greet with a matching tray + hint
+      var params = new URLSearchParams(window.location.search);
+      var packId = params.get("pack");
+      if (packId){
+        var map = {
+          "cute-animals":"Animals","good-friends":"Animals","ocean-pals":"Animals","dino-world":"Animals",
+          "space-explorers":"Space","yummy-food":"Food","emoji-mix":"Food","gamer-life":"Fun",
+          "sports-all-day":"Fun","good-vibes":"Stars","pastel-dreams":"Stars","nature-trail":"Stars"
+        };
+        var startCat = map[packId] || catNames[0];
+        var catBtn = Array.prototype.find.call(trayCats.querySelectorAll(".sm-traycat"), function(b){ return b.textContent===startCat; });
+        if(catBtn) catBtn.click();
+        setHint("Pack loaded! Tap a sticker on the right, then tap the canvas to start your design.");
+      }
+
+      renderSaved();
+    });
+  })();
+  </script>
+</body>
+</html>
