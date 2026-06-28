@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Adventure — Printable Adventures — Red 5</title>
+  <meta name="description" content="Preview, print and download a Red 5 printable adventure pack.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="assets/logo.png">
+  <script src="app.js" defer></script>
+  <script src="printable-adventures.js" defer></script>
+
+  <style>
+  /* ===== Printable Adventure detail — scoped ============================ */
+  body[data-page="printable-detail"] .pa-d-wrap{
+    display:grid; grid-template-columns:minmax(280px,420px) 1fr; gap:2.4rem; align-items:start;
+  }
+  @media (max-width:880px){ body[data-page="printable-detail"] .pa-d-wrap{ grid-template-columns:1fr; gap:1.6rem; } }
+
+  /* Cover */
+  body[data-page="printable-detail"] .pa-d-cover{
+    position:relative; border-radius:24px; overflow:hidden; background:#1a2150;
+    box-shadow:0 24px 50px -20px rgba(26,33,74,.5); aspect-ratio:16/11;
+  }
+  body[data-page="printable-detail"] .pa-d-cover img{ width:100%; height:100%; object-fit:cover; display:block; }
+  body[data-page="printable-detail"] .pa-d-club{
+    display:none; position:absolute; top:14px; left:14px; align-items:center; gap:.3rem;
+    background:linear-gradient(135deg,#ffd23f,#f4a91e); color:#5a3b00;
+    font-family:var(--font-display); font-weight:700; font-size:.85rem;
+    padding:.35rem .8rem; border-radius:999px; box-shadow:0 6px 14px rgba(0,0,0,.25);
+  }
+
+  /* Quick facts */
+  body[data-page="printable-detail"] .pa-d-facts{
+    display:flex; gap:.7rem; flex-wrap:wrap; margin:.4rem 0 1rem;
+  }
+  body[data-page="printable-detail"] .pa-d-facts span{
+    display:inline-flex; align-items:center; gap:.4rem; background:#fff;
+    border:1px solid #eceefa; border-radius:12px; padding:.5rem .8rem;
+    font-weight:700; font-size:.9rem; color:#3a4366;
+  }
+  body[data-page="printable-detail"] .pa-d-facts svg{ fill:none; stroke:var(--accent); stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+
+  body[data-page="printable-detail"] .pa-d-tags{ display:flex; gap:.4rem; flex-wrap:wrap; margin-bottom:1rem; }
+  body[data-page="printable-detail"] .pa-tag{
+    font-size:.78rem; font-weight:700; color:#5a52a8; background:var(--accent-soft);
+    padding:.25rem .7rem; border-radius:999px;
+  }
+
+  body[data-page="printable-detail"] .pa-d-title{ margin:.2rem 0 .2rem; }
+  body[data-page="printable-detail"] .pa-d-blurb{ color:#475070; font-size:1.05rem; }
+
+  /* Buttons */
+  body[data-page="printable-detail"] .pa-d-actions{ display:flex; gap:.7rem; flex-wrap:wrap; margin:1.2rem 0; }
+  body[data-page="printable-detail"] .pa-d-actions button{
+    display:inline-flex; align-items:center; gap:.5rem; border:none; cursor:pointer;
+    font-family:var(--font-display); font-weight:700; font-size:.98rem;
+    padding:.75rem 1.3rem; border-radius:14px; transition:.15s;
+  }
+  body[data-page="printable-detail"] .pa-d-print{ background:var(--accent); color:#fff; }
+  body[data-page="printable-detail"] .pa-d-pdf{ background:#2b2f6e; color:#fff; }
+  body[data-page="printable-detail"] .pa-d-share{ background:#fff; color:#3a4366; border:2px solid #e6e8f2 !important; }
+  body[data-page="printable-detail"] .pa-d-fav{ background:#fff0f3; color:#d61f74; border:2px solid #ffd5e4 !important; }
+  body[data-page="printable-detail"] .pa-d-fav svg{ fill:#cdd2e6; }
+  body[data-page="printable-detail"] .pa-d-fav.on svg{ fill:#ff3f8e; }
+  body[data-page="printable-detail"] .pa-d-actions button svg{ width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  body[data-page="printable-detail"] .pa-d-print svg, body[data-page="printable-detail"] .pa-d-pdf svg{ stroke:#fff; }
+  body[data-page="printable-detail"] .pa-d-actions button:hover{ transform:translateY(-2px); filter:brightness(1.04); }
+
+  /* Panels */
+  body[data-page="printable-detail"] .pa-d-panels{ display:grid; grid-template-columns:1fr 1fr; gap:1.4rem; margin-top:.6rem; }
+  @media (max-width:560px){ body[data-page="printable-detail"] .pa-d-panels{ grid-template-columns:1fr; } }
+  body[data-page="printable-detail"] .pa-d-panel{
+    background:#fff; border:1px solid #eef0f7; border-radius:18px; padding:1.2rem 1.3rem;
+    box-shadow:0 10px 26px -18px rgba(26,33,74,.3);
+  }
+  body[data-page="printable-detail"] .pa-d-panel h3{
+    margin:0 0 .7rem; font-family:var(--font-display); font-size:1.1rem; color:var(--ink);
+    display:flex; align-items:center; gap:.5rem;
+  }
+  body[data-page="printable-detail"] .pa-d-panel h3 svg{ width:20px; height:20px; fill:none; stroke:var(--accent); stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  body[data-page="printable-detail"] .pa-d-included{ list-style:none; padding:0; margin:0; }
+  body[data-page="printable-detail"] .pa-d-included li{ display:flex; align-items:center; gap:.55rem; padding:.32rem 0; color:#3a4366; font-weight:600; }
+  body[data-page="printable-detail"] .pa-d-included svg{ fill:none; stroke:#2da05a; stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; flex:none; }
+
+  body[data-page="printable-detail"] .pa-d-supplies{ list-style:none; padding:0; margin:0; }
+  body[data-page="printable-detail"] .pa-d-supplies li{ padding:.28rem 0; }
+  body[data-page="printable-detail"] .pa-d-supplies label{ display:flex; align-items:center; gap:.6rem; cursor:pointer; color:#3a4366; font-weight:600; }
+  body[data-page="printable-detail"] .pa-d-supplies input{ width:20px; height:20px; accent-color:var(--accent); cursor:pointer; }
+  body[data-page="printable-detail"] .pa-d-supplies input:checked + span{ text-decoration:line-through; color:#9aa1bf; }
+
+  body[data-page="printable-detail"] .pa-d-cert{
+    margin-top:1.4rem; display:inline-flex; align-items:center; gap:.5rem; background:linear-gradient(135deg,#ffd23f,#f4a91e);
+    color:#5a3b00; border:none; cursor:pointer; font-family:var(--font-display); font-weight:700;
+    padding:.75rem 1.3rem; border-radius:14px; transition:.15s;
+  }
+  body[data-page="printable-detail"] .pa-d-cert:hover{ transform:translateY(-2px); filter:brightness(1.04); }
+
+  /* More adventures rail */
+  body[data-page="printable-detail"] .pa-d-more{ margin-top:2.6rem; }
+  body[data-page="printable-detail"] .pa-d-more-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:1rem; }
+  body[data-page="printable-detail"] .pa-d-more-card{
+    text-decoration:none; background:#fff; border:1px solid #eef0f7; border-radius:16px; overflow:hidden;
+    box-shadow:0 10px 24px -18px rgba(26,33,74,.3); transition:transform .18s, box-shadow .18s; display:flex; flex-direction:column;
+  }
+  body[data-page="printable-detail"] .pa-d-more-card:hover{ transform:translateY(-4px); box-shadow:0 20px 36px -18px rgba(26,33,74,.4); }
+  body[data-page="printable-detail"] .pa-d-more-card img{ width:100%; aspect-ratio:16/11; object-fit:cover; display:block; }
+  body[data-page="printable-detail"] .pa-d-more-card span{ padding:.6rem .7rem; font-family:var(--font-display); font-weight:700; font-size:.9rem; color:var(--ink); }
+  </style>
+</head>
+<body data-page="printable-detail" class="accent-indigo">
+
+  <section class="page-hero">
+    <div class="container">
+      <div class="breadcrumb">
+        <a href="index.html">Home</a> /
+        <a href="printable-adventures.html">Printable Adventures</a> /
+        <span class="pa-d-crumb-title">Adventure</span>
+      </div>
+      <span class="eyebrow"><span data-icon="star"></span> Printable Adventure</span>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container" id="paDetail">
+      <div class="pa-d-wrap">
+
+        <div>
+          <div class="pa-d-cover">
+            <img src="" alt="Adventure cover">
+            <span class="pa-d-club">★ Club</span>
+          </div>
+        </div>
+
+        <div>
+          <h1 class="pa-d-title">Adventure</h1>
+          <div class="pa-d-facts">
+            <span><svg viewBox="0 0 24 24" width="18" height="18"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg><span class="pa-d-ages">Ages</span></span>
+            <span><svg viewBox="0 0 24 24" width="18" height="18"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span class="pa-d-time">Time</span></span>
+            <span><svg viewBox="0 0 24 24" width="18" height="18"><path d="M6 3h9l3 3v15H6z"/><path d="M9 8h6M9 12h6M9 16h4"/></svg><span class="pa-d-pages">Pages</span></span>
+            <span><svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.5L12 21l-4.9-2.6.9-5.5-4-3.9L9.5 8z"/></svg><span class="pa-d-diff">Difficulty</span></span>
+          </div>
+          <div class="pa-d-tags"></div>
+          <p class="pa-d-blurb">Loading…</p>
+
+          <div class="pa-d-actions">
+            <button class="pa-d-print" type="button"><svg viewBox="0 0 24 24"><path d="M6 9V3h12v6"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg> Print</button>
+            <button class="pa-d-pdf" type="button"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg> Download PDF</button>
+            <button class="pa-d-share" type="button"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg> Share with Parent</button>
+            <button class="pa-d-fav" type="button"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 21s-7.5-4.6-10-9.1C.2 8.6 1.7 5 5.2 5c2 0 3.3 1.1 4 2.2C9.9 6.1 11.2 5 13.2 5c3.5 0 5 3.6 3.2 6.9C17.5 16.4 12 21 12 21z"/></svg> <span>Save</span></button>
+          </div>
+
+          <div class="pa-d-panels">
+            <div class="pa-d-panel">
+              <h3><svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg> Pages included</h3>
+              <ul class="pa-d-included"></ul>
+            </div>
+            <div class="pa-d-panel">
+              <h3><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg> Supplies to gather</h3>
+              <ul class="pa-d-supplies"></ul>
+            </div>
+          </div>
+
+          <button class="pa-d-cert" type="button"><svg viewBox="0 0 24 24" width="18" height="18" style="fill:none;stroke:#5a3b00;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><circle cx="12" cy="9" r="6"/><path d="M9 14l-2 7 5-3 5 3-2-7"/></svg> Print achievement certificate</button>
+        </div>
+
+      </div>
+
+      <div class="pa-d-more">
+        <div class="section-head" style="text-align:left;margin-bottom:1rem"><h2>More adventures</h2></div>
+        <div class="pa-d-more-grid"></div>
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>

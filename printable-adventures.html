@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Printable Adventures — Red 5</title>
+  <meta name="description" content="A library of premium printable activity packs — scavenger hunts, puzzles, coloring, escape rooms and more. Download exciting adventures you can enjoy anywhere.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="assets/logo.png">
+  <script src="app.js" defer></script>
+  <script src="printable-adventures.js" defer></script>
+
+  <style>
+  /* ===== Printable Adventures — scoped to the library page only ========= */
+  body[data-page="printables"] .pa-tools{ margin-top:1.4rem; }
+
+  /* Search + favorites row */
+  body[data-page="printables"] .pa-searchrow{
+    display:flex; gap:.8rem; flex-wrap:wrap; align-items:center; margin-bottom:1rem;
+  }
+  body[data-page="printables"] .pa-search{
+    position:relative; flex:1; min-width:240px; max-width:520px;
+  }
+  body[data-page="printables"] .pa-search svg{
+    position:absolute; left:16px; top:50%; transform:translateY(-50%);
+    width:20px; height:20px; fill:none; stroke:#9aa1bf; stroke-width:2;
+  }
+  body[data-page="printables"] .pa-search input{
+    width:100%; border:2px solid #e6e8f2; border-radius:999px;
+    padding:.85rem 1.1rem .85rem 3rem; font-family:var(--font-body);
+    font-size:1rem; color:var(--ink); background:#fff; outline:none;
+    transition:border-color .15s, box-shadow .15s;
+  }
+  body[data-page="printables"] .pa-search input:focus{
+    border-color:var(--accent); box-shadow:0 0 0 4px var(--accent-soft);
+  }
+  body[data-page="printables"] .pa-favtoggle{
+    display:inline-flex; align-items:center; gap:.5rem; border:2px solid #e6e8f2;
+    background:#fff; color:var(--ink); border-radius:999px; padding:.7rem 1.2rem;
+    font-family:var(--font-display); font-weight:600; font-size:.95rem; cursor:pointer;
+    transition:.15s;
+  }
+  body[data-page="printables"] .pa-favtoggle svg{ width:18px; height:18px; fill:#cfd3e6; transition:.15s; }
+  body[data-page="printables"] .pa-favtoggle:hover{ border-color:var(--accent); }
+  body[data-page="printables"] .pa-favtoggle.on{ background:#fff0f3; border-color:#ff5ba6; color:#d61f74; }
+  body[data-page="printables"] .pa-favtoggle.on svg{ fill:#ff3f8e; }
+
+  /* Category chips */
+  body[data-page="printables"] .pa-chips{
+    display:flex; gap:.55rem; flex-wrap:wrap; margin-bottom:1.6rem;
+  }
+  body[data-page="printables"] .pa-chip{
+    border:2px solid #e6e8f2; background:#fff; color:#46506e;
+    border-radius:999px; padding:.5rem 1.05rem; font-family:var(--font-display);
+    font-weight:600; font-size:.92rem; cursor:pointer; transition:.15s; white-space:nowrap;
+  }
+  body[data-page="printables"] .pa-chip:hover{ border-color:var(--accent); color:var(--accent); transform:translateY(-1px); }
+  body[data-page="printables"] .pa-chip.active{
+    background:var(--accent); border-color:var(--accent); color:#fff;
+    box-shadow:0 8px 18px -8px var(--accent);
+  }
+
+  /* The premium grid */
+  body[data-page="printables"] .pa-grid{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(248px,1fr));
+    gap:1.6rem;
+  }
+
+  /* Mini book-cover card */
+  body[data-page="printables"] .pa-card{
+    position:relative; background:#fff; border-radius:22px; overflow:hidden;
+    box-shadow:0 14px 32px -16px rgba(26,33,74,.35); border:1px solid #eef0f7;
+    display:flex; flex-direction:column; transition:transform .2s, box-shadow .2s;
+  }
+  body[data-page="printables"] .pa-card:hover{
+    transform:translateY(-6px); box-shadow:0 26px 48px -18px rgba(26,33,74,.45);
+  }
+  body[data-page="printables"] .pa-cover{
+    display:block; position:relative; aspect-ratio:16/11; overflow:hidden;
+    background:#1a2150;
+  }
+  body[data-page="printables"] .pa-cover img{
+    width:100%; height:100%; object-fit:cover; display:block;
+    transition:transform .35s ease;
+  }
+  body[data-page="printables"] .pa-card:hover .pa-cover img{ transform:scale(1.06); }
+
+  /* Cover badges */
+  body[data-page="printables"] .pa-badge-club{
+    position:absolute; top:12px; left:12px; z-index:2;
+    background:linear-gradient(135deg,#ffd23f,#f4a91e); color:#5a3b00;
+    font-family:var(--font-display); font-weight:700; font-size:.78rem;
+    padding:.3rem .7rem; border-radius:999px; box-shadow:0 4px 10px rgba(0,0,0,.25);
+  }
+  body[data-page="printables"] .pa-badge-diff{
+    position:absolute; bottom:12px; left:12px; z-index:2; color:#fff;
+    font-family:var(--font-display); font-weight:700; font-size:.74rem;
+    padding:.25rem .65rem; border-radius:999px; backdrop-filter:blur(2px);
+    box-shadow:0 4px 10px rgba(0,0,0,.25);
+  }
+  body[data-page="printables"] .pa-badge-diff.easy{ background:rgba(45,160,90,.92); }
+  body[data-page="printables"] .pa-badge-diff.med{ background:rgba(245,160,30,.94); }
+  body[data-page="printables"] .pa-badge-diff.hard{ background:rgba(225,29,43,.92); }
+
+  /* Heart favorite */
+  body[data-page="printables"] .pa-heart{
+    position:absolute; top:10px; right:12px; z-index:3;
+    width:40px; height:40px; border-radius:50%; border:none; cursor:pointer;
+    background:rgba(255,255,255,.92); box-shadow:0 4px 12px rgba(0,0,0,.22);
+    display:flex; align-items:center; justify-content:center; transition:.15s;
+  }
+  body[data-page="printables"] .pa-heart svg{ fill:#cdd2e6; transition:.15s; }
+  body[data-page="printables"] .pa-heart:hover{ transform:scale(1.1); }
+  body[data-page="printables"] .pa-heart.on svg{ fill:#ff3f8e; }
+  body[data-page="printables"] .pa-heart.on{ background:#fff; }
+
+  /* Card body */
+  body[data-page="printables"] .pa-body{ padding:1rem 1.1rem 1.2rem; display:flex; flex-direction:column; gap:.55rem; flex:1; }
+  body[data-page="printables"] .pa-body h3{
+    margin:0; font-family:var(--font-display); font-weight:700; font-size:1.18rem;
+    color:var(--ink); line-height:1.2;
+  }
+  body[data-page="printables"] .pa-meta{
+    display:flex; gap:.9rem; flex-wrap:wrap; font-size:.84rem; color:#5b657f;
+  }
+  body[data-page="printables"] .pa-meta span{ display:inline-flex; align-items:center; gap:.32rem; }
+  body[data-page="printables"] .pa-meta svg{ fill:none; stroke:#8a93b2; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+  body[data-page="printables"] .pa-diff{ font-weight:700; }
+  body[data-page="printables"] .pa-diff.easy{ color:#2da05a; }
+  body[data-page="printables"] .pa-diff.med{ color:#e08a17; }
+  body[data-page="printables"] .pa-diff.hard{ color:#e11d2b; }
+
+  body[data-page="printables"] .pa-tags{ display:flex; gap:.35rem; flex-wrap:wrap; margin-top:.1rem; }
+  body[data-page="printables"] .pa-tag{
+    font-size:.72rem; font-weight:700; color:#5a52a8; background:var(--accent-soft);
+    padding:.2rem .55rem; border-radius:999px;
+  }
+
+  body[data-page="printables"] .pa-open{
+    margin-top:auto; display:inline-flex; align-items:center; justify-content:center; gap:.45rem;
+    background:var(--accent); color:#fff; text-decoration:none;
+    font-family:var(--font-display); font-weight:700; font-size:.95rem;
+    padding:.65rem 1rem; border-radius:14px; transition:.15s;
+  }
+  body[data-page="printables"] .pa-open svg{ fill:none; stroke:#fff; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+  body[data-page="printables"] .pa-open:hover{ filter:brightness(1.07); transform:translateY(-1px); }
+
+  body[data-page="printables"] .pa-empty{
+    display:none; text-align:center; padding:3rem 1rem; color:#6b7390;
+    font-size:1.05rem; grid-column:1/-1;
+  }
+
+  /* Info strip */
+  body[data-page="printables"] .pa-why{
+    margin-top:2.4rem; background:var(--accent-soft); border-radius:20px;
+    padding:1.4rem 1.6rem; display:flex; gap:1.6rem; flex-wrap:wrap; justify-content:center;
+  }
+  body[data-page="printables"] .pa-why span{
+    display:inline-flex; align-items:center; gap:.5rem; font-family:var(--font-display);
+    font-weight:600; color:#3a4366; font-size:.95rem;
+  }
+  body[data-page="printables"] .pa-why b{ color:var(--accent); }
+  </style>
+</head>
+<body data-page="printables" class="accent-indigo">
+
+  <section class="page-hero">
+    <div class="container">
+      <div class="breadcrumb"><a href="index.html">Home</a> / Printable Adventures</div>
+      <span class="eyebrow"><span data-icon="star"></span> Printable Adventures</span>
+      <h1>Printable Adventures</h1>
+      <p>Download exciting activities, challenges, puzzles, games and adventures you can enjoy anywhere.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+
+      <div class="pa-tools">
+        <div class="pa-searchrow">
+          <div class="pa-search">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input id="paSearch" type="search" placeholder="Search adventures…" aria-label="Search adventures">
+          </div>
+          <button id="paFavToggle" class="pa-favtoggle" type="button" aria-pressed="false">
+            <svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-10-9.1C.2 8.6 1.7 5 5.2 5c2 0 3.3 1.1 4 2.2C9.9 6.1 11.2 5 13.2 5c3.5 0 5 3.6 3.2 6.9C17.5 16.4 12 21 12 21z"/></svg>
+            My Favorites
+          </button>
+        </div>
+
+        <div class="pa-chips" id="paChips"></div>
+      </div>
+
+      <div class="pa-grid" id="paGrid"></div>
+      <p class="pa-empty" id="paEmpty">No adventures match — try another category or search.</p>
+
+      <div class="pa-why">
+        <span><b>★</b> Encourages creativity</span>
+        <span><b>★</b> Less screen time</span>
+        <span><b>★</b> Builds confidence</span>
+        <span><b>★</b> Great for road trips</span>
+        <span><b>★</b> Fun for the whole family</span>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="container">
+    <div class="cta-band">
+      <h2>New adventures every month</h2>
+      <p>Red 5 Club members unlock fresh printable packs, exclusive adventures, certificates and badges.</p>
+      <div class="hero-actions">
+        <a class="btn btn-yellow btn-lg" href="membership.html"><span data-icon="star"></span> Join the Club</a>
+        <a class="btn btn-ghost btn-lg" href="create-zone.html">Back to Create Zone</a>
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>
