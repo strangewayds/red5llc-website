@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Buddy Creator — Red 5</title>
+  <meta name="description" content="Build your own Buddy! Pick a species, colors, expression and accessories, give it a personality and name, then save, print and color your Buddy.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Baloo+2:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="assets/logo.png">
+  <script src="buddy.js" defer></script>
+  <style>
+    body{ margin:0; font-family:var(--font-body,'Nunito',sans-serif); color:#2a2052;
+      background:
+        radial-gradient(800px 400px at 85% -10%, #ffe6f4 0, rgba(255,230,244,0) 60%),
+        linear-gradient(180deg,#efeaff,#f6f2ff); }
+    .bc-wrap{ min-height:100vh; display:flex; flex-direction:column; }
+
+    /* Top bar */
+    .bc-top{ display:flex; align-items:center; gap:.7rem; padding:.7rem 1rem; flex-wrap:wrap;
+      background:linear-gradient(90deg,#7c5cff,#b13bff); color:#fff;
+      box-shadow:0 4px 16px rgba(110,60,180,.30); position:sticky; top:0; z-index:30; }
+    .bc-back{ display:inline-flex; align-items:center; gap:.4rem; background:rgba(255,255,255,.2); color:#fff;
+      text-decoration:none; font-family:var(--font-display); font-weight:600; padding:.45rem .9rem; border-radius:999px; font-size:.9rem; }
+    .bc-back:hover{ background:rgba(255,255,255,.32); }
+    .bc-title{ font-family:var(--font-display); font-weight:700; font-size:1.25rem; margin:0; display:flex; align-items:center; gap:.4rem; }
+    .bc-spacer{ flex:1; }
+    .bc-btn{ border:none; cursor:pointer; font-family:var(--font-display); font-weight:600; font-size:.88rem;
+      padding:.55rem 1rem; border-radius:999px; color:#fff; display:inline-flex; align-items:center; gap:.4rem;
+      box-shadow:0 6px 14px rgba(0,0,0,.18); }
+    .bc-btn.save{ background:linear-gradient(135deg,#3ddc84,#22b566); }
+    .bc-btn.png{ background:linear-gradient(135deg,#ffb02e,#ff8a18); color:#4a3500; }
+    .bc-btn.print{ background:#fff; color:#7c2fd6; }
+    .bc-btn.color{ background:rgba(255,255,255,.22); }
+    .bc-btn:hover{ filter:brightness(1.07); }
+
+    /* Layout: preview (left) + panels (right) */
+    .bc-main{ flex:1; display:grid; grid-template-columns:minmax(320px,1fr) 1.15fr; gap:1.4rem; padding:1.4rem; align-items:start; max-width:1280px; margin:0 auto; width:100%; box-sizing:border-box; }
+    @media (max-width:940px){ .bc-main{ grid-template-columns:1fr; } }
+
+    /* Stage / preview */
+    .bc-stagewrap{ position:sticky; top:80px; display:flex; flex-direction:column; gap:1rem; }
+    @media (max-width:940px){ .bc-stagewrap{ position:static; } }
+    .bc-stage{ position:relative; background:
+        radial-gradient(420px 420px at 50% 30%, #fff6ff 0, #efe7ff 70%, #e6dbff 100%);
+      border-radius:28px; padding:1.4rem; box-shadow:0 26px 60px rgba(110,70,200,.28); text-align:center; overflow:hidden; }
+    .bc-stage .stars{ position:absolute; inset:0; pointer-events:none; opacity:.6; }
+    .bc-stage .buddy-svg{ width:min(340px,72vw); height:min(340px,72vw); filter:drop-shadow(0 16px 26px rgba(80,40,160,.30)); animation:bcBob 3.4s ease-in-out infinite; }
+    @keyframes bcBob{ 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-10px) } }
+    .bc-name-show{ font-family:var(--font-display); font-weight:700; font-size:1.5rem; color:#5b3fb0; margin:.4rem 0 .1rem; min-height:1.4em; }
+    .bc-species-show{ color:#8a6bd6; font-weight:700; font-size:.92rem; }
+
+    /* Buddy says bubble */
+    .bc-says{ position:relative; background:#fff; border-radius:18px; padding:.85rem 1rem; box-shadow:0 10px 24px rgba(110,80,200,.14);
+      font-weight:700; color:#5b3fb0; display:flex; align-items:center; gap:.6rem; font-size:.95rem; }
+    .bc-says .bubtail{ position:absolute; top:-9px; left:30px; width:18px; height:18px; background:#fff; transform:rotate(45deg); border-radius:4px; }
+    .bc-says .mini{ flex:none; width:42px; height:42px; }
+    .bc-says button{ margin-left:auto; flex:none; border:none; background:#efeaff; color:#7c5cff; cursor:pointer; font-weight:700; border-radius:999px; padding:.3em .7em; font-size:.78rem; }
+
+    /* Panels */
+    .bc-panels{ display:flex; flex-direction:column; gap:1rem; }
+    .bc-card{ background:#fff; border-radius:20px; padding:1.05rem 1.15rem; box-shadow:0 10px 26px rgba(110,80,150,.12); }
+    .bc-card h2{ font-family:var(--font-display); font-size:1.02rem; margin:0 0 .8rem; color:#7c5cff; display:flex; align-items:center; gap:.45rem; }
+    .bc-field{ margin-bottom:.8rem; } .bc-field:last-child{ margin-bottom:0; }
+    .bc-field label{ display:block; font-size:.78rem; font-weight:800; color:#6a5a7a; margin-bottom:.35rem; }
+    .bc-field input[type=text], .bc-field input[type=date]{
+      width:100%; box-sizing:border-box; border:2px solid #ece3f6; border-radius:12px; padding:.55rem .7rem;
+      font-family:var(--font-body); font-size:.95rem; color:#2a2052; background:#fff; }
+    .bc-field input:focus{ outline:none; border-color:#7c5cff; box-shadow:0 0 0 3px #e7deff; }
+    .bc-grid2{ display:grid; grid-template-columns:1fr 1fr; gap:.7rem; }
+    @media (max-width:480px){ .bc-grid2{ grid-template-columns:1fr; } }
+
+    /* Species picker */
+    .bc-species{ display:grid; grid-template-columns:repeat(auto-fill,minmax(78px,1fr)); gap:.5rem; }
+    .bc-sp{ border:3px solid transparent; background:#f7f3ff; border-radius:14px; cursor:pointer; padding:.4rem .2rem .3rem; text-align:center; transition:.12s; }
+    .bc-sp .buddy-svg{ width:48px; height:48px; }
+    .bc-sp span{ display:block; font-size:.66rem; font-weight:700; color:#6a5a7a; margin-top:.1rem; }
+    .bc-sp:hover{ background:#efeaff; }
+    .bc-sp.sel{ border-color:#7c5cff; background:#efeaff; box-shadow:0 0 0 2px #d8ccff; }
+
+    /* Swatches */
+    .bc-swatches{ display:flex; flex-wrap:wrap; gap:.45rem; }
+    .bc-sw{ width:32px; height:32px; border-radius:50%; border:2px solid rgba(0,0,0,.08); cursor:pointer; padding:0; }
+    .bc-sw.sel{ border-color:#2a2052; box-shadow:0 0 0 2px #ffd23f; transform:scale(1.1); }
+
+    /* Chip buttons (expression / personality / accessories) */
+    .bc-chips{ display:flex; flex-wrap:wrap; gap:.45rem; }
+    .bc-chip{ border:2px solid #ece3f6; background:#fff; cursor:pointer; border-radius:999px;
+      font-family:var(--font-display); font-weight:600; font-size:.85rem; color:#5a4a72;
+      padding:.4rem .85rem; display:inline-flex; align-items:center; gap:.35rem; transition:.12s; }
+    .bc-chip:hover{ border-color:#7c5cff; color:#7c5cff; }
+    .bc-chip.sel{ background:linear-gradient(135deg,#7c5cff,#b13bff); color:#fff; border-color:transparent; box-shadow:0 6px 14px rgba(124,92,255,.32); }
+    .bc-chip .e{ font-size:1rem; line-height:1; }
+
+    .bc-randrow{ display:flex; gap:.6rem; flex-wrap:wrap; }
+    .bc-rand{ flex:1; border:none; cursor:pointer; background:linear-gradient(135deg,#ff7ad9,#ff5a8a); color:#fff;
+      font-family:var(--font-display); font-weight:700; padding:.7rem; border-radius:14px; font-size:.95rem;
+      box-shadow:0 8px 18px rgba(255,90,138,.30); display:inline-flex; align-items:center; justify-content:center; gap:.4rem; }
+    .bc-rand:hover{ filter:brightness(1.06); }
+
+    /* Passport card */
+    .bc-passport{
+      background:linear-gradient(160deg,#fff,#f7f1ff); border:2px solid #e3d8ff; border-radius:22px;
+      padding:1.1rem; box-shadow:0 14px 34px rgba(110,70,200,.18); position:relative; overflow:hidden; }
+    .bc-passport::before{ content:""; position:absolute; top:-40px; right:-40px; width:130px; height:130px; border-radius:50%;
+      background:radial-gradient(circle,#ffe6f4,transparent 70%); }
+    .bc-pp-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:.6rem; }
+    .bc-pp-brand{ font-family:var(--font-display); font-weight:700; color:#b13bff; letter-spacing:.04em; font-size:.78rem; text-transform:uppercase; }
+    .bc-pp-star{ color:#ffb02e; }
+    .bc-pp-body{ display:grid; grid-template-columns:auto 1fr; gap:.9rem; align-items:center; }
+    .bc-pp-avatar{ width:110px; height:110px; background:#efeaff; border-radius:18px; display:grid; place-items:center; }
+    .bc-pp-avatar .buddy-svg{ width:100px; height:100px; }
+    .bc-pp-name{ font-family:var(--font-display); font-weight:700; font-size:1.35rem; color:#5b3fb0; margin:0; line-height:1.1; }
+    .bc-pp-sub{ color:#8a6bd6; font-weight:700; font-size:.85rem; margin:.1rem 0 .5rem; }
+    .bc-pp-rows{ font-size:.85rem; color:#4a3a62; }
+    .bc-pp-rows div{ display:flex; gap:.4rem; padding:.12rem 0; }
+    .bc-pp-rows b{ color:#7c5cff; min-width:84px; flex:none; }
+
+    /* Toast */
+    .toast{ position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(20px); background:#2b2150; color:#fff;
+      padding:.7rem 1.2rem; border-radius:999px; box-shadow:0 10px 30px rgba(0,0,0,.4); opacity:0; pointer-events:none; transition:.25s; font-weight:700; z-index:80; }
+    .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+    /* Hidden print area built on demand */
+    #bcPrintArea{ display:none; }
+
+    @media print{
+      body{ background:#fff !important; }
+      .bc-top, .bc-panels, .bc-stagewrap, .toast{ display:none !important; }
+      .bc-main{ display:block; padding:0; }
+      #bcPrintArea{ display:block !important; }
+      .bc-print-passport{ width:6.6in; margin:.4in auto; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+      .bc-print-poster{ width:6.5in; margin:.4in auto; text-align:center; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+      .bc-print-color{ width:6.5in; margin:.4in auto; text-align:center; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bc-wrap">
+    <div class="bc-top">
+      <a class="bc-back" href="build-a-buddy.html">← Back to Buddies</a>
+      <h1 class="bc-title">🧸 Buddy Creator</h1>
+      <div class="bc-spacer"></div>
+      <button class="bc-btn color" id="bcColorBtn" type="button">🖍 Coloring Page</button>
+      <button class="bc-btn print" id="bcPrintBtn" type="button">🖨 Print Passport</button>
+      <button class="bc-btn png" id="bcPngBtn" type="button">⬇ Download PNG</button>
+      <button class="bc-btn save" id="bcSaveBtn" type="button">💾 Save Buddy</button>
+    </div>
+
+    <div class="bc-main">
+      <!-- LIVE PREVIEW -->
+      <div class="bc-stagewrap">
+        <div class="bc-stage">
+          <svg class="stars" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <g fill="#fff">
+              <circle cx="14" cy="18" r="1.4"/><circle cx="82" cy="14" r="1.8"/><circle cx="90" cy="60" r="1.3"/>
+              <circle cx="10" cy="70" r="1.6"/><circle cx="50" cy="8" r="1.2"/><circle cx="70" cy="86" r="1.4"/>
+            </g>
+          </svg>
+          <div id="bcPreview"></div>
+          <div class="bc-name-show" id="bcNameShow">Your Buddy</div>
+          <div class="bc-species-show" id="bcSpeciesShow"></div>
+        </div>
+
+        <div class="bc-says">
+          <span class="bubtail"></span>
+          <span class="mini" id="bcSaysMini"></span>
+          <span id="bcSaysText">Let's build something awesome together!</span>
+          <button type="button" id="bcSaysBtn">Again</button>
+        </div>
+
+        <!-- Buddy Passport -->
+        <div class="bc-passport" id="bcPassport">
+          <div class="bc-pp-top">
+            <span class="bc-pp-brand">Red 5 · Buddy Passport</span>
+            <span class="bc-pp-star" data-icon="star"></span>
+          </div>
+          <div class="bc-pp-body">
+            <div class="bc-pp-avatar" id="bcPpAvatar"></div>
+            <div>
+              <p class="bc-pp-name" id="bcPpName">Your Buddy</p>
+              <p class="bc-pp-sub" id="bcPpSub"></p>
+              <div class="bc-pp-rows" id="bcPpRows"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CUSTOMIZATION PANELS -->
+      <div class="bc-panels">
+        <div class="bc-card">
+          <h2>🐾 Choose a species</h2>
+          <div class="bc-species" id="bcSpecies"></div>
+        </div>
+
+        <div class="bc-card">
+          <h2>🎨 Body color</h2>
+          <div class="bc-swatches" id="bcColors"></div>
+        </div>
+
+        <div class="bc-card">
+          <h2>😊 Expression</h2>
+          <div class="bc-chips" id="bcExpr"></div>
+        </div>
+
+        <div class="bc-card">
+          <h2>🎩 Accessories <span style="font-weight:600;color:#a99ac4;font-size:.78rem">(tap to toggle)</span></h2>
+          <div class="bc-chips" id="bcAcc"></div>
+        </div>
+
+        <div class="bc-card">
+          <h2>💫 Personality</h2>
+          <div class="bc-chips" id="bcPers"></div>
+        </div>
+
+        <div class="bc-card">
+          <h2>📝 Name &amp; favorites</h2>
+          <div class="bc-field">
+            <label for="bcName">Buddy's name</label>
+            <input type="text" id="bcName" maxlength="24" placeholder="e.g. Sparky">
+          </div>
+          <div class="bc-grid2">
+            <div class="bc-field">
+              <label for="bcFavColor">Favorite color</label>
+              <input type="text" id="bcFavColor" maxlength="20" placeholder="e.g. Purple">
+            </div>
+            <div class="bc-field">
+              <label for="bcFavFood">Favorite food</label>
+              <input type="text" id="bcFavFood" maxlength="24" placeholder="e.g. Pizza">
+            </div>
+          </div>
+          <div class="bc-field">
+            <label for="bcBirthday">Birthday</label>
+            <input type="date" id="bcBirthday">
+          </div>
+        </div>
+
+        <div class="bc-card">
+          <div class="bc-randrow">
+            <button class="bc-rand" id="bcSurprise" type="button">🎲 Surprise Me!</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Print target (filled on demand) -->
+  <div id="bcPrintArea"></div>
+
+  <div class="toast" id="bcToast"></div>
+
+  <script>
+  (function () {
+    function ready(fn){ if(document.readyState!=="loading"){ fn(); } else { document.addEventListener("DOMContentLoaded", fn); } }
+    ready(function () {
+      var B = window.Buddy;
+      if (!B) return;
+
+      // ---- icon helper (app.js isn't loaded on this standalone creator) ----
+      if (window.RED5_ICONS) {
+        document.querySelectorAll("[data-icon]").forEach(function (el) {
+          var n = el.getAttribute("data-icon");
+          if (window.RED5_ICONS[n]) el.innerHTML = window.RED5_ICONS[n];
+        });
+      }
+
+      var $ = function (id) { return document.getElementById(id); };
+      function escapeHtml(s){ return String(s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]; }); }
+
+      // ---- State: load by ?id=, else default (maybe ?species=) ----
+      var loadId = B.param("id");
+      var buddy;
+      if (loadId) {
+        buddy = B.get(loadId) || B.defaultBuddy(B.param("species"));
+      } else {
+        buddy = B.defaultBuddy(B.param("species"));
+      }
+
+      // ---- Build static controls ----
+      var spWrap = $("bcSpecies");
+      spWrap.innerHTML = B.SPECIES.map(function (sp) {
+        return '<button type="button" class="bc-sp" data-sp="'+sp.id+'">'+
+          B.svg({ species:sp.id, color:sp.color, expression:"happy", accessories:[] }) +
+          '<span>'+sp.name+'</span></button>';
+      }).join("");
+
+      var colWrap = $("bcColors");
+      colWrap.innerHTML = B.COLORS.map(function (c) {
+        return '<button type="button" class="bc-sw" data-color="'+c+'" style="background:'+c+'" aria-label="color"></button>';
+      }).join("");
+
+      $("bcExpr").innerHTML = B.EXPRESSIONS.map(function (e) {
+        return '<button type="button" class="bc-chip" data-expr="'+e.id+'"><span class="e">'+e.emoji+'</span>'+e.name+'</button>';
+      }).join("");
+
+      $("bcAcc").innerHTML = B.ACCESSORIES.map(function (a) {
+        return '<button type="button" class="bc-chip" data-acc="'+a.id+'"><span class="e">'+a.emoji+'</span>'+a.name+'</button>';
+      }).join("");
+
+      $("bcPers").innerHTML = B.PERSONALITIES.map(function (p) {
+        return '<button type="button" class="bc-chip" data-pers="'+p.id+'"><span class="e">'+p.emoji+'</span>'+p.name+'</button>';
+      }).join("");
+
+      // ---- Render the whole UI from state ----
+      function persName(id){ for (var i=0;i<B.PERSONALITIES.length;i++) if(B.PERSONALITIES[i].id===id) return B.PERSONALITIES[i].name; return ""; }
+
+      function render() {
+        // preview
+        $("bcPreview").innerHTML = B.svg(buddy);
+        var sp = B.getSpecies(buddy.species) || { name:"Buddy" };
+        $("bcNameShow").textContent = buddy.name || "Your Buddy";
+        $("bcSpeciesShow").textContent = persName(buddy.personality) + " " + sp.name;
+
+        // species selection
+        spWrap.querySelectorAll(".bc-sp").forEach(function (b) {
+          b.classList.toggle("sel", b.getAttribute("data-sp") === buddy.species);
+        });
+        // color selection
+        colWrap.querySelectorAll(".bc-sw").forEach(function (b) {
+          b.classList.toggle("sel", b.getAttribute("data-color").toLowerCase() === (buddy.color||"").toLowerCase());
+        });
+        // expression
+        $("bcExpr").querySelectorAll(".bc-chip").forEach(function (b) {
+          b.classList.toggle("sel", b.getAttribute("data-expr") === buddy.expression);
+        });
+        // accessories
+        $("bcAcc").querySelectorAll(".bc-chip").forEach(function (b) {
+          b.classList.toggle("sel", buddy.accessories.indexOf(b.getAttribute("data-acc")) !== -1);
+        });
+        // personality
+        $("bcPers").querySelectorAll(".bc-chip").forEach(function (b) {
+          b.classList.toggle("sel", b.getAttribute("data-pers") === buddy.personality);
+        });
+
+        renderPassport();
+      }
+
+      function renderPassport() {
+        var sp = B.getSpecies(buddy.species) || { name:"Buddy" };
+        $("bcPpAvatar").innerHTML = B.svg(buddy);
+        $("bcPpName").textContent = buddy.name || "Your Buddy";
+        $("bcPpSub").textContent = persName(buddy.personality) + " " + sp.name;
+        var created = buddy.created ? B.formatDate(buddy.created) : B.formatDate(new Date().toISOString());
+        var rows = "";
+        rows += '<div><b>Species</b><span>'+escapeHtml(sp.name)+'</span></div>';
+        rows += '<div><b>Personality</b><span>'+escapeHtml(persName(buddy.personality))+'</span></div>';
+        if (buddy.favColor) rows += '<div><b>Fav color</b><span>'+escapeHtml(buddy.favColor)+'</span></div>';
+        if (buddy.favFood)  rows += '<div><b>Fav food</b><span>'+escapeHtml(buddy.favFood)+'</span></div>';
+        if (buddy.birthday) rows += '<div><b>Birthday</b><span>'+escapeHtml(B.formatDate(buddy.birthday))+'</span></div>';
+        rows += '<div><b>Created</b><span>'+escapeHtml(created)+'</span></div>';
+        $("bcPpRows").innerHTML = rows;
+      }
+
+      // ---- Field values into inputs ----
+      $("bcName").value = buddy.name || "";
+      $("bcFavColor").value = buddy.favColor || "";
+      $("bcFavFood").value = buddy.favFood || "";
+      $("bcBirthday").value = buddy.birthday || "";
+
+      // ---- Wire up controls ----
+      spWrap.addEventListener("click", function (e) {
+        var b = e.target.closest(".bc-sp"); if (!b) return;
+        buddy.species = b.getAttribute("data-sp");
+        render();
+      });
+      colWrap.addEventListener("click", function (e) {
+        var b = e.target.closest(".bc-sw"); if (!b) return;
+        buddy.color = b.getAttribute("data-color");
+        render();
+      });
+      $("bcExpr").addEventListener("click", function (e) {
+        var b = e.target.closest(".bc-chip"); if (!b) return;
+        buddy.expression = b.getAttribute("data-expr");
+        render();
+      });
+      $("bcAcc").addEventListener("click", function (e) {
+        var b = e.target.closest(".bc-chip"); if (!b) return;
+        var id = b.getAttribute("data-acc");
+        var i = buddy.accessories.indexOf(id);
+        if (i === -1) buddy.accessories.push(id); else buddy.accessories.splice(i, 1);
+        render();
+      });
+      $("bcPers").addEventListener("click", function (e) {
+        var b = e.target.closest(".bc-chip"); if (!b) return;
+        buddy.personality = b.getAttribute("data-pers");
+        render();
+      });
+
+      $("bcName").addEventListener("input", function () { buddy.name = this.value; renderName(); renderPassport(); });
+      $("bcFavColor").addEventListener("input", function () { buddy.favColor = this.value; renderPassport(); });
+      $("bcFavFood").addEventListener("input", function () { buddy.favFood = this.value; renderPassport(); });
+      $("bcBirthday").addEventListener("input", function () { buddy.birthday = this.value; renderPassport(); });
+      function renderName(){ $("bcNameShow").textContent = buddy.name || "Your Buddy"; }
+
+      // ---- Buddy says ----
+      $("bcSaysMini").innerHTML = B.svg({ species:buddy.species, color:buddy.color, expression:"happy", accessories:[] });
+      function newSaying(){ $("bcSaysText").textContent = B.saying(); $("bcSaysMini").innerHTML = B.svg(buddy); }
+      $("bcSaysBtn").addEventListener("click", newSaying);
+
+      // ---- Surprise me ----
+      $("bcSurprise").addEventListener("click", function () {
+        var pick = function (arr) { return arr[Math.floor(Math.random()*arr.length)]; };
+        buddy.species = pick(B.SPECIES).id;
+        buddy.color = pick(B.COLORS);
+        buddy.expression = pick(B.EXPRESSIONS).id;
+        buddy.personality = pick(B.PERSONALITIES).id;
+        // random 0-2 accessories
+        var accs = B.ACCESSORIES.slice();
+        buddy.accessories = [];
+        var n = Math.floor(Math.random()*3);
+        for (var i=0;i<n;i++){ var a = accs.splice(Math.floor(Math.random()*accs.length),1)[0]; if(a) buddy.accessories.push(a.id); }
+        render();
+        newSaying();
+        toast("✨ Surprise! Meet your new Buddy.");
+      });
+
+      // ---- Save ----
+      $("bcSaveBtn").addEventListener("click", function () {
+        buddy.name = ($("bcName").value || "").trim();
+        if (!buddy.name) { toast("Give your Buddy a name first! 📝"); $("bcName").focus(); return; }
+        buddy = B.save(buddy);
+        // keep URL in sync so refresh re-opens this buddy
+        try { history.replaceState(null, "", "buddy-creator.html?id=" + encodeURIComponent(buddy.id)); } catch (e) {}
+        renderPassport();
+        toast("💾 Saved to My Collection!");
+      });
+
+      // ---- Toast ----
+      var toastEl = $("bcToast"), toastT;
+      function toast(msg) {
+        toastEl.textContent = msg; toastEl.classList.add("show");
+        clearTimeout(toastT); toastT = setTimeout(function(){ toastEl.classList.remove("show"); }, 2200);
+      }
+
+      // ===== Export helpers =====================================================
+      function svgToImage(svgStr, cb) {
+        var img = new Image();
+        var svg = '<?xml version="1.0" encoding="UTF-8"?>' + svgStr;
+        var url = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+        img.onload = function () { cb(img); };
+        img.onerror = function () { toast("Sorry — export failed in this browser."); };
+        img.src = url;
+      }
+
+      // Download PNG of the buddy on a soft card
+      $("bcPngBtn").addEventListener("click", function () {
+        var size = 800;
+        var name = buddy.name || "My Buddy";
+        var sp = B.getSpecies(buddy.species) || { name:"Buddy" };
+        var svgStr =
+          '<svg xmlns="http://www.w3.org/2000/svg" width="'+size+'" height="'+size+'" viewBox="0 0 800 800">'+
+            '<defs><radialGradient id="bg" cx="50%" cy="38%" r="75%">'+
+              '<stop offset="0%" stop-color="#fff6ff"/><stop offset="70%" stop-color="#efe7ff"/><stop offset="100%" stop-color="#e6dbff"/>'+
+            '</radialGradient></defs>'+
+            '<rect width="800" height="800" rx="48" fill="url(#bg)"/>'+
+            '<g transform="translate(150 70) scale(2.5)">'+ B.svg(buddy) +'</g>'+
+            '<text x="400" y="690" text-anchor="middle" font-family="Fredoka, sans-serif" font-size="56" font-weight="700" fill="#5b3fb0">'+escapeHtml(name)+'</text>'+
+            '<text x="400" y="740" text-anchor="middle" font-family="Nunito, sans-serif" font-size="30" font-weight="700" fill="#8a6bd6">'+escapeHtml(sp.name)+' · Red 5 Buddy</text>'+
+          '</svg>';
+        svgToImage(svgStr, function (img) {
+          var c = document.createElement("canvas"); c.width = size; c.height = size;
+          var ctx = c.getContext("2d"); ctx.drawImage(img, 0, 0, size, size);
+          var a = document.createElement("a");
+          a.download = (name.replace(/[^a-z0-9]+/gi, "-").toLowerCase() || "buddy") + "-red5.png";
+          a.href = c.toDataURL("image/png"); a.click();
+          toast("⬇ Downloaded your Buddy PNG!");
+        });
+      });
+
+      // Build a print layout, print, then restore
+      function printDoc(html) {
+        $("bcPrintArea").innerHTML = html;
+        window.print();
+      }
+
+      // Print passport (collectible card)
+      $("bcPrintBtn").addEventListener("click", function () {
+        var sp = B.getSpecies(buddy.species) || { name:"Buddy" };
+        var created = buddy.created ? B.formatDate(buddy.created) : B.formatDate(new Date().toISOString());
+        var rows = [
+          ["Species", sp.name],
+          ["Personality", persName(buddy.personality)]
+        ];
+        if (buddy.favColor) rows.push(["Favorite color", buddy.favColor]);
+        if (buddy.favFood)  rows.push(["Favorite food", buddy.favFood]);
+        if (buddy.birthday) rows.push(["Birthday", B.formatDate(buddy.birthday)]);
+        rows.push(["Created on", created]);
+        var rowHtml = rows.map(function (r) {
+          return '<div style="display:flex;gap:.6rem;padding:.28rem 0;border-bottom:1px dashed #e3d8ff;font-size:15px">'+
+            '<b style="color:#7c5cff;min-width:130px">'+escapeHtml(r[0])+'</b><span style="color:#4a3a62">'+escapeHtml(r[1])+'</span></div>';
+        }).join("");
+        var html =
+          '<div class="bc-print-passport" style="border:3px solid #e3d8ff;border-radius:24px;padding:24px;background:linear-gradient(160deg,#fff,#f7f1ff);font-family:Nunito,sans-serif">'+
+            '<div style="text-align:center;font-family:Fredoka,sans-serif;font-weight:700;color:#b13bff;letter-spacing:.06em;text-transform:uppercase;font-size:14px">★ Red 5 · Buddy Passport ★</div>'+
+            '<div style="display:flex;gap:20px;align-items:center;margin-top:16px">'+
+              '<div style="width:170px;height:170px;background:#efeaff;border-radius:20px;display:flex;align-items:center;justify-content:center;flex:none">'+
+                '<div style="width:150px;height:150px">'+B.svg(buddy)+'</div></div>'+
+              '<div style="flex:1">'+
+                '<div style="font-family:Fredoka,sans-serif;font-weight:700;font-size:30px;color:#5b3fb0;line-height:1.1">'+escapeHtml(buddy.name || "My Buddy")+'</div>'+
+                '<div style="color:#8a6bd6;font-weight:700;margin:2px 0 12px">'+escapeHtml(persName(buddy.personality)+" "+sp.name)+'</div>'+
+                rowHtml +
+              '</div>'+
+            '</div>'+
+            '<div style="text-align:center;margin-top:16px;color:#a99ac4;font-size:12px">A Red 5 Buddy · Best friends for every adventure</div>'+
+          '</div>';
+        printDoc(html);
+      });
+
+      // Coloring page (black & white outline)
+      $("bcColorBtn").addEventListener("click", function () {
+        var html =
+          '<div class="bc-print-color">'+
+            '<h2 style="font-family:Fredoka,sans-serif;color:#222;margin:0 0 4px">Color in '+escapeHtml(buddy.name || "your Buddy")+'!</h2>'+
+            '<p style="font-family:Nunito,sans-serif;color:#555;margin:0 0 16px">Grab your crayons and bring your Red 5 Buddy to life.</p>'+
+            '<div style="width:5in;height:5in;margin:0 auto;border:2px solid #ddd;border-radius:16px;display:flex;align-items:center;justify-content:center">'+
+              '<div style="width:4.4in;height:4.4in">'+ B.outlineSvg(buddy) +'</div>'+
+            '</div>'+
+            '<p style="font-family:Nunito,sans-serif;color:#999;margin-top:14px;font-size:12px">Red 5 · Build a Buddy</p>'+
+          '</div>';
+        printDoc(html);
+      });
+
+      // Clear print area after printing so it doesn't linger
+      window.addEventListener("afterprint", function () { $("bcPrintArea").innerHTML = ""; });
+
+      // ---- First paint ----
+      render();
+      $("bcSaysText").textContent = "Hi there! Let's build the best Buddy ever!";
+    });
+  })();
+  </script>
+</body>
+</html>

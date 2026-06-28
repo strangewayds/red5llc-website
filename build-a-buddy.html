@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Build a Buddy — Red 5</title>
+  <meta name="description" content="Create your own personal Buddy — pick a species, give it a name and personality, then take it on every Red 5 adventure. Build, collect and print your Buddies!">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="assets/logo.png">
+  <script src="app.js" defer></script>
+  <script src="buddy.js" defer></script>
+  <style>
+    /* ---- Build a Buddy landing — scoped so it can't touch other pages ---- */
+    body[data-page="buddy"]{ --bb:#7c5cff; --bb-2:#ff5a8a; --bb-soft:#efeaff; }
+
+    body[data-page="buddy"] .page-hero{
+      background:
+        radial-gradient(900px 360px at 80% -40%, #ffe6f4 0, rgba(255,230,244,0) 70%),
+        linear-gradient(180deg,#efeaff, #ffffff);
+    }
+
+    /* Hero buddy parade */
+    body[data-page="buddy"] .bb-hero-grid{ display:grid; grid-template-columns:1.2fr 1fr; gap:1.5rem; align-items:center; }
+    @media (max-width:820px){ body[data-page="buddy"] .bb-hero-grid{ grid-template-columns:1fr; } }
+    body[data-page="buddy"] .bb-parade{ display:flex; justify-content:center; gap:.4rem; flex-wrap:wrap; }
+    body[data-page="buddy"] .bb-parade .buddy-svg{ width:120px; height:120px; filter:drop-shadow(0 12px 20px rgba(80,50,160,.22)); animation:bbFloat 3.6s ease-in-out infinite; }
+    body[data-page="buddy"] .bb-parade .buddy-svg:nth-child(2){ width:150px; height:150px; animation-delay:.5s; }
+    body[data-page="buddy"] .bb-parade .buddy-svg:nth-child(3){ animation-delay:1s; }
+    @keyframes bbFloat{ 0%,100%{ transform:translateY(0) } 50%{ transform:translateY(-10px) } }
+    body[data-page="buddy"] .hero-actions{ margin-top:1.2rem; }
+
+    /* Section heads */
+    body[data-page="buddy"] .bb-head{ text-align:center; max-width:46ch; margin:0 auto 1.6rem; }
+    body[data-page="buddy"] .bb-head h2{ font-size:clamp(1.5rem,3vw,2.1rem); }
+    body[data-page="buddy"] .bb-head p{ color:var(--muted); }
+
+    /* Species gallery */
+    body[data-page="buddy"] .bb-species{
+      display:grid; grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:1rem;
+    }
+    body[data-page="buddy"] .bb-tile{
+      position:relative; background:#fff; border:1px solid #ece6ff; border-radius:22px;
+      padding:1rem .8rem .9rem; text-decoration:none; color:inherit; text-align:center;
+      box-shadow:0 12px 28px rgba(110,80,200,.12); overflow:hidden;
+      transition:transform .16s ease, box-shadow .16s ease;
+    }
+    body[data-page="buddy"] .bb-tile::before{
+      content:""; position:absolute; inset:0 0 auto 0; height:62%;
+      background:linear-gradient(180deg,var(--tc,#efeaff), #fff); opacity:.55;
+    }
+    body[data-page="buddy"] .bb-tile:hover{ transform:translateY(-5px); box-shadow:0 22px 46px rgba(110,80,200,.24); }
+    body[data-page="buddy"] .bb-tile .buddy-svg{ position:relative; width:108px; height:108px; filter:drop-shadow(0 8px 12px rgba(80,50,160,.18)); }
+    body[data-page="buddy"] .bb-tile h3{ position:relative; margin:.3rem 0 .15rem; font-size:1.02rem; color:#4a3aa0; }
+    body[data-page="buddy"] .bb-tile .bb-make{
+      position:relative; display:inline-block; margin-top:.3rem; font-family:var(--font-display);
+      font-weight:600; font-size:.82rem; color:#fff; background:linear-gradient(135deg,var(--bb),var(--bb-2));
+      padding:.34em .9em; border-radius:999px; box-shadow:0 6px 14px rgba(124,92,255,.32);
+    }
+
+    /* My Buddies collection */
+    body[data-page="buddy"] .bb-collection{
+      display:grid; grid-template-columns:repeat(auto-fill, minmax(170px,1fr)); gap:1rem;
+    }
+    body[data-page="buddy"] .bb-mine{
+      background:#fff; border:1px solid #ece6ff; border-radius:20px; padding:1rem .8rem;
+      text-align:center; box-shadow:0 12px 28px rgba(110,80,200,.12); display:flex; flex-direction:column; align-items:center; gap:.3rem;
+    }
+    body[data-page="buddy"] .bb-mine .buddy-svg{ width:110px; height:110px; }
+    body[data-page="buddy"] .bb-mine h3{ margin:.2rem 0 0; font-size:1.02rem; color:#4a3aa0; }
+    body[data-page="buddy"] .bb-mine .sp{ font-size:.8rem; color:var(--muted); }
+    body[data-page="buddy"] .bb-mine .row{ display:flex; gap:.4rem; margin-top:.5rem; }
+    body[data-page="buddy"] .bb-mine a, body[data-page="buddy"] .bb-mine button{
+      border:none; cursor:pointer; font-family:var(--font-display); font-weight:600; font-size:.78rem;
+      padding:.4em .8em; border-radius:999px; text-decoration:none;
+    }
+    body[data-page="buddy"] .bb-mine .edit{ background:var(--bb); color:#fff; }
+    body[data-page="buddy"] .bb-mine .del{ background:#f4eefe; color:#8a6bd6; }
+    body[data-page="buddy"] .bb-empty{
+      grid-column:1/-1; text-align:center; padding:2.4rem 1rem; background:#fff;
+      border:2px dashed #d8ccff; border-radius:22px; color:var(--muted);
+    }
+    body[data-page="buddy"] .bb-empty .buddy-svg{ width:120px; height:120px; opacity:.85; margin-bottom:.4rem; }
+    body[data-page="buddy"] .bb-empty a{ color:var(--bb); font-weight:800; }
+
+    /* How it grows */
+    body[data-page="buddy"] .bb-steps{ display:grid; grid-template-columns:repeat(3,1fr); gap:1.1rem; }
+    @media (max-width:760px){ body[data-page="buddy"] .bb-steps{ grid-template-columns:1fr; } }
+    body[data-page="buddy"] .bb-step{
+      background:linear-gradient(180deg,#faf8ff,#fff); border:1px solid #ece6ff; border-radius:20px;
+      padding:1.3rem 1.1rem; text-align:center; box-shadow:0 10px 24px rgba(110,80,200,.10);
+    }
+    body[data-page="buddy"] .bb-step .ico{
+      width:54px; height:54px; border-radius:16px; display:grid; place-items:center; margin:0 auto .7rem;
+      background:linear-gradient(135deg,var(--bb),var(--bb-2)); color:#fff;
+    }
+    body[data-page="buddy"] .bb-step .ico svg{ width:28px; height:28px; }
+    body[data-page="buddy"] .bb-step h3{ font-size:1.08rem; color:#4a3aa0; margin-bottom:.3rem; }
+    body[data-page="buddy"] .bb-step p{ color:var(--muted); font-size:.92rem; margin:0; }
+
+    body[data-page="buddy"] .cta-band{
+      background:linear-gradient(135deg,#7c5cff,#b13bff) !important;
+    }
+    body[data-page="buddy"] .cta-band p{ color:#efe6ff; }
+  </style>
+</head>
+<body data-page="buddy" class="accent-indigo">
+
+  <section class="page-hero">
+    <div class="container">
+      <div class="breadcrumb"><a href="index.html">Home</a> / <a href="create-zone.html">Create Zone</a> / Build a Buddy</div>
+      <div class="bb-hero-grid">
+        <div>
+          <span class="eyebrow"><span data-icon="sparkle"></span> Build a Buddy</span>
+          <h1>Build a Buddy</h1>
+          <p>Create your best friend for every Red 5 adventure. Pick a species, choose colors, add a personality, and make a Buddy that's totally, completely <em>yours</em>.</p>
+          <div class="hero-actions">
+            <a class="btn btn-accent btn-lg" href="buddy-creator.html"><span data-icon="sparkle"></span> Create Buddy</a>
+            <a class="btn btn-outline btn-lg" href="#my-buddies">My Collection</a>
+          </div>
+        </div>
+        <div class="bb-parade" id="bbParade" aria-hidden="true"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SPECIES GALLERY -->
+  <section class="section">
+    <div class="container">
+      <div class="bb-head">
+        <h2>Pick your species ✨</h2>
+        <p>Every Buddy starts as one of these. Tap one to start building — you can change everything later!</p>
+      </div>
+      <div class="bb-species" id="bbSpecies"></div>
+    </div>
+  </section>
+
+  <!-- MY BUDDIES -->
+  <section class="section" id="my-buddies" style="background:#faf8ff">
+    <div class="container">
+      <div class="bb-head">
+        <h2>My Buddies 🧡</h2>
+        <p>Your saved Buddies live here. Open one to keep customizing, or print its passport.</p>
+      </div>
+      <div class="bb-collection" id="bbCollection"></div>
+    </div>
+  </section>
+
+  <!-- HOW IT GROWS -->
+  <section class="section">
+    <div class="container">
+      <div class="bb-head">
+        <h2>Your Buddy grows with you</h2>
+        <p>A Buddy isn't just a picture — it's a friend that joins you all across Red 5.</p>
+      </div>
+      <div class="bb-steps">
+        <div class="bb-step">
+          <div class="ico"><span data-icon="palette"></span></div>
+          <h3>1. Build it</h3>
+          <p>Choose a species, colors, an expression and fun accessories. Watch your Buddy come to life as you go!</p>
+        </div>
+        <div class="bb-step">
+          <div class="ico"><span data-icon="heart"></span></div>
+          <h3>2. Give it heart</h3>
+          <p>Add a name, a personality and your favorites to make a one-of-a-kind Buddy Passport you can collect.</p>
+        </div>
+        <div class="bb-step">
+          <div class="ico"><span data-icon="compass"></span></div>
+          <h3>3. Take it everywhere</h3>
+          <p>Print a poster, a passport card, or a coloring page — and bring your Buddy along on every adventure.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container">
+    <div class="cta-band">
+      <h2>Ready to meet your new best friend?</h2>
+      <p>Build, name and collect your very own Buddies — then print them out to color and keep.</p>
+      <div class="hero-actions">
+        <a class="btn btn-yellow btn-lg" href="buddy-creator.html"><span data-icon="star"></span> Start Building</a>
+        <a class="btn btn-ghost btn-lg" href="create-zone.html">Back to Create Zone</a>
+      </div>
+    </div>
+  </section>
+
+  <script>
+  (function () {
+    function ready(fn){ if(document.readyState!=="loading"){ fn(); } else { document.addEventListener("DOMContentLoaded", fn); } }
+    ready(function () {
+      var B = window.Buddy;
+      if (!B) return;
+
+      /* Hero parade — three colorful sample buddies */
+      var parade = document.getElementById("bbParade");
+      var samples = [
+        { species:"fox",     color:"#ff8a3d", expression:"happy",   accessories:["scarf"] },
+        { species:"dragon",  color:"#7c5cff", expression:"excited", accessories:["crown"] },
+        { species:"unicorn", color:"#f2a3e8", expression:"love",    accessories:["bow"] }
+      ];
+      parade.innerHTML = samples.map(function(s){ return B.svg(s); }).join("");
+
+      /* Species gallery — premium tiles linking into the creator */
+      var grid = document.getElementById("bbSpecies");
+      grid.innerHTML = B.SPECIES.map(function (sp) {
+        var preview = B.svg({ species:sp.id, color:sp.color, expression:"happy", accessories:[] });
+        return '<a class="bb-tile" style="--tc:'+B.shade(sp.color,70)+'" href="buddy-creator.html?species='+sp.id+'">'+
+          preview +
+          '<h3>'+sp.name+'</h3>'+
+          '<span class="bb-make">Build →</span>'+
+        '</a>';
+      }).join("");
+
+      /* My Buddies collection from localStorage */
+      function renderCollection() {
+        var wrap = document.getElementById("bbCollection");
+        var list = B.load();
+        if (!list.length) {
+          wrap.innerHTML = '<div class="bb-empty">'+
+            B.svg({ species:"puppy", color:"#c9914f", expression:"happy", accessories:[] }) +
+            '<p style="font-size:1.05rem;font-weight:800;color:#4a3aa0;margin:.2rem 0">No Buddies yet!</p>'+
+            '<p>Build your first friend and it will show up right here. <a href="buddy-creator.html">Create a Buddy →</a></p>'+
+          '</div>';
+          return;
+        }
+        wrap.innerHTML = list.map(function (b) {
+          var sp = B.getSpecies(b.species) || { name:"Buddy" };
+          return '<div class="bb-mine">'+
+            B.svg(b) +
+            '<h3>'+(b.name ? escapeHtml(b.name) : "Unnamed Buddy")+'</h3>'+
+            '<span class="sp">'+sp.name+'</span>'+
+            '<div class="row">'+
+              '<a class="edit" href="buddy-creator.html?id='+encodeURIComponent(b.id)+'">Open</a>'+
+              '<button class="del" type="button" data-del="'+b.id+'">Delete</button>'+
+            '</div>'+
+          '</div>';
+        }).join("");
+        wrap.querySelectorAll("[data-del]").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            if (confirm("Delete this Buddy? This can't be undone.")) {
+              B.remove(btn.getAttribute("data-del"));
+              renderCollection();
+            }
+          });
+        });
+      }
+      function escapeHtml(s){ return String(s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]; }); }
+      renderCollection();
+    });
+  })();
+  </script>
+</body>
+</html>
