@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Comic Creator — Red 5</title>
+  <meta name="description" content="Make your very own comic book! Pick a layout, add backgrounds, heroes, speech bubbles and POW! sound effects, then print or download your comic. Every hero has a story — what's yours?">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Bangers&family=Baloo+2:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="assets/logo.png">
+  <script src="app.js" defer></script>
+  <style>
+    /* ===== Comic Creator landing — scoped to this page only ===== */
+    body[data-page="comic"]{ --cmc-purple:#7c4dff; --cmc-blue:#2ba8e0; --cmc-pink:#ff4d8d; --cmc-yellow:#ffd23f; --cmc-ink:#1d1340; }
+
+    /* Hero: bold comic sky */
+    body[data-page="comic"] .page-hero{
+      background:
+        radial-gradient(circle at 18% 22%, rgba(255,210,63,.35), transparent 38%),
+        radial-gradient(circle at 82% 18%, rgba(255,77,141,.30), transparent 42%),
+        linear-gradient(160deg,#5b3fb0 0%, #7c4dff 45%, #2ba8e0 100%);
+      position:relative; overflow:hidden; color:#fff;
+    }
+    body[data-page="comic"] .page-hero::before{
+      content:""; position:absolute; inset:0; opacity:.18; pointer-events:none;
+      background-image:radial-gradient(rgba(255,255,255,.9) 1.4px, transparent 1.6px);
+      background-size:14px 14px;
+    }
+    body[data-page="comic"] .page-hero .container{ position:relative; z-index:2; }
+    body[data-page="comic"] .page-hero .breadcrumb a,
+    body[data-page="comic"] .page-hero .breadcrumb{ color:rgba(255,255,255,.85); }
+    body[data-page="comic"] .page-hero h1{
+      font-family:"Bangers","Fredoka",sans-serif; letter-spacing:2px; font-weight:400;
+      font-size:clamp(2.6rem,6vw,4.4rem); line-height:1; color:#fff;
+      text-shadow:3px 3px 0 #1d1340, 6px 6px 0 rgba(255,77,141,.55);
+      -webkit-text-stroke:1px #1d1340;
+    }
+    body[data-page="comic"] .page-hero .eyebrow{ color:#1d1340; background:var(--cmc-yellow); border-radius:999px; padding:.3em .9em; box-shadow:3px 3px 0 #1d1340; }
+    body[data-page="comic"] .page-hero > .container > p{ color:rgba(255,255,255,.95); font-size:1.2rem; font-weight:700; }
+    body[data-page="comic"] .cmc-hero-actions{ display:flex; flex-wrap:wrap; gap:.7rem; margin-top:1.3rem; }
+    body[data-page="comic"] .cmc-pow{
+      position:absolute; right:6%; top:18%; z-index:1; font-family:"Bangers",sans-serif;
+      font-size:clamp(2rem,7vw,5rem); color:var(--cmc-yellow); transform:rotate(-12deg);
+      text-shadow:3px 3px 0 #1d1340; -webkit-text-stroke:2px #1d1340; pointer-events:none;
+      animation:cmcPop 2.6s ease-in-out infinite;
+    }
+    @keyframes cmcPop{ 0%,100%{ transform:rotate(-12deg) scale(1);} 50%{ transform:rotate(-12deg) scale(1.08);} }
+    @media (max-width:680px){ body[data-page="comic"] .cmc-pow{ display:none; } }
+
+    /* Section heads with comic flair */
+    body[data-page="comic"] .cmc-eyebrow{ display:inline-block; font-family:"Bangers",sans-serif; letter-spacing:1.5px; color:var(--cmc-purple); font-size:1.4rem; }
+
+    /* Template gallery */
+    body[data-page="comic"] .cmc-templates{
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:1.2rem;
+    }
+    body[data-page="comic"] .cmc-tpl{
+      background:#fff; border:3px solid var(--cmc-ink); border-radius:18px; overflow:hidden;
+      display:flex; flex-direction:column; cursor:pointer; text-decoration:none; color:inherit;
+      box-shadow:6px 6px 0 rgba(29,19,64,.12); transition:transform .14s ease, box-shadow .14s ease;
+    }
+    body[data-page="comic"] .cmc-tpl:hover{ transform:translate(-2px,-2px); box-shadow:9px 9px 0 rgba(124,77,255,.25); }
+    body[data-page="comic"] .cmc-tpl-prev{
+      aspect-ratio:4/3; background:linear-gradient(160deg,#f3ecff,#e3f4fc); padding:12px;
+      display:grid; gap:6px; box-sizing:border-box;
+    }
+    body[data-page="comic"] .cmc-cell{ background:#fff; border:2.5px solid var(--cmc-ink); border-radius:5px; }
+    body[data-page="comic"] .cmc-tpl-body{ padding:.7rem .9rem .9rem; border-top:3px solid var(--cmc-ink); }
+    body[data-page="comic"] .cmc-tpl-body h3{ margin:0 0 .15rem; font-size:1rem; color:var(--cmc-ink); display:flex; align-items:center; gap:.4rem; }
+    body[data-page="comic"] .cmc-tpl-body p{ margin:0; font-size:.82rem; color:var(--muted); }
+
+    /* Layout previews using grid-template-areas */
+    body[data-page="comic"] .lyt-1{ grid-template-columns:1fr; grid-template-rows:1fr; }
+    body[data-page="comic"] .lyt-2{ grid-template-columns:1fr 1fr; grid-template-rows:1fr; }
+    body[data-page="comic"] .lyt-3{ grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; }
+    body[data-page="comic"] .lyt-3 .cmc-cell:first-child{ grid-column:1 / span 2; }
+    body[data-page="comic"] .lyt-4{ grid-template-columns:1fr 1fr; grid-template-rows:1fr 1fr; }
+    body[data-page="comic"] .lyt-6{ grid-template-columns:1fr 1fr 1fr; grid-template-rows:1fr 1fr; }
+    body[data-page="comic"] .lyt-splash{ grid-template-columns:1fr; grid-template-rows:1fr; }
+    body[data-page="comic"] .lyt-splash .cmc-cell{ background:linear-gradient(135deg,#ffd23f,#ff8a3d); display:grid; place-items:center; }
+    body[data-page="comic"] .lyt-splash .cmc-cell::after{ content:"POW!"; font-family:"Bangers",sans-serif; color:#fff; font-size:1.5rem; text-shadow:2px 2px 0 var(--cmc-ink); -webkit-text-stroke:1px var(--cmc-ink); transform:rotate(-8deg); }
+
+    /* Story starters */
+    body[data-page="comic"] .cmc-starters{ display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:1rem; }
+    body[data-page="comic"] .cmc-starter{
+      background:#fff; border:3px solid var(--cmc-ink); border-radius:16px; padding:1.1rem 1.2rem;
+      box-shadow:5px 5px 0 rgba(29,19,64,.10); display:flex; flex-direction:column; gap:.45rem;
+    }
+    body[data-page="comic"] .cmc-starter .emoji{ font-size:1.9rem; }
+    body[data-page="comic"] .cmc-starter h3{ margin:0; font-size:1.05rem; color:var(--cmc-purple); }
+    body[data-page="comic"] .cmc-starter p{ margin:0; font-size:.9rem; color:var(--muted); line-height:1.4; }
+    body[data-page="comic"] .cmc-starter .go{
+      margin-top:.4rem; align-self:flex-start; text-decoration:none; font-family:var(--font-display);
+      font-weight:600; font-size:.85rem; color:#fff; background:var(--cmc-purple);
+      padding:.45rem 1rem; border-radius:999px; box-shadow:0 5px 12px rgba(124,77,255,.3);
+    }
+    body[data-page="comic"] .cmc-starter .go:hover{ filter:brightness(1.08); }
+
+    /* AI idea box */
+    body[data-page="comic"] .cmc-idea-box{
+      background:linear-gradient(135deg,#f3ecff,#e3f4fc); border:3px dashed var(--cmc-purple);
+      border-radius:20px; padding:1.6rem; text-align:center;
+    }
+    body[data-page="comic"] .cmc-idea-out{
+      background:#fff; border:3px solid var(--cmc-ink); border-radius:14px; padding:1.1rem 1.3rem;
+      margin:1rem auto 0; max-width:640px; min-height:64px; font-size:1.05rem; color:var(--cmc-ink);
+      line-height:1.5; box-shadow:4px 4px 0 rgba(29,19,64,.10); text-align:left;
+    }
+    body[data-page="comic"] .cmc-idea-out b{ color:var(--cmc-purple); }
+    body[data-page="comic"] .cmc-idea-btn{
+      border:none; cursor:pointer; font-family:var(--font-display); font-weight:700; font-size:1.05rem;
+      color:var(--cmc-ink); background:var(--cmc-yellow); padding:.7rem 1.5rem; border-radius:999px;
+      box-shadow:4px 4px 0 var(--cmc-ink); transition:transform .1s ease;
+    }
+    body[data-page="comic"] .cmc-idea-btn:hover{ transform:translate(-1px,-1px); }
+    body[data-page="comic"] .cmc-idea-btn:active{ transform:translate(2px,2px); box-shadow:1px 1px 0 var(--cmc-ink); }
+
+    /* My Library */
+    body[data-page="comic"] .cmc-lib-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:1.1rem; }
+    body[data-page="comic"] .cmc-lib-card{
+      background:#fff; border:3px solid var(--cmc-ink); border-radius:16px; overflow:hidden;
+      box-shadow:5px 5px 0 rgba(29,19,64,.10); display:flex; flex-direction:column;
+    }
+    body[data-page="comic"] .cmc-lib-prev{ aspect-ratio:4/3; background:linear-gradient(160deg,#f3ecff,#e3f4fc); display:grid; place-items:center; font-size:2.4rem; }
+    body[data-page="comic"] .cmc-lib-body{ padding:.7rem .85rem .9rem; display:flex; flex-direction:column; gap:.5rem; }
+    body[data-page="comic"] .cmc-lib-body h3{ margin:0; font-size:.98rem; color:var(--cmc-ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    body[data-page="comic"] .cmc-lib-body .meta{ font-size:.75rem; color:var(--muted); }
+    body[data-page="comic"] .cmc-lib-open{
+      text-align:center; text-decoration:none; font-family:var(--font-display); font-weight:600; font-size:.85rem;
+      color:#fff; background:var(--cmc-blue); padding:.45rem; border-radius:999px;
+    }
+    body[data-page="comic"] .cmc-lib-open:hover{ filter:brightness(1.07); }
+    body[data-page="comic"] .cmc-lib-empty{
+      grid-column:1/-1; text-align:center; color:var(--muted); padding:2.4rem 1rem;
+      background:#fff; border:3px dashed #d8cfe8; border-radius:18px;
+    }
+
+    /* How it works */
+    body[data-page="comic"] .cmc-steps{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:1rem; }
+    body[data-page="comic"] .cmc-step{ text-align:center; }
+    body[data-page="comic"] .cmc-step .num{
+      width:54px; height:54px; margin:0 auto .6rem; border-radius:50%; display:grid; place-items:center;
+      font-family:"Bangers",sans-serif; font-size:1.7rem; color:#fff; background:var(--cmc-pink);
+      box-shadow:3px 3px 0 var(--cmc-ink);
+    }
+    body[data-page="comic"] .cmc-step h3{ margin:0 0 .3rem; font-size:1.05rem; color:var(--cmc-ink); }
+    body[data-page="comic"] .cmc-step p{ margin:0; font-size:.88rem; color:var(--muted); }
+  </style>
+</head>
+<body data-page="comic" class="accent-blue">
+
+  <section class="page-hero">
+    <div class="cmc-pow">BOOM!</div>
+    <div class="container">
+      <div class="breadcrumb"><a href="index.html">Home</a> / <a href="create-zone.html">Create Zone</a> / Comic Creator</div>
+      <span class="eyebrow">💥 Comic Creator</span>
+      <h1>Comic Creator</h1>
+      <p>Every hero has a story. What's yours?</p>
+      <div class="cmc-hero-actions">
+        <a class="btn btn-yellow btn-lg" href="comic-builder.html"><span data-icon="sparkle"></span> Create New Comic</a>
+        <a class="btn btn-red btn-lg" href="#cmc-ideas"><span data-icon="bulb"></span> AI Story Ideas</a>
+        <a class="btn btn-outline btn-lg" href="#cmc-templates" style="color:#fff;border-color:rgba(255,255,255,.7)">Browse Templates</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEMPLATE GALLERY -->
+  <section class="section" id="cmc-templates">
+    <div class="container">
+      <div class="section-head">
+        <span class="cmc-eyebrow">Pick your page</span>
+        <h2>Comic Templates</h2>
+        <p>Choose how many panels your story needs — then start building!</p>
+      </div>
+      <div class="cmc-templates">
+        <a class="cmc-tpl" href="comic-builder.html?layout=1">
+          <div class="cmc-tpl-prev lyt-1"><div class="cmc-cell"></div></div>
+          <div class="cmc-tpl-body"><h3>🟦 Single Panel</h3><p>One big scene. Great for a poster or splash.</p></div>
+        </a>
+        <a class="cmc-tpl" href="comic-builder.html?layout=2">
+          <div class="cmc-tpl-prev lyt-2"><div class="cmc-cell"></div><div class="cmc-cell"></div></div>
+          <div class="cmc-tpl-body"><h3>🟦🟦 Two Panels</h3><p>Before & after, or this then that.</p></div>
+        </a>
+        <a class="cmc-tpl" href="comic-builder.html?layout=3">
+          <div class="cmc-tpl-prev lyt-3"><div class="cmc-cell"></div><div class="cmc-cell"></div><div class="cmc-cell"></div></div>
+          <div class="cmc-tpl-body"><h3>🎬 Three Panels</h3><p>A wide opener plus two scenes.</p></div>
+        </a>
+        <a class="cmc-tpl" href="comic-builder.html?layout=4">
+          <div class="cmc-tpl-prev lyt-4"><div class="cmc-cell"></div><div class="cmc-cell"></div><div class="cmc-cell"></div><div class="cmc-cell"></div></div>
+          <div class="cmc-tpl-body"><h3>📚 Four Panels</h3><p>Beginning, middle, twist and ending.</p></div>
+        </a>
+        <a class="cmc-tpl" href="comic-builder.html?layout=6">
+          <div class="cmc-tpl-prev lyt-6"><div class="cmc-cell"></div><div class="cmc-cell"></div><div class="cmc-cell"></div><div class="cmc-cell"></div><div class="cmc-cell"></div><div class="cmc-cell"></div></div>
+          <div class="cmc-tpl-body"><h3>🗯️ Six Panels</h3><p>A full action-packed comic page.</p></div>
+        </a>
+        <a class="cmc-tpl" href="comic-builder.html?layout=splash">
+          <div class="cmc-tpl-prev lyt-splash"><div class="cmc-cell"></div></div>
+          <div class="cmc-tpl-body"><h3>💥 Full-Page Splash</h3><p>One huge dramatic hero moment!</p></div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI STORY IDEAS -->
+  <section class="section alt" id="cmc-ideas">
+    <div class="container">
+      <div class="section-head">
+        <span class="cmc-eyebrow">Stuck for ideas?</span>
+        <h2>AI Story Idea Helper</h2>
+        <p>Tap the button for a fun, ready-to-draw story idea — beginning, middle and end!</p>
+      </div>
+      <div class="cmc-idea-box">
+        <button class="cmc-idea-btn" id="cmcIdeaBtn" type="button">💡 Give me a story idea!</button>
+        <div class="cmc-idea-out" id="cmcIdeaOut">Click the button and a brand-new comic story idea will pop up right here. ✨</div>
+        <p style="margin:1rem 0 0;font-size:.85rem;color:var(--muted)">Kid-safe ideas, made just for you. <a href="comic-builder.html" style="color:var(--cmc-purple);font-weight:700">Open the builder →</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- STORY STARTERS -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <span class="cmc-eyebrow">Story idea starters</span>
+        <h2>Pick a Spark</h2>
+        <p>Every great comic starts with one big idea.</p>
+      </div>
+      <div class="cmc-starters">
+        <div class="cmc-starter"><span class="emoji">🦸</span><h3>Superhero Saves the Day</h3><p>An everyday kid discovers a surprising super-power and helps their town.</p><a class="go" href="comic-builder.html?layout=4&spark=hero">Start this →</a></div>
+        <div class="cmc-starter"><span class="emoji">🐉</span><h3>The Friendly Dragon</h3><p>Two best friends find a tiny dragon in the park and keep it a secret.</p><a class="go" href="comic-builder.html?layout=4&spark=dragon">Start this →</a></div>
+        <div class="cmc-starter"><span class="emoji">🚀</span><h3>Space Explorers</h3><p>A crew of young astronauts lands on a planet made entirely of candy.</p><a class="go" href="comic-builder.html?layout=6&spark=space">Start this →</a></div>
+        <div class="cmc-starter"><span class="emoji">🔍</span><h3>The Mystery of the Missing Cookie</h3><p>A kid detective follows clues to solve the case of the vanishing treat.</p><a class="go" href="comic-builder.html?layout=4&spark=mystery">Start this →</a></div>
+        <div class="cmc-starter"><span class="emoji">🐾</span><h3>My Pet's Secret Life</h3><p>What does your pet REALLY do all day while you're at school?</p><a class="go" href="comic-builder.html?layout=4&spark=pet">Start this →</a></div>
+        <div class="cmc-starter"><span class="emoji">🏰</span><h3>The Brave Knight</h3><p>A small but mighty knight must outsmart a grumpy (not-so-scary) ogre.</p><a class="go" href="comic-builder.html?layout=4&spark=knight">Start this →</a></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section alt">
+    <div class="container">
+      <div class="section-head"><span class="cmc-eyebrow">Easy as 1-2-3-4</span><h2>How it works</h2></div>
+      <div class="cmc-steps">
+        <div class="cmc-step"><div class="num">1</div><h3>Pick a layout</h3><p>Choose how many panels your comic needs.</p></div>
+        <div class="cmc-step"><div class="num">2</div><h3>Add scenes</h3><p>Drop in backgrounds, heroes and props.</p></div>
+        <div class="cmc-step"><div class="num">3</div><h3>Tell the story</h3><p>Add speech bubbles and POW! sound effects.</p></div>
+        <div class="cmc-step"><div class="num">4</div><h3>Print & share</h3><p>Print your comic or download it as a picture.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MY LIBRARY -->
+  <section class="section" id="cmc-library">
+    <div class="container">
+      <div class="section-head"><span class="cmc-eyebrow">Your bookshelf</span><h2>My Comic Library</h2><p>Comics you've made are saved right here on this device.</p></div>
+      <div class="cmc-lib-grid" id="cmcLibGrid">
+        <div class="cmc-lib-empty">You haven't made any comics yet. <br><a href="comic-builder.html" style="color:var(--cmc-purple);font-weight:700">Create your first comic →</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="container">
+    <div class="cta-band">
+      <h2>Ready to make your masterpiece?</h2>
+      <p>Build your own comic book — heroes, villains, big BOOMS and happy endings.</p>
+      <div class="hero-actions">
+        <a class="btn btn-yellow btn-lg" href="comic-builder.html"><span data-icon="star"></span> Open the Comic Builder</a>
+        <a class="btn btn-ghost btn-lg" href="create-zone.html">Back to Create Zone</a>
+      </div>
+    </div>
+  </section>
+
+  <script src="comic-creator.js" defer></script>
+</body>
+</html>

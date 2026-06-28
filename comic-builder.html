@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Comic Builder — Red 5</title>
+  <meta name="description" content="Build your own comic book! Pick a layout, add backgrounds, heroes, speech bubbles and POW! sound effects, then print or download it.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Bangers&family=Baloo+2:wght@500;700&family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="assets/logo.png">
+  <style>
+    body{ margin:0; font-family:var(--font-body,'Nunito',sans-serif); background:#ece6fb; color:#1d1340; }
+    :root{ --cb-purple:#7c4dff; --cb-blue:#2ba8e0; --cb-pink:#ff4d8d; --cb-yellow:#ffd23f; --cb-ink:#1d1340; }
+    .cb-wrap{ min-height:100vh; display:flex; flex-direction:column; }
+
+    /* ===== Top bar ===== */
+    .cb-top{ display:flex; align-items:center; gap:.6rem; padding:.6rem 1rem; flex-wrap:wrap;
+      background:linear-gradient(90deg,#5b3fb0,#7c4dff 55%,#2ba8e0); color:#fff;
+      box-shadow:0 4px 14px rgba(60,30,110,.3); position:sticky; top:0; z-index:30; }
+    .cb-back{ display:inline-flex; align-items:center; gap:.4rem; background:rgba(255,255,255,.2); color:#fff;
+      text-decoration:none; font-family:var(--font-display); font-weight:600; padding:.45rem .9rem; border-radius:999px; font-size:.9rem; }
+    .cb-back:hover{ background:rgba(255,255,255,.34); }
+    .cb-brand{ font-family:"Bangers",sans-serif; letter-spacing:1.2px; font-size:1.4rem; margin:0; display:flex; align-items:center; gap:.4rem;
+      text-shadow:2px 2px 0 #1d1340; }
+    .cb-titlefield{ border:none; border-radius:10px; padding:.45rem .8rem; font-family:var(--font-display); font-weight:700;
+      font-size:1rem; color:#1d1340; min-width:170px; max-width:240px; }
+    .cb-titlefield:focus{ outline:3px solid var(--cb-yellow); }
+    .cb-spacer{ flex:1; }
+    .cb-btn{ border:none; cursor:pointer; font-family:var(--font-display); font-weight:600; font-size:.88rem;
+      padding:.5rem 1rem; border-radius:999px; color:#fff; display:inline-flex; align-items:center; gap:.4rem;
+      box-shadow:0 5px 12px rgba(0,0,0,.2); white-space:nowrap; }
+    .cb-btn:hover{ filter:brightness(1.08); }
+    .cb-btn.ghost{ background:rgba(255,255,255,.2); }
+    .cb-btn.save{ background:linear-gradient(135deg,#3ddc84,#22b566); }
+    .cb-btn.png{ background:linear-gradient(135deg,#ffb02e,#ff8a18); color:#4a3500; }
+    .cb-btn.print{ background:#fff; color:#7c4dff; }
+
+    /* ===== Main layout ===== */
+    .cb-main{ flex:1; display:grid; grid-template-columns:300px 1fr; gap:1rem; padding:1rem; align-items:start; }
+    @media (max-width:920px){ .cb-main{ grid-template-columns:1fr; } }
+
+    /* ===== Left tool panel ===== */
+    .cb-panel{ display:flex; flex-direction:column; gap:.9rem; position:sticky; top:74px; max-height:calc(100vh - 90px); overflow-y:auto; padding-right:.2rem; }
+    @media (max-width:920px){ .cb-panel{ position:static; max-height:none; order:2; } .cb-stagewrap{ order:1; } }
+    .cb-card{ background:#fff; border-radius:16px; padding:.9rem 1rem; box-shadow:0 8px 20px rgba(90,60,130,.12); }
+    .cb-card h2{ font-family:var(--font-display); font-size:.98rem; margin:0 0 .6rem; color:var(--cb-purple); display:flex; align-items:center; gap:.4rem; }
+    .cb-hint{ font-size:.78rem; color:#7a6a9a; margin:0 0 .5rem; }
+
+    /* Layout chooser */
+    .cb-layouts{ display:grid; grid-template-columns:repeat(3,1fr); gap:.5rem; }
+    .cb-lyt{ aspect-ratio:4/3; border:2.5px solid #e2d9f4; border-radius:9px; background:#faf7ff; cursor:pointer; padding:5px; display:grid; gap:3px; }
+    .cb-lyt.sel{ border-color:var(--cb-purple); box-shadow:0 0 0 2px #e0d4ff; }
+    .cb-lyt span{ background:#d9cdf3; border-radius:2px; }
+    .cb-lyt.l1{ grid-template:1fr/1fr; }
+    .cb-lyt.l2{ grid-template:1fr/1fr 1fr; }
+    .cb-lyt.l3{ grid-template:1fr 1fr/1fr 1fr; }
+    .cb-lyt.l3 span:first-child{ grid-column:1/3; }
+    .cb-lyt.l4{ grid-template:1fr 1fr/1fr 1fr; }
+    .cb-lyt.l6{ grid-template:1fr 1fr/1fr 1fr 1fr; }
+    .cb-lyt.lsplash{ grid-template:1fr/1fr; }
+    .cb-lyt.lsplash span{ background:linear-gradient(135deg,var(--cb-yellow),var(--cb-pink)); }
+
+    /* Generic tray of tap-to-add chips */
+    .cb-tray{ display:flex; flex-wrap:wrap; gap:.4rem; }
+    .cb-tray button{ min-width:42px; height:42px; padding:0 .4rem; font-size:1.4rem; background:#faf7ff; border:2px solid #ece3fb;
+      border-radius:11px; cursor:pointer; line-height:1; display:inline-flex; align-items:center; justify-content:center; }
+    .cb-tray button:hover{ border-color:var(--cb-purple); transform:translateY(-1px); }
+    .cb-tray.scenes button{ flex-direction:column; gap:2px; font-size:1.05rem; width:62px; height:54px; }
+    .cb-tray.scenes button small{ font-size:.6rem; color:#6a5a8a; font-family:var(--font-body); font-weight:700; }
+
+    /* Sound effect chips */
+    .cb-sfx button{ font-family:"Bangers",sans-serif; font-size:1rem; letter-spacing:.5px; padding:.3rem .7rem; height:auto;
+      color:#fff; border:2px solid var(--cb-ink); border-radius:8px; }
+    .cb-sfx .sx1{ background:var(--cb-pink); } .cb-sfx .sx2{ background:var(--cb-blue); }
+    .cb-sfx .sx3{ background:#ff8a3d; } .cb-sfx .sx4{ background:#5da130; }
+    .cb-sfx .sx5{ background:var(--cb-purple); } .cb-sfx .sx6{ background:#e11d2b; }
+
+    /* Bubble buttons */
+    .cb-bubbles{ display:grid; grid-template-columns:1fr 1fr; gap:.5rem; }
+    .cb-bubbles button{ background:#faf7ff; border:2px solid #ece3fb; border-radius:11px; cursor:pointer; padding:.55rem .4rem;
+      font-family:var(--font-display); font-weight:600; font-size:.85rem; color:var(--cb-ink); display:flex; flex-direction:column; align-items:center; gap:.2rem; }
+    .cb-bubbles button:hover{ border-color:var(--cb-purple); }
+    .cb-bubbles button .ico{ font-size:1.3rem; }
+
+    /* AI assistant card */
+    .cb-ai{ background:linear-gradient(135deg,#f3ecff,#e3f4fc); }
+    .cb-ai-out{ background:#fff; border:2px solid #e2d9f4; border-radius:11px; padding:.7rem .8rem; font-size:.85rem; line-height:1.45;
+      color:var(--cb-ink); margin-bottom:.6rem; min-height:40px; }
+    .cb-ai-out b{ color:var(--cb-purple); }
+    .cb-ai-btns{ display:flex; gap:.5rem; flex-wrap:wrap; }
+    .cb-ai-btn{ flex:1; border:none; cursor:pointer; font-family:var(--font-display); font-weight:600; font-size:.8rem;
+      padding:.55rem .5rem; border-radius:10px; color:#fff; background:var(--cb-purple); box-shadow:0 4px 10px rgba(124,77,255,.3); white-space:nowrap; }
+    .cb-ai-btn.alt{ background:var(--cb-blue); }
+    .cb-ai-btn:hover{ filter:brightness(1.08); }
+    .cb-ai .note{ font-size:.7rem; color:#8a7aaa; margin:.5rem 0 0; }
+
+    /* ===== Stage ===== */
+    .cb-stagewrap{ display:flex; flex-direction:column; align-items:center; gap:.8rem; }
+    .cb-pagebar{ display:flex; align-items:center; gap:.5rem; flex-wrap:wrap; justify-content:center; }
+    .cb-pageinfo{ font-family:var(--font-display); font-weight:700; color:#5b3fb0; font-size:.9rem; }
+    .cb-pagedot{ width:30px; height:30px; border-radius:8px; border:2px solid #c9bce8; background:#fff; cursor:pointer;
+      font-weight:700; color:#5b3fb0; }
+    .cb-pagedot.sel{ background:var(--cb-purple); color:#fff; border-color:var(--cb-purple); }
+    .cb-miniadd{ width:30px; height:30px; border-radius:8px; border:2px dashed #b7a6e0; background:#fff; cursor:pointer; color:#7c4dff; font-size:1.1rem; line-height:1; }
+
+    .cb-stage{ background:#fff; border:4px solid var(--cb-ink); border-radius:8px; box-shadow:0 18px 44px rgba(60,30,110,.28);
+      width:min(760px,94vw); aspect-ratio:17/22; padding:14px; box-sizing:border-box; display:grid; gap:12px; position:relative; }
+    .cb-comic-title{ position:absolute; left:50%; top:-2px; transform:translate(-50%,-58%); background:var(--cb-yellow);
+      border:3px solid var(--cb-ink); border-radius:10px; padding:.15rem 1rem; font-family:"Bangers",sans-serif; letter-spacing:1px;
+      font-size:1.3rem; color:var(--cb-ink); box-shadow:3px 3px 0 var(--cb-ink); max-width:90%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+    /* Panels */
+    .cb-panelcell{ position:relative; border:3px solid var(--cb-ink); border-radius:4px; overflow:hidden; background:#eef3f8;
+      cursor:default; touch-action:none; }
+    .cb-panelcell.sel{ box-shadow:inset 0 0 0 3px var(--cb-yellow); }
+    .cb-panelcell .cb-bg{ position:absolute; inset:0; width:100%; height:100%; }
+    .cb-panelcell .cb-placeholder{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; text-align:center;
+      color:#9aa7b8; font-size:.8rem; padding:.5rem; pointer-events:none; font-family:var(--font-display); }
+
+    /* placed elements */
+    .cb-el{ position:absolute; transform:translate(-50%,-50%); cursor:grab; user-select:none; touch-action:none; }
+    .cb-el.sel{ outline:2px dashed var(--cb-pink); outline-offset:3px; }
+    .cb-el.char{ font-size:54px; line-height:1; filter:drop-shadow(0 3px 4px rgba(0,0,0,.28)); }
+    .cb-el.sfx{ font-family:"Bangers",sans-serif; letter-spacing:1px; font-size:34px; color:var(--cb-yellow);
+      -webkit-text-stroke:2px var(--cb-ink); text-shadow:3px 3px 0 var(--cb-ink); }
+    .cb-el .cb-bubble{ background:#fff; border:3px solid var(--cb-ink); border-radius:18px; padding:.4rem .7rem; min-width:60px; max-width:180px;
+      font-family:"Comic Neue","Baloo 2",cursive; font-weight:700; font-size:15px; color:var(--cb-ink); text-align:center; position:relative; line-height:1.2;
+      word-break:break-word; }
+    .cb-el .cb-bubble[contenteditable]:focus{ outline:none; box-shadow:0 0 0 3px #ffe1ec; }
+    .cb-el .cb-bubble.speech::after{ content:""; position:absolute; left:22px; bottom:-15px; border:9px solid transparent;
+      border-top-color:var(--cb-ink); border-bottom:0; }
+    .cb-el .cb-bubble.speech::before{ content:""; position:absolute; left:24px; bottom:-9px; border:7px solid transparent;
+      border-top-color:#fff; border-bottom:0; z-index:1; }
+    .cb-el .cb-bubble.thought{ border-radius:50% / 42%; }
+    .cb-el .cb-bubble.thought::after{ content:"○ ○"; position:absolute; left:14px; bottom:-20px; color:var(--cb-ink); font-size:10px; letter-spacing:2px; }
+
+    /* element handles */
+    .cb-handle{ position:absolute; width:18px; height:18px; border-radius:50%; background:var(--cb-pink); border:2px solid #fff;
+      box-shadow:0 1px 4px rgba(0,0,0,.4); cursor:nwse-resize; right:-9px; bottom:-9px; display:none; z-index:5; }
+    .cb-del{ position:absolute; width:20px; height:20px; border-radius:50%; background:#e11d2b; border:2px solid #fff; color:#fff;
+      font-size:13px; line-height:16px; text-align:center; cursor:pointer; right:-10px; top:-10px; display:none; z-index:5; font-weight:700; }
+    .cb-el.sel .cb-handle, .cb-el.sel .cb-del{ display:block; }
+
+    /* footer hint */
+    .cb-foot{ font-size:.82rem; color:#6a5a8a; text-align:center; max-width:640px; }
+    .cb-foot b{ color:var(--cb-pink); }
+
+    .cb-selnote{ background:#fff7d6; border:2px solid var(--cb-yellow); border-radius:10px; padding:.5rem .7rem; font-size:.8rem; color:#6a5300; }
+
+    /* toast */
+    .toast{ position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(20px); background:#2b2150; color:#fff;
+      padding:.7rem 1.2rem; border-radius:999px; box-shadow:0 10px 30px rgba(0,0,0,.4); opacity:0; pointer-events:none; transition:.25s; font-weight:600; z-index:80; }
+    .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+    /* Library modal */
+    .cb-modal{ position:fixed; inset:0; background:rgba(40,20,70,.6); display:none; align-items:center; justify-content:center; z-index:90; padding:1rem; }
+    .cb-modal.show{ display:flex; }
+    .cb-modal-box{ background:#fff; border-radius:22px; max-width:640px; width:100%; max-height:84vh; overflow:auto; padding:1.4rem; box-shadow:0 30px 70px rgba(0,0,0,.45); }
+    .cb-modal-box h3{ font-family:"Bangers",sans-serif; letter-spacing:1px; color:var(--cb-purple); font-size:1.6rem; margin:.1rem 0 1rem; }
+    .cb-modal-close{ float:right; border:none; background:#f0ebfa; width:34px; height:34px; border-radius:50%; cursor:pointer; font-size:1rem; color:#5b3fb0; }
+    .cb-liblist{ display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:.9rem; }
+    .cb-libitem{ border:2px solid #e2d9f4; border-radius:14px; overflow:hidden; }
+    .cb-libitem .prev{ aspect-ratio:4/3; background:linear-gradient(160deg,#f3ecff,#e3f4fc); display:grid; place-items:center; font-size:2rem; }
+    .cb-libitem .body{ padding:.55rem .7rem; }
+    .cb-libitem .body h4{ margin:0 0 .2rem; font-size:.9rem; color:var(--cb-ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .cb-libitem .body .meta{ font-size:.72rem; color:#8a7aaa; margin-bottom:.5rem; }
+    .cb-libitem .acts{ display:flex; gap:.4rem; }
+    .cb-libitem .acts button{ flex:1; border:none; cursor:pointer; border-radius:8px; font-family:var(--font-display); font-weight:600; font-size:.76rem; padding:.4rem; }
+    .cb-libitem .acts .open{ background:var(--cb-purple); color:#fff; }
+    .cb-libitem .acts .del{ background:#fdeaea; color:#c11; }
+    .cb-libempty{ color:#8a7aaa; text-align:center; padding:1.5rem; }
+
+    /* ===== Print: only the comic page(s) ===== */
+    @media print{
+      @page{ size:portrait; margin:.4in; }
+      .cb-top, .cb-panel, .cb-pagebar, .cb-foot, .toast, .cb-modal, .cb-selnote{ display:none !important; }
+      body{ background:#fff; }
+      .cb-main{ display:block; padding:0; }
+      .cb-stagewrap{ display:block; }
+      .cb-stage{ width:100% !important; max-width:7.2in; aspect-ratio:17/22; margin:0 auto; box-shadow:none !important;
+        page-break-after:always; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+      .cb-el.sel{ outline:none !important; }
+      .cb-handle, .cb-del{ display:none !important; }
+      .cb-panelcell.sel{ box-shadow:none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="cb-wrap">
+    <!-- TOP BAR -->
+    <div class="cb-top">
+      <a class="cb-back" href="comic-creator.html">← Back</a>
+      <span class="cb-brand">💥 Comic Builder</span>
+      <input class="cb-titlefield" id="cbTitle" type="text" maxlength="40" placeholder="My Comic Title" aria-label="Comic title">
+      <div class="cb-spacer"></div>
+      <button class="cb-btn ghost" id="cbLibBtn" type="button">📚 My Library</button>
+      <button class="cb-btn print" id="cbPrint" type="button">🖨 Print</button>
+      <button class="cb-btn png" id="cbPng" type="button">⬇ PNG</button>
+      <button class="cb-btn save" id="cbSave" type="button">💾 Save</button>
+    </div>
+
+    <div class="cb-main">
+      <!-- LEFT TOOLS -->
+      <div class="cb-panel">
+        <div class="cb-selnote" id="cbSelNote">Tap a panel to select it, then add backgrounds, characters and bubbles into it.</div>
+
+        <div class="cb-card">
+          <h2>🧩 Panel Layout</h2>
+          <div class="cb-layouts" id="cbLayouts">
+            <button class="cb-lyt l1" data-layout="1" title="1 panel"><span></span></button>
+            <button class="cb-lyt l2" data-layout="2" title="2 panels"><span></span><span></span></button>
+            <button class="cb-lyt l3" data-layout="3" title="3 panels"><span></span><span></span><span></span></button>
+            <button class="cb-lyt l4" data-layout="4" title="4 panels"><span></span><span></span><span></span><span></span></button>
+            <button class="cb-lyt l6" data-layout="6" title="6 panels"><span></span><span></span><span></span><span></span><span></span><span></span></button>
+            <button class="cb-lyt lsplash" data-layout="splash" title="Splash page"><span></span></button>
+          </div>
+        </div>
+
+        <div class="cb-card">
+          <h2>🌄 Background</h2>
+          <p class="cb-hint">Tap to set the selected panel's scene.</p>
+          <div class="cb-tray scenes" id="cbScenes"></div>
+        </div>
+
+        <div class="cb-card">
+          <h2>🦸 Characters</h2>
+          <p class="cb-hint">Tap to drop into the selected panel. Drag to move, corner dot to resize.</p>
+          <div class="cb-tray" id="cbChars"></div>
+        </div>
+
+        <div class="cb-card">
+          <h2>🧸 Props &amp; Items</h2>
+          <div class="cb-tray" id="cbProps"></div>
+        </div>
+
+        <div class="cb-card">
+          <h2>💬 Bubbles</h2>
+          <div class="cb-bubbles">
+            <button id="cbAddSpeech" type="button"><span class="ico">💬</span> Speech</button>
+            <button id="cbAddThought" type="button"><span class="ico">💭</span> Thought</button>
+          </div>
+        </div>
+
+        <div class="cb-card">
+          <h2>💥 Sound Effects</h2>
+          <div class="cb-tray cb-sfx" id="cbSfx"></div>
+        </div>
+
+        <div class="cb-card cb-ai">
+          <h2>🤖 AI Story Assistant</h2>
+          <div class="cb-ai-out" id="cbAiOut">Need a story? Tap below for a fun idea, or ask "What happens next?" for a creative nudge.</div>
+          <div class="cb-ai-btns">
+            <button class="cb-ai-btn" id="cbIdeaBtn" type="button">💡 Story idea</button>
+            <button class="cb-ai-btn alt" id="cbNextBtn" type="button">➡️ What's next?</button>
+          </div>
+          <p class="note">Safe, kid-friendly ideas — not real AI, just a friendly helper.</p>
+        </div>
+      </div>
+
+      <!-- STAGE -->
+      <div class="cb-stagewrap">
+        <div class="cb-pagebar">
+          <span class="cb-pageinfo">Pages:</span>
+          <div id="cbPageDots" style="display:flex;gap:.4rem;flex-wrap:wrap;"></div>
+          <button class="cb-miniadd" id="cbAddPage" type="button" title="Add page">+</button>
+          <button class="cb-pagedot" id="cbDelPage" type="button" title="Delete page" style="border-color:#f0b4b4;color:#c11;width:auto;padding:0 .5rem">🗑</button>
+        </div>
+
+        <div class="cb-stage" id="cbStage"></div>
+
+        <p class="cb-foot">Tap a <b>panel</b> to select it, then add a scene, characters and bubbles. Click any element to <b>edit, move or delete</b> it. Everything saves automatically. Use <b>Print</b> for a real comic book!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIBRARY MODAL -->
+  <div class="cb-modal" id="cbLibModal">
+    <div class="cb-modal-box">
+      <button class="cb-modal-close" id="cbLibClose" type="button">✕</button>
+      <h3>📚 My Comic Library</h3>
+      <div class="cb-liblist" id="cbLibList"></div>
+      <p class="cb-libempty" id="cbLibEmpty" style="display:none">No saved comics yet — make one and tap Save! 💥</p>
+    </div>
+  </div>
+
+  <div class="toast" id="cbToast"></div>
+
+  <script src="comic-creator.js" defer></script>
+  <script src="comic-builder.js" defer></script>
+</body>
+</html>
