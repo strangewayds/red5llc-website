@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Story Writer — Red 5</title>
+  <meta name="description" content="The Red 5 writing studio: write your own book chapter by chapter, build characters, design a cover, and get help from your friendly Story Coach. Autosaves and prints!">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Baloo+2:wght@500;700&family=Caveat:wght@600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="assets/logo.png">
+  <script src="app.js" defer></script>
+  <script src="story-creator.js" defer></script>
+  <style>
+    /* ===== Story Writer studio — scoped to this page only ===== */
+    body[data-page="writer"]{
+      --sc-purple:#6c5ce7; --sc-indigo:#3a2c9c; --sc-blue:#2ba8e0;
+      --sc-pink:#ff5d9e; --sc-gold:#ffc53d; --sc-ink:#221a4a;
+      background:#f3f1fb;
+    }
+
+    /* Top toolbar */
+    body[data-page="writer"] .sw-bar{
+      position:sticky; top:0; z-index:40; background:#fff; border-bottom:1px solid var(--line);
+      box-shadow:0 4px 14px rgba(20,30,60,.06);
+    }
+    body[data-page="writer"] .sw-bar-inner{
+      display:flex; align-items:center; gap:.8rem; padding:.7rem 0; flex-wrap:wrap;
+    }
+    body[data-page="writer"] .sw-back{
+      display:inline-flex; align-items:center; gap:.4rem; font-family:var(--font-display); font-weight:700;
+      color:var(--sc-purple); font-size:.92rem;
+    }
+    body[data-page="writer"] .sw-back:hover{ color:var(--sc-indigo); }
+    body[data-page="writer"] .sw-bar-title{ font-family:var(--font-display); font-weight:700; color:var(--sc-ink); margin-right:auto; }
+    body[data-page="writer"] .sw-saved{ font-size:.8rem; color:var(--green); font-weight:700; opacity:0; transition:opacity .3s; }
+    body[data-page="writer"] .sw-saved.show{ opacity:1; }
+    body[data-page="writer"] .btn-sm{ padding:.5em 1em; font-size:.88rem; box-shadow:none; }
+
+    /* Layout: editor + side panel */
+    body[data-page="writer"] .sw-layout{
+      display:grid; grid-template-columns:1fr 320px; gap:1.4rem; padding:1.4rem 0 3rem; align-items:start;
+    }
+    @media (max-width:920px){ body[data-page="writer"] .sw-layout{ grid-template-columns:1fr; } }
+
+    body[data-page="writer"] .sw-card{
+      background:#fff; border:1px solid var(--line); border-radius:18px; padding:1.3rem 1.4rem;
+      box-shadow:var(--shadow-sm); margin-bottom:1.2rem;
+    }
+    body[data-page="writer"] .sw-card h2{ font-size:1.15rem; color:var(--sc-ink); margin:0 0 .9rem; display:flex; align-items:center; gap:.5rem; }
+    body[data-page="writer"] .sw-card h2 .em{ font-size:1.2rem; }
+
+    /* Title / author fields */
+    body[data-page="writer"] .sw-field{ margin-bottom:.9rem; }
+    body[data-page="writer"] .sw-field label{ display:block; font-family:var(--font-display); font-weight:600; font-size:.82rem; color:var(--muted); margin-bottom:.3rem; text-transform:uppercase; letter-spacing:.04em; }
+    body[data-page="writer"] .sw-input, body[data-page="writer"] .sw-select{
+      width:100%; font-family:var(--font-body); font-size:1rem; color:var(--sc-ink);
+      border:2px solid var(--line); border-radius:12px; padding:.6rem .8rem; background:#fff;
+    }
+    body[data-page="writer"] .sw-input:focus, body[data-page="writer"] .sw-select:focus,
+    body[data-page="writer"] .sw-area:focus{ outline:none; border-color:var(--sc-purple); box-shadow:0 0 0 3px rgba(108,92,231,.15); }
+    body[data-page="writer"] .sw-title-in{ font-family:var(--font-display); font-weight:700; font-size:1.5rem; border:none; border-bottom:2px dashed var(--line); border-radius:0; padding-left:0; }
+    body[data-page="writer"] .sw-title-in:focus{ box-shadow:none; border-bottom-color:var(--sc-purple); }
+    body[data-page="writer"] .sw-row{ display:flex; gap:1rem; flex-wrap:wrap; }
+    body[data-page="writer"] .sw-row > *{ flex:1; min-width:160px; }
+
+    /* Chapters tabs */
+    body[data-page="writer"] .sw-chaptabs{ display:flex; gap:.4rem; flex-wrap:wrap; align-items:center; margin-bottom:.9rem; }
+    body[data-page="writer"] .sw-chip{
+      font-family:var(--font-display); font-weight:600; font-size:.86rem; cursor:pointer;
+      border:2px solid var(--line); background:#fff; color:var(--muted); border-radius:999px;
+      padding:.38em .9em; transition:all .12s ease; white-space:nowrap;
+    }
+    body[data-page="writer"] .sw-chip:hover{ border-color:var(--sc-purple); color:var(--sc-purple); }
+    body[data-page="writer"] .sw-chip.active{ background:var(--sc-purple); border-color:var(--sc-purple); color:#fff; }
+    body[data-page="writer"] .sw-chip-add{ color:var(--sc-purple); border-style:dashed; border-color:var(--sc-purple); }
+
+    body[data-page="writer"] .sw-chaptitle-in{
+      width:100%; font-family:var(--font-display); font-weight:700; font-size:1.15rem; color:var(--sc-ink);
+      border:none; border-bottom:2px dashed var(--line); padding:.2rem 0 .5rem; margin-bottom:.7rem;
+    }
+    body[data-page="writer"] .sw-chaptitle-in:focus{ outline:none; border-bottom-color:var(--sc-purple); }
+    body[data-page="writer"] .sw-area{
+      width:100%; min-height:340px; resize:vertical; font-family:"Lora",Georgia,serif; font-size:1.08rem;
+      line-height:1.75; color:#2a2440; border:2px solid var(--line); border-radius:12px; padding:1rem 1.1rem;
+      background:#fffdf8;
+    }
+    body[data-page="writer"] .sw-chapfoot{ display:flex; justify-content:space-between; align-items:center; gap:.6rem; margin-top:.6rem; flex-wrap:wrap; }
+    body[data-page="writer"] .sw-del{ background:none; border:none; color:#c0392b; font-weight:700; font-size:.82rem; cursor:pointer; font-family:var(--font-display); }
+    body[data-page="writer"] .sw-del:hover{ text-decoration:underline; }
+
+    /* Word count + progress */
+    body[data-page="writer"] .sw-count{ display:flex; align-items:center; gap:.8rem; flex-wrap:wrap; margin-bottom:.6rem; }
+    body[data-page="writer"] .sw-count .big{ font-family:var(--font-display); font-weight:700; font-size:1.4rem; color:var(--sc-purple); }
+    body[data-page="writer"] .sw-count .lbl{ font-size:.86rem; color:var(--muted); }
+    body[data-page="writer"] .sw-goalbar{ height:12px; border-radius:999px; background:#eceef3; overflow:hidden; }
+    body[data-page="writer"] .sw-goalbar i{ display:block; height:100%; border-radius:999px; background:linear-gradient(90deg,var(--sc-purple),var(--sc-pink)); transition:width .4s ease; }
+    body[data-page="writer"] .sw-goalnote{ font-size:.82rem; color:var(--muted); margin-top:.4rem; }
+    body[data-page="writer"] .sw-goalnote b{ color:var(--green); }
+
+    /* Side panel — Story Coach */
+    body[data-page="writer"] .sw-side{ position:sticky; top:74px; }
+    body[data-page="writer"] .sw-coach{
+      background:linear-gradient(160deg,#efeaff,#e3f4fc); border:1px solid #ded6ff;
+    }
+    body[data-page="writer"] .sw-coach .coachbot{
+      display:flex; align-items:center; gap:.6rem; margin-bottom:.8rem;
+    }
+    body[data-page="writer"] .sw-coach .coachbot .face{
+      width:44px; height:44px; border-radius:50%; background:linear-gradient(150deg,var(--sc-purple),var(--sc-blue));
+      display:grid; place-items:center; font-size:1.4rem; box-shadow:0 6px 14px rgba(108,92,231,.35); flex:none;
+    }
+    body[data-page="writer"] .sw-coach .coachbot b{ font-family:var(--font-display); color:var(--sc-ink); font-size:1.05rem; display:block; }
+    body[data-page="writer"] .sw-coach .coachbot span{ font-size:.78rem; color:var(--muted); }
+    body[data-page="writer"] .sw-coach-out{
+      background:#fff; border-radius:14px; padding:.9rem 1rem; min-height:80px; font-size:.95rem; line-height:1.5;
+      color:var(--sc-ink); box-shadow:0 6px 16px rgba(20,30,60,.08); margin-bottom:.8rem;
+    }
+    body[data-page="writer"] .sw-coach-out b{ color:var(--sc-purple); }
+    body[data-page="writer"] .sw-coach-btns{ display:flex; flex-direction:column; gap:.5rem; }
+    body[data-page="writer"] .sw-coach-btn{
+      width:100%; text-align:left; cursor:pointer; border:none; border-radius:12px; padding:.65rem .9rem;
+      font-family:var(--font-display); font-weight:600; font-size:.9rem; color:#fff;
+      display:flex; align-items:center; gap:.55rem; transition:transform .1s ease, filter .1s ease;
+    }
+    body[data-page="writer"] .sw-coach-btn:hover{ transform:translateY(-1px); filter:brightness(1.06); }
+    body[data-page="writer"] .cb-idea{ background:var(--sc-purple); }
+    body[data-page="writer"] .cb-next{ background:var(--sc-blue); }
+    body[data-page="writer"] .cb-cheer{ background:var(--sc-pink); }
+    body[data-page="writer"] .sw-coach-note{ font-size:.74rem; color:var(--muted); margin:.7rem 0 0; text-align:center; }
+
+    /* Character builder */
+    body[data-page="writer"] .sw-char .sw-field{ margin-bottom:.7rem; }
+    body[data-page="writer"] .sw-char textarea.sw-input{ min-height:54px; resize:vertical; font-family:var(--font-body); line-height:1.4; }
+
+    /* Cover customizer */
+    body[data-page="writer"] .sw-cover-wrap{ display:grid; grid-template-columns:150px 1fr; gap:1.2rem; align-items:start; }
+    @media (max-width:520px){ body[data-page="writer"] .sw-cover-wrap{ grid-template-columns:1fr; } }
+    body[data-page="writer"] #swCoverPrev{
+      aspect-ratio:3/4; border-radius:6px 12px 12px 6px; color:#fff; padding:1rem .9rem;
+      display:flex; flex-direction:column; justify-content:space-between; border-left:5px solid rgba(0,0,0,.18);
+      box-shadow:0 16px 30px rgba(20,30,60,.22);
+    }
+    body[data-page="writer"] #swCoverPrev .pt{ font-family:var(--font-display); font-weight:700; font-size:1.1rem; line-height:1.15; text-shadow:0 2px 8px rgba(0,0,0,.3); }
+    body[data-page="writer"] #swCoverPrev .ps{ font-size:.78rem; opacity:.92; margin-top:.2rem; }
+    body[data-page="writer"] #swCoverPrev .pm{ font-size:2.6rem; align-self:center; filter:drop-shadow(0 2px 5px rgba(0,0,0,.3)); }
+    body[data-page="writer"] #swCoverPrev .pa{ font-size:.74rem; opacity:.92; }
+    body[data-page="writer"] .sw-swatches{ display:flex; flex-wrap:wrap; gap:.45rem; }
+    body[data-page="writer"] .sw-swatch{ width:34px; height:34px; border-radius:9px; cursor:pointer; border:3px solid transparent; box-shadow:0 3px 8px rgba(20,30,60,.15); }
+    body[data-page="writer"] .sw-swatch.active{ border-color:var(--sc-ink); transform:scale(1.05); }
+    body[data-page="writer"] .sw-marks{ display:flex; flex-wrap:wrap; gap:.35rem; }
+    body[data-page="writer"] .sw-mark{ font-size:1.3rem; width:38px; height:38px; border-radius:10px; border:2px solid var(--line); background:#fff; cursor:pointer; display:grid; place-items:center; }
+    body[data-page="writer"] .sw-mark.active{ border-color:var(--sc-purple); background:#efeaff; }
+
+    /* Buttons row */
+    body[data-page="writer"] .sw-actions{ display:flex; gap:.6rem; flex-wrap:wrap; }
+
+    /* Toast */
+    body[data-page="writer"] .sw-toast{
+      position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(20px);
+      background:var(--sc-ink); color:#fff; padding:.8rem 1.3rem; border-radius:999px; font-weight:700;
+      font-family:var(--font-display); box-shadow:0 14px 30px rgba(0,0,0,.3); opacity:0; pointer-events:none;
+      transition:opacity .25s ease, transform .25s ease; z-index:200; font-size:.95rem;
+    }
+    body[data-page="writer"] .sw-toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+    /* Read Mode + Print book (overlay) */
+    body[data-page="writer"] .sw-read{
+      position:fixed; inset:0; z-index:300; background:rgba(34,26,74,.55); backdrop-filter:blur(4px);
+      display:none; overflow:auto; padding:2rem 1rem;
+    }
+    body[data-page="writer"] .sw-read.open{ display:block; }
+    body[data-page="writer"] .sw-read-close{
+      position:fixed; top:18px; right:22px; z-index:310; background:#fff; border:none; cursor:pointer;
+      width:44px; height:44px; border-radius:50%; font-size:1.3rem; box-shadow:0 8px 20px rgba(0,0,0,.25); color:var(--sc-ink);
+    }
+    /* the printable / readable book */
+    body[data-page="writer"] #swBook{
+      max-width:680px; margin:0 auto; background:#fffdf8; border-radius:8px; box-shadow:0 30px 70px rgba(0,0,0,.4);
+      overflow:hidden;
+    }
+    body[data-page="writer"] #swBook .bk-coverpage{
+      aspect-ratio:3/4; color:#fff; display:flex; flex-direction:column; justify-content:space-between;
+      padding:2.5rem 2rem; border-left:8px solid rgba(0,0,0,.18);
+    }
+    body[data-page="writer"] #swBook .bk-coverpage .bt{ font-family:var(--font-display); font-weight:700; font-size:2.4rem; line-height:1.1; text-shadow:0 3px 12px rgba(0,0,0,.3); }
+    body[data-page="writer"] #swBook .bk-coverpage .bs{ font-size:1.05rem; opacity:.92; margin-top:.4rem; }
+    body[data-page="writer"] #swBook .bk-coverpage .bm{ font-size:5rem; align-self:center; filter:drop-shadow(0 3px 8px rgba(0,0,0,.3)); }
+    body[data-page="writer"] #swBook .bk-coverpage .ba{ font-size:1rem; opacity:.92; }
+    body[data-page="writer"] #swBook .bk-chap{ padding:2.4rem 2.6rem; border-top:1px solid #eee; }
+    body[data-page="writer"] #swBook .bk-chap h3{ font-family:var(--font-display); color:var(--sc-indigo); font-size:1.5rem; margin:0 0 .2rem; }
+    body[data-page="writer"] #swBook .bk-chap .bk-chnum{ font-family:var(--font-display); text-transform:uppercase; letter-spacing:.1em; font-size:.78rem; color:var(--sc-pink); font-weight:700; }
+    body[data-page="writer"] #swBook .bk-chap p{ font-family:"Lora",Georgia,serif; font-size:1.12rem; line-height:1.85; color:#2a2440; margin:0 0 1em; white-space:pre-wrap; }
+    body[data-page="writer"] #swBook .bk-end{ text-align:center; padding:2rem; font-family:"Caveat",cursive; font-size:2rem; color:var(--sc-purple); }
+
+    /* ---- Print styles: only the book ---- */
+    @media print{
+      body[data-page="writer"] .sw-bar, body[data-page="writer"] .sw-layout,
+      body[data-page="writer"] .sw-toast, body[data-page="writer"] .sw-read-close,
+      body[data-page="writer"] footer, body[data-page="writer"] .site-footer{ display:none !important; }
+      body[data-page="writer"]{ background:#fff; }
+      body[data-page="writer"] .sw-read{ position:static; display:block !important; background:none; padding:0; backdrop-filter:none; }
+      body[data-page="writer"] #swBook{ max-width:100%; box-shadow:none; border-radius:0; }
+      body[data-page="writer"] #swBook .bk-coverpage{ page-break-after:always; }
+      body[data-page="writer"] #swBook .bk-chap{ page-break-before:always; }
+      body[data-page="writer"] #swBook .bk-coverpage,
+      body[data-page="writer"] #swBook .bk-coverpage *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    }
+  </style>
+</head>
+<body data-page="writer" class="accent-indigo">
+
+  <!-- Toolbar -->
+  <div class="sw-bar">
+    <div class="container sw-bar-inner">
+      <a class="sw-back" href="story-creator.html"><span data-icon="arrow"></span> Story Creator</a>
+      <span class="sw-bar-title">Writing Studio</span>
+      <span class="sw-saved" id="swSaved">✓ Saved</span>
+      <button class="btn btn-outline btn-sm" id="swReadBtn" type="button"><span data-icon="book"></span> Read Mode</button>
+      <button class="btn btn-outline btn-sm" id="swTextBtn" type="button">Download Text</button>
+      <button class="btn btn-red btn-sm" id="swPrintBtn" type="button"><span data-icon="star"></span> Print Book</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="sw-layout">
+
+      <!-- ===== MAIN EDITOR ===== -->
+      <div class="sw-main">
+
+        <!-- Book details -->
+        <div class="sw-card">
+          <div class="sw-field">
+            <label for="swTitle">Story Title</label>
+            <input class="sw-input sw-title-in" id="swTitle" type="text" placeholder="My Amazing Story" maxlength="80">
+          </div>
+          <div class="sw-row">
+            <div class="sw-field">
+              <label for="swAuthor">Author Name</label>
+              <input class="sw-input" id="swAuthor" type="text" placeholder="Written by..." maxlength="60">
+            </div>
+            <div class="sw-field">
+              <label for="swGoal">Word Goal</label>
+              <select class="sw-select" id="swGoal">
+                <option value="500">Level 1 — 500 words</option>
+                <option value="1000" selected>Level 2 — 1,000 words</option>
+                <option value="3000">Level 3 — 3,000 words</option>
+                <option value="5000">Mini Novel — 5,000 words</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Word count / goal -->
+        <div class="sw-card">
+          <div class="sw-count">
+            <span class="big" id="swWords">0</span>
+            <span class="lbl">words written · goal <span id="swGoalLbl">1,000</span></span>
+          </div>
+          <div class="sw-goalbar"><i id="swGoalFill" style="width:0%"></i></div>
+          <div class="sw-goalnote" id="swGoalNote">Start typing your story below — every word counts!</div>
+        </div>
+
+        <!-- Chapters + writing -->
+        <div class="sw-card">
+          <h2><span class="em">📖</span> Chapters</h2>
+          <div class="sw-chaptabs" id="swChapTabs"></div>
+          <input class="sw-chaptitle-in" id="swChapTitle" type="text" placeholder="Chapter title (optional)" maxlength="80">
+          <textarea class="sw-area" id="swArea" spellcheck="true" placeholder="Once upon a time..."></textarea>
+          <div class="sw-chapfoot">
+            <span class="lbl" id="swChapWords">0 words in this chapter</span>
+            <button class="sw-del" id="swChapDel" type="button">Delete this chapter</button>
+          </div>
+        </div>
+
+        <!-- Character builder -->
+        <div class="sw-card sw-char">
+          <h2><span class="em">🦸</span> Character Builder</h2>
+          <div class="sw-row">
+            <div class="sw-field"><label for="swChName">Name</label><input class="sw-input" id="swChName" type="text" placeholder="Your hero's name" maxlength="40"></div>
+            <div class="sw-field"><label for="swChPers">Personality</label><input class="sw-input" id="swChPers" type="text" placeholder="Brave, funny, kind..." maxlength="60"></div>
+          </div>
+          <div class="sw-row">
+            <div class="sw-field"><label for="swChStr">Greatest Strength</label><input class="sw-input" id="swChStr" type="text" placeholder="Never gives up" maxlength="60"></div>
+            <div class="sw-field"><label for="swChFear">Biggest Fear</label><input class="sw-input" id="swChFear" type="text" placeholder="The dark, heights..." maxlength="60"></div>
+          </div>
+          <div class="sw-field"><label for="swChLook">Appearance Notes</label><textarea class="sw-input" id="swChLook" placeholder="Curly red hair, green backpack, a lucky coin..." maxlength="240"></textarea></div>
+        </div>
+
+        <!-- Cover customizer -->
+        <div class="sw-card">
+          <h2><span class="em">🎨</span> Book Cover</h2>
+          <div class="sw-cover-wrap">
+            <div id="swCoverPrev" style="background:linear-gradient(155deg,#6c5ce7,#3a2c9c)">
+              <div><div class="pt" id="cpTitle">My Amazing Story</div><div class="ps" id="cpSub"></div></div>
+              <div class="pm" id="cpMark">📖</div>
+              <div class="pa" id="cpAuthor"></div>
+            </div>
+            <div>
+              <div class="sw-field"><label for="swCoverSub">Subtitle (optional)</label><input class="sw-input" id="swCoverSub" type="text" placeholder="A tale of adventure" maxlength="60"></div>
+              <div class="sw-field"><label>Cover Color</label><div class="sw-swatches" id="swSwatches"></div></div>
+              <div class="sw-field"><label>Cover Picture</label><div class="sw-marks" id="swMarks"></div></div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /sw-main -->
+
+      <!-- ===== SIDE PANEL ===== -->
+      <aside class="sw-side">
+        <div class="sw-card sw-coach">
+          <div class="coachbot">
+            <div class="face">🤖</div>
+            <div><b>Story Coach</b><span>Here to help you write!</span></div>
+          </div>
+          <div class="sw-coach-out" id="swCoachOut">Hi, author! I'm your Story Coach. Click a button below whenever you need an idea, want to know what happens next, or just need a little cheer. ✨</div>
+          <div class="sw-coach-btns">
+            <button class="sw-coach-btn cb-idea" id="cbIdea" type="button"><span>💡</span> Give me a story idea</button>
+            <button class="sw-coach-btn cb-next" id="cbNext" type="button"><span>➡️</span> What happens next?</button>
+            <button class="sw-coach-btn cb-cheer" id="cbCheer" type="button"><span>🌟</span> Cheer me on!</button>
+          </div>
+          <p class="sw-coach-note">Tip: your story saves by itself as you write.</p>
+        </div>
+
+        <div class="sw-card">
+          <h2 style="font-size:1.05rem"><span class="em">💾</span> Your Story</h2>
+          <div class="sw-actions">
+            <button class="btn btn-green btn-sm" id="swSaveBtn" type="button">Save Now</button>
+            <button class="btn btn-outline btn-sm" id="swNewBtn" type="button">New Story</button>
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+
+  <!-- Read Mode / Print book overlay -->
+  <div class="sw-read" id="swRead">
+    <button class="sw-read-close" id="swReadClose" type="button" aria-label="Close">✕</button>
+    <div id="swBook"></div>
+  </div>
+
+  <div class="sw-toast" id="swToast"></div>
+
+  <script>
+  (function () {
+    "use strict";
+    document.addEventListener("DOMContentLoaded", init);
+
+    function init() {
+      var SC = window.SC || {};
+      var LIB_KEY = SC.LIB_KEY || "red5_stories_v1";
+      var COVERS = SC.covers || { purple:"linear-gradient(155deg,#6c5ce7,#3a2c9c)" };
+      var esc = SC.escapeHtml || function (s) { return String(s); };
+
+      var MARKS = ["📖","🐉","🚀","🏰","🦊","🔍","⚽","✨","🦕","🤖","🌊","⏳","🦸","🌟","🐾","🧭"];
+
+      // ---- element refs ----
+      var $ = function (id) { return document.getElementById(id); };
+      var elTitle=$("swTitle"), elAuthor=$("swAuthor"), elGoal=$("swGoal"),
+          elWords=$("swWords"), elGoalLbl=$("swGoalLbl"), elGoalFill=$("swGoalFill"), elGoalNote=$("swGoalNote"),
+          elTabs=$("swChapTabs"), elChapTitle=$("swChapTitle"), elArea=$("swArea"),
+          elChapWords=$("swChapWords"), elChapDel=$("swChapDel"),
+          elChName=$("swChName"), elChPers=$("swChPers"), elChStr=$("swChStr"), elChFear=$("swChFear"), elChLook=$("swChLook"),
+          elCoverSub=$("swCoverSub"), elSwatches=$("swSwatches"), elMarks=$("swMarks"),
+          cpTitle=$("cpTitle"), cpSub=$("cpSub"), cpMark=$("cpMark"), cpAuthor=$("cpAuthor"), elCoverPrev=$("swCoverPrev"),
+          elSaved=$("swSaved"), elToast=$("swToast");
+
+      // ---- state ----
+      var story = null, current = 0, saveTimer = null;
+
+      function uid() { return "s" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+      function param(name) {
+        var m = new RegExp("[?&]" + name + "=([^&]+)").exec(location.search);
+        return m ? decodeURIComponent(m[1]) : null;
+      }
+      function loadLib() { try { return JSON.parse(localStorage.getItem(LIB_KEY) || "[]"); } catch (e) { return []; } }
+      function saveLib(list) { try { localStorage.setItem(LIB_KEY, JSON.stringify(list)); } catch (e) {} }
+
+      function blankStory(genre) {
+        return {
+          id: uid(), title: "", author: "", goal: 1000,
+          chapters: [{ title: "Chapter 1", text: "" }],
+          character: { name:"", pers:"", str:"", fear:"", look:"" },
+          cover: { title:"", subtitle:"", author:"", color:"purple", mark:"📖" },
+          genre: genre || "", created: Date.now(), updated: Date.now()
+        };
+      }
+
+      // ---- load existing or create new ----
+      var id = param("id");
+      if (id) {
+        var found = loadLib().filter(function (s) { return s.id === id; })[0];
+        story = found || blankStory();
+      } else {
+        story = blankStory(param("genre"));
+      }
+      // backfill missing fields (older saves)
+      story.chapters = story.chapters && story.chapters.length ? story.chapters : [{ title:"Chapter 1", text:"" }];
+      story.character = story.character || { name:"", pers:"", str:"", fear:"", look:"" };
+      story.cover = story.cover || { title:"", subtitle:"", author:"", color:"purple", mark:"📖" };
+
+      // ---- build swatches + marks ----
+      Object.keys(COVERS).forEach(function (key) {
+        var b = document.createElement("button");
+        b.type = "button"; b.className = "sw-swatch"; b.dataset.color = key;
+        b.style.background = COVERS[key]; b.title = key;
+        b.addEventListener("click", function () { story.cover.color = key; renderCoverControls(); renderCover(); queueSave(); });
+        elSwatches.appendChild(b);
+      });
+      MARKS.forEach(function (m) {
+        var b = document.createElement("button");
+        b.type = "button"; b.className = "sw-mark"; b.textContent = m; b.dataset.mark = m;
+        b.addEventListener("click", function () { story.cover.mark = m; renderCoverControls(); renderCover(); queueSave(); });
+        elMarks.appendChild(b);
+      });
+
+      // ---- word counting ----
+      function countWords(text) {
+        var t = (text || "").trim();
+        return t ? t.split(/\s+/).length : 0;
+      }
+      function totalWords() {
+        return story.chapters.reduce(function (n, c) { return n + countWords(c.text); }, 0);
+      }
+      function fmt(n) { return n.toLocaleString(); }
+
+      function renderCount() {
+        var total = totalWords();
+        var goal = story.goal || 1000;
+        var pct = Math.min(100, Math.round((total / goal) * 100));
+        elWords.textContent = fmt(total);
+        elGoalLbl.textContent = fmt(goal);
+        elGoalFill.style.width = pct + "%";
+        elChapWords.textContent = fmt(countWords(story.chapters[current].text)) + " words in this chapter";
+        if (total === 0) elGoalNote.innerHTML = "Start typing your story below — every word counts!";
+        else if (pct >= 100) elGoalNote.innerHTML = "<b>🎉 Goal reached — you did it, author!</b> Keep going or set a bigger goal.";
+        else elGoalNote.innerHTML = fmt(goal - total) + " words to go. You're <b>" + pct + "%</b> of the way there!";
+      }
+
+      // ---- chapters ----
+      function renderTabs() {
+        elTabs.innerHTML = "";
+        story.chapters.forEach(function (ch, i) {
+          var b = document.createElement("button");
+          b.type = "button";
+          b.className = "sw-chip" + (i === current ? " active" : "");
+          b.textContent = "Ch " + (i + 1);
+          b.addEventListener("click", function () { switchChapter(i); });
+          elTabs.appendChild(b);
+        });
+        var add = document.createElement("button");
+        add.type = "button"; add.className = "sw-chip sw-chip-add"; add.textContent = "+ Add Chapter";
+        add.addEventListener("click", addChapter);
+        elTabs.appendChild(add);
+        elChapDel.style.display = story.chapters.length > 1 ? "" : "none";
+      }
+      function loadChapter() {
+        var ch = story.chapters[current];
+        elChapTitle.value = ch.title || "";
+        elArea.value = ch.text || "";
+        renderCount();
+      }
+      function switchChapter(i) { saveChapterFromInputs(); current = i; renderTabs(); loadChapter(); }
+      function addChapter() {
+        saveChapterFromInputs();
+        story.chapters.push({ title: "Chapter " + (story.chapters.length + 1), text: "" });
+        current = story.chapters.length - 1;
+        renderTabs(); loadChapter(); queueSave();
+        elChapTitle.focus();
+      }
+      function saveChapterFromInputs() {
+        if (!story.chapters[current]) return;
+        story.chapters[current].title = elChapTitle.value;
+        story.chapters[current].text = elArea.value;
+      }
+      elChapDel.addEventListener("click", function () {
+        if (story.chapters.length <= 1) return;
+        if (!confirm("Delete this chapter? This can't be undone.")) return;
+        story.chapters.splice(current, 1);
+        if (current >= story.chapters.length) current = story.chapters.length - 1;
+        renderTabs(); loadChapter(); queueSave();
+      });
+
+      // ---- cover ----
+      function renderCover() {
+        var title = story.cover.title || story.title || "My Amazing Story";
+        cpTitle.textContent = title;
+        cpSub.textContent = story.cover.subtitle || "";
+        cpMark.textContent = story.cover.mark || "📖";
+        cpAuthor.textContent = (story.cover.author || story.author) ? "by " + (story.cover.author || story.author) : "";
+        elCoverPrev.style.background = COVERS[story.cover.color] || COVERS.purple;
+      }
+      function renderCoverControls() {
+        Array.prototype.forEach.call(elSwatches.children, function (b) {
+          b.classList.toggle("active", b.dataset.color === story.cover.color);
+        });
+        Array.prototype.forEach.call(elMarks.children, function (b) {
+          b.classList.toggle("active", b.dataset.mark === story.cover.mark);
+        });
+      }
+
+      // ---- save ----
+      function persist() {
+        saveChapterFromInputs();
+        story.updated = Date.now();
+        // keep cover title/author in sync with main fields if cover-specific not set
+        story.cover.title = story.cover.title || "";
+        var list = loadLib();
+        var idx = -1;
+        for (var i = 0; i < list.length; i++) { if (list[i].id === story.id) { idx = i; break; } }
+        if (idx >= 0) list[idx] = story; else list.push(story);
+        saveLib(list);
+        flashSaved();
+      }
+      function flashSaved() {
+        elSaved.classList.add("show");
+        setTimeout(function () { elSaved.classList.remove("show"); }, 1400);
+      }
+      function queueSave() {
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(persist, 800);
+      }
+
+      // ---- field bindings ----
+      elTitle.addEventListener("input", function () {
+        story.title = elTitle.value;
+        renderCover(); queueSave();
+      });
+      elAuthor.addEventListener("input", function () { story.author = elAuthor.value; renderCover(); queueSave(); });
+      elGoal.addEventListener("change", function () { story.goal = parseInt(elGoal.value, 10) || 1000; renderCount(); queueSave(); });
+      elChapTitle.addEventListener("input", function () { story.chapters[current].title = elChapTitle.value; queueSave(); });
+      elArea.addEventListener("input", function () { story.chapters[current].text = elArea.value; renderCount(); queueSave(); });
+      elCoverSub.addEventListener("input", function () { story.cover.subtitle = elCoverSub.value; renderCover(); queueSave(); });
+      // character
+      function bindChar(el, key) { el.addEventListener("input", function () { story.character[key] = el.value; queueSave(); }); }
+      bindChar(elChName, "name"); bindChar(elChPers, "pers"); bindChar(elChStr, "str"); bindChar(elChFear, "fear"); bindChar(elChLook, "look");
+
+      // ---- populate UI from story ----
+      function hydrate() {
+        elTitle.value = story.title || "";
+        elAuthor.value = story.author || "";
+        elGoal.value = String(story.goal || 1000);
+        elCoverSub.value = story.cover.subtitle || "";
+        elChName.value = story.character.name || "";
+        elChPers.value = story.character.pers || "";
+        elChStr.value = story.character.str || "";
+        elChFear.value = story.character.fear || "";
+        elChLook.value = story.character.look || "";
+        renderTabs(); loadChapter(); renderCoverControls(); renderCover(); renderCount();
+      }
+
+      // ============ STORY COACH ============
+      var coachOut = $("swCoachOut");
+      var lastIdea = -1, lastNext = -1, lastCheer = -1;
+      function pick(arr, last) {
+        var i; do { i = Math.floor(Math.random() * arr.length); } while (i === last && arr.length > 1);
+        return i;
+      }
+      $("cbIdea").addEventListener("click", function () {
+        var idea;
+        if (SC.ideaByGenre && story.genre) idea = SC.ideaByGenre(story.genre);
+        else if (SC.ideas) { lastIdea = pick(SC.ideas, lastIdea); idea = SC.ideas[lastIdea]; }
+        if (!idea) { coachOut.textContent = "Try writing about a character who really wants something — then make it hard to get!"; return; }
+        coachOut.innerHTML = "Here's an idea you can use or change:<br><br>" + SC.formatIdea(idea);
+      });
+      $("cbNext").addEventListener("click", function () {
+        var arr = SC.next || ["What happens next? Surprise your reader!"];
+        lastNext = pick(arr, lastNext);
+        coachOut.innerHTML = "<b>What happens next?</b><br>" + esc(arr[lastNext]);
+      });
+      $("cbCheer").addEventListener("click", function () {
+        var arr = SC.cheers || ["You're doing great — keep writing!"];
+        lastCheer = pick(arr, lastCheer);
+        coachOut.innerHTML = "🌟 " + esc(arr[lastCheer]);
+      });
+
+      // ============ SAVE / NEW ============
+      $("swSaveBtn").addEventListener("click", function () { persist(); toast("Story saved!"); });
+      $("swNewBtn").addEventListener("click", function () {
+        persist();
+        if (confirm("Start a brand-new story? Your current story is already saved in My Library.")) {
+          location.href = "story-writer.html";
+        }
+      });
+
+      // ============ BUILD BOOK (read + print) ============
+      function buildBook() {
+        saveChapterFromInputs();
+        var book = $("swBook");
+        var title = story.cover.title || story.title || "My Amazing Story";
+        var author = story.cover.author || story.author || "";
+        var bg = COVERS[story.cover.color] || COVERS.purple;
+        var html =
+          '<div class="bk-coverpage" style="background:' + bg + '">' +
+            '<div><div class="bt">' + esc(title) + '</div>' +
+            (story.cover.subtitle ? '<div class="bs">' + esc(story.cover.subtitle) + '</div>' : '') + '</div>' +
+            '<div class="bm">' + (story.cover.mark || "📖") + '</div>' +
+            '<div class="ba">' + (author ? "by " + esc(author) : "") + '</div>' +
+          '</div>';
+        story.chapters.forEach(function (ch, i) {
+          var paras = (ch.text || "").trim();
+          var body = paras
+            ? paras.split(/\n{2,}/).map(function (p) { return "<p>" + esc(p) + "</p>"; }).join("")
+            : "<p style='opacity:.5'>(This chapter is empty.)</p>";
+          html += '<div class="bk-chap"><div class="bk-chnum">Chapter ' + (i + 1) + '</div>' +
+                  '<h3>' + esc(ch.title || ("Chapter " + (i + 1))) + '</h3>' + body + '</div>';
+        });
+        html += '<div class="bk-end">The End ✦</div>';
+        book.innerHTML = html;
+      }
+
+      var readEl = $("swRead");
+      $("swReadBtn").addEventListener("click", function () { buildBook(); readEl.classList.add("open"); document.body.style.overflow = "hidden"; });
+      $("swReadClose").addEventListener("click", function () { readEl.classList.remove("open"); document.body.style.overflow = ""; });
+      readEl.addEventListener("click", function (e) { if (e.target === readEl) { readEl.classList.remove("open"); document.body.style.overflow = ""; } });
+
+      $("swPrintBtn").addEventListener("click", function () {
+        persist(); buildBook();
+        var wasOpen = readEl.classList.contains("open");
+        readEl.classList.add("open");
+        setTimeout(function () {
+          window.print();
+          if (!wasOpen) { readEl.classList.remove("open"); document.body.style.overflow = ""; }
+        }, 120);
+      });
+
+      // ============ DOWNLOAD TEXT ============
+      $("swTextBtn").addEventListener("click", function () {
+        saveChapterFromInputs();
+        var title = story.cover.title || story.title || "My Story";
+        var author = story.cover.author || story.author || "";
+        var out = title + "\n";
+        if (story.cover.subtitle) out += story.cover.subtitle + "\n";
+        if (author) out += "by " + author + "\n";
+        out += "\n" + "=".repeat(40) + "\n\n";
+        story.chapters.forEach(function (ch, i) {
+          out += "Chapter " + (i + 1) + ": " + (ch.title || "") + "\n\n";
+          out += (ch.text || "") + "\n\n";
+        });
+        out += "The End\n";
+        var blob = new Blob([out], { type: "text/plain;charset=utf-8" });
+        var a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = title.replace(/[^a-z0-9]+/gi, "_").slice(0, 40) + ".txt";
+        document.body.appendChild(a); a.click();
+        setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+        toast("Downloaded as text!");
+      });
+
+      // ---- toast ----
+      var toastTimer = null;
+      function toast(msg) {
+        elToast.textContent = msg; elToast.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { elToast.classList.remove("show"); }, 2200);
+      }
+
+      // save on leave
+      window.addEventListener("beforeunload", function () { persist(); });
+
+      // go!
+      hydrate();
+    }
+  })();
+  </script>
+</body>
+</html>
