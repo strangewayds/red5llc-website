@@ -11,6 +11,46 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" href="assets/logo.png">
   <script src="app.js" defer></script>
+  <style>
+    /* ===== Premium Features — uniform premium card component (home only) ===== */
+    body[data-page="home"] .pf-section{ padding:3.4rem 0 1rem; }
+    body[data-page="home"] .pf-head{ text-align:center; max-width:680px; margin:0 auto 2.2rem; }
+    body[data-page="home"] .pf-head h2{ font-size:clamp(1.8rem,3.4vw,2.6rem); margin:.4rem 0 .5rem; }
+    body[data-page="home"] .pf-head p{ color:var(--muted); font-size:1.08rem; margin:0; }
+    body[data-page="home"] .pf-grid{
+      display:grid; grid-template-columns:repeat(3, 1fr); gap:32px;
+      max-width:1500px; margin:0 auto;
+    }
+    @media (max-width:1000px){ body[data-page="home"] .pf-grid{ grid-template-columns:repeat(2, 1fr); } }
+    @media (max-width:640px){ body[data-page="home"] .pf-grid{ grid-template-columns:1fr; } }
+    body[data-page="home"] .pf-card{
+      display:flex; flex-direction:column; background:#fff; border-radius:24px; overflow:hidden;
+      text-decoration:none; color:inherit; border:1.5px solid rgba(30,20,60,.05);
+      box-shadow:0 18px 42px -18px rgba(40,30,70,.28);
+      transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    }
+    body[data-page="home"] .pf-card:hover{
+      transform:translateY(-10px);
+      box-shadow:0 34px 60px -22px rgba(40,30,70,.42);
+      border-color:var(--btn);
+    }
+    body[data-page="home"] .pf-art{ aspect-ratio:16/10; overflow:hidden; background:#f3eef9; }
+    body[data-page="home"] .pf-art img{ width:100%; height:100%; object-fit:cover; display:block; transition:transform .25s ease; }
+    body[data-page="home"] .pf-card:hover .pf-art img{ transform:scale(1.04); }
+    body[data-page="home"] .pf-body{ display:flex; flex-direction:column; gap:.55rem; padding:32px; flex:1; }
+    body[data-page="home"] .pf-body h3{
+      margin:0; font-size:1.4rem; line-height:1.2; display:flex; align-items:center; gap:.5rem; color:#2c2150;
+    }
+    body[data-page="home"] .pf-emoji{ font-size:1.5rem; line-height:1; }
+    body[data-page="home"] .pf-body p{ margin:0; color:var(--muted); font-size:.98rem; line-height:1.5; flex:1; }
+    body[data-page="home"] .pf-btn{
+      align-self:flex-end; margin-top:1.1rem; background:var(--btn); color:#fff;
+      font-family:var(--font-display); font-weight:700; font-size:1rem; padding:.66rem 1.5rem;
+      border-radius:999px; box-shadow:0 10px 20px -8px var(--btn);
+      transition:filter .2s ease, transform .2s ease;
+    }
+    body[data-page="home"] .pf-card:hover .pf-btn{ filter:brightness(1.1); transform:translateY(-2px); }
+  </style>
 </head>
 <body data-page="home">
 
@@ -89,6 +129,65 @@
           <p>Rosie's favorites, merch, books, crafts &amp; more</p>
           <span class="feature-arrow" data-icon="arrow"></span>
         </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PREMIUM FEATURES ===================== -->
+  <section class="pf-section">
+    <div class="container">
+      <div class="pf-head">
+        <span class="eyebrow"><span data-icon="sparkle"></span> Premium Creative Experiences</span>
+        <h2>Red 5's Biggest Creative Experiences</h2>
+        <p>Make comics, write stories, build a buddy, take on monthly challenges, and share it all — premium tools made for young creators.</p>
+      </div>
+      <div class="pf-grid">
+
+        <a class="pf-card" style="--btn:#7c4dff" href="comic-creator.html">
+          <div class="pf-art"><img src="assets/cz-comic.png" alt="Comic Creator"></div>
+          <div class="pf-body">
+            <h3><span class="pf-emoji">💬</span> Comic Creator</h3>
+            <p>Make your own comic books with characters, speech bubbles and bold action words.</p>
+            <span class="pf-btn">Open</span>
+          </div>
+        </a>
+
+        <a class="pf-card" style="--btn:#2ba8e0" href="story-creator.html">
+          <div class="pf-art"><img src="assets/cz-story.png" alt="Story Creator"></div>
+          <div class="pf-body">
+            <h3><span class="pf-emoji">📖</span> Story Creator</h3>
+            <p>Write and illustrate your own stories and grow them into real chapter books.</p>
+            <span class="pf-btn">Open</span>
+          </div>
+        </a>
+
+        <a class="pf-card" style="--btn:#5b4bd6" href="build-a-buddy.html">
+          <div class="pf-art"><img src="assets/cz-buddy.png" alt="Build a Buddy"></div>
+          <div class="pf-body">
+            <h3><span class="pf-emoji">🧸</span> Build a Buddy</h3>
+            <p>Design a one-of-a-kind buddy — pick the colors, accessories and personality.</p>
+            <span class="pf-btn">Open</span>
+          </div>
+        </a>
+
+        <a class="pf-card" style="--btn:#ff7a45" href="monthly-challenges.html">
+          <div class="pf-art"><img src="assets/mc-mascots.png" alt="Monthly Challenges"></div>
+          <div class="pf-body">
+            <h3><span class="pf-emoji">🏆</span> Monthly Challenges</h3>
+            <p>Take on a fresh themed adventure every month and earn stars and badges.</p>
+            <span class="pf-btn">Open</span>
+          </div>
+        </a>
+
+        <a class="pf-card" style="--btn:#2fae5f" href="creator-gallery.html">
+          <div class="pf-art"><img src="assets/cz-share.png" alt="Creator Gallery"></div>
+          <div class="pf-body">
+            <h3><span class="pf-emoji">🌟</span> Creator Gallery</h3>
+            <p>Show off your creations in a safe, parent-approved gallery and inspire others.</p>
+            <span class="pf-btn">Open</span>
+          </div>
+        </a>
+
       </div>
     </div>
   </section>
