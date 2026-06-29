@@ -15,15 +15,16 @@
   <style>
     body[data-page="craft"]{ --accent:#ff5a8a; --accent-soft:#ffe6ef; }
 
-    body[data-page="craft"] .cd-layout{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.05fr); gap:2rem; align-items:start; }
+    body[data-page="craft"] .cd-layout{ display:grid; grid-template-columns:minmax(0,420px) minmax(0,1fr); gap:2.4rem; align-items:start; }
     @media (max-width:880px){ body[data-page="craft"] .cd-layout{ grid-template-columns:1fr; } }
 
     /* left: hero image + facts */
+    /* Source art is ~258x152; cap the hero so it never upscales past ~1.45x (stays crisp). */
     body[data-page="craft"] .cd-hero{
       border-radius:24px; overflow:hidden; box-shadow:0 18px 44px rgba(170,110,140,.2);
-      background:var(--accent-soft); aspect-ratio:258 / 152;
+      background:var(--accent-soft); aspect-ratio:258 / 152; width:100%; max-width:372px;
     }
-    body[data-page="craft"] .cd-hero img{ width:100%; height:100%; object-fit:cover; display:block; }
+    body[data-page="craft"] .cd-hero img{ width:100%; height:100%; object-fit:cover; object-position:center; display:block; }
     body[data-page="craft"] .cd-meta{ display:flex; flex-wrap:wrap; gap:.5rem; margin:1rem 0 1.1rem; }
     body[data-page="craft"] .cd-pill{
       display:inline-flex; align-items:center; gap:.35rem; font-family:var(--font-display,'Fredoka');

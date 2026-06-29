@@ -61,8 +61,9 @@
     body[data-page="story"] .sc-hero-art{
       position:relative; justify-self:center;
     }
+    /* Source art is only 196x150; cap width so it stays crisp instead of upscaling to ~2x. */
     body[data-page="story"] .sc-hero-art img{
-      width:min(420px,42vw); border-radius:22px;
+      width:min(300px,32vw); border-radius:22px;
       box-shadow:0 30px 60px rgba(20,12,60,.45);
       transform:rotate(2deg);
     }

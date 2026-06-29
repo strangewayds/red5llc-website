@@ -502,14 +502,30 @@
       }
 
       // ---- save ----
-      function persist() {
+      // A story is "empty" if the kid hasn't entered any real content yet. We use
+      // this to avoid auto-saving blank "Untitled" stories (e.g. on page unload),
+      // which would otherwise clutter My Library every time the page is opened.
+      function isEmptyStory() {
+        if ((story.title || "").trim()) return false;
+        if ((story.author || "").trim()) return false;
+        if ((story.cover.subtitle || "").trim()) return false;
+        var c = story.character || {};
+        if ((c.name || c.pers || c.str || c.fear || c.look || "").trim()) return false;
+        var hasText = story.chapters.some(function (ch) {
+          return (ch.text || "").trim() || ((ch.title || "").trim() && ch.title.trim() !== "Chapter " + (story.chapters.indexOf(ch) + 1));
+        });
+        return !hasText;
+      }
+      function persist(force) {
         saveChapterFromInputs();
-        story.updated = Date.now();
-        // keep cover title/author in sync with main fields if cover-specific not set
-        story.cover.title = story.cover.title || "";
         var list = loadLib();
         var idx = -1;
         for (var i = 0; i < list.length; i++) { if (list[i].id === story.id) { idx = i; break; } }
+        // Don't create a brand-new library entry for an untouched, empty story.
+        if (!force && idx < 0 && isEmptyStory()) return;
+        story.updated = Date.now();
+        // keep cover title/author in sync with main fields if cover-specific not set
+        story.cover.title = story.cover.title || "";
         if (idx >= 0) list[idx] = story; else list.push(story);
         saveLib(list);
         flashSaved();
@@ -577,7 +593,7 @@
       });
 
       // ============ SAVE / NEW ============
-      $("swSaveBtn").addEventListener("click", function () { persist(); toast("Story saved!"); });
+      $("swSaveBtn").addEventListener("click", function () { persist(true); toast("Story saved!"); });
       $("swNewBtn").addEventListener("click", function () {
         persist();
         if (confirm("Start a brand-new story? Your current story is already saved in My Library.")) {

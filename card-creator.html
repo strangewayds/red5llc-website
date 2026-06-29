@@ -230,6 +230,20 @@
   </div>
 
   <div class="toast" id="ccToast"></div>
+
+  <!-- kindness-cards.js is the shared source of the card data (window.KC_CARDS),
+       but its init() also auto-builds the *gallery* UI and expects the gallery's
+       containers to exist. On this editor page they don't, so it threw
+       "Cannot set properties of null (setting 'innerHTML')". These hidden, no-op
+       stubs give that script harmless targets so the data still loads cleanly. -->
+  <div id="kcGalleryStub" hidden aria-hidden="true" style="display:none">
+    <div id="kcChips"></div>
+    <input id="kcSearch" type="text">
+    <div id="kcGrid"></div>
+    <div id="kcEmpty"></div>
+    <span id="kcCount"></span>
+  </div>
+
   <script src="kindness-cards.js" defer></script>
   <script src="card-creator.js" defer></script>
 </body>

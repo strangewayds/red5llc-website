@@ -381,62 +381,195 @@
     });
   }
 
-  /* ---------------- PNG export (SVG foreignObject) ---------------- */
+  /* ---------------- PNG export (native canvas render) ----------------
+     NOTE: We deliberately do NOT use the SVG <foreignObject> trick here.
+     Chrome taints any canvas that an <img> built from an <svg><foreignObject>
+     is drawn onto, so toDataURL()/toBlob() throw a SecurityError and the
+     download silently fails. Instead we paint the current page to a canvas
+     with the 2D API (backgrounds, characters, SFX and bubbles), which yields
+     a real, downloadable PNG. */
+  function roundRectPath(ctx, x, y, w, h, r) {
+    r = Math.min(r, w / 2, h / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+  function paintSceneGradient(ctx, key, x, y, w, h) {
+    var s = SCENES[key];
+    if (!s) { ctx.fillStyle = "#eef3f8"; ctx.fillRect(x, y, w, h); return; }
+    var css = s.grad, g;
+    // radial-gradient(circle at 30% 30%, c1, c2[, c3])
+    var rad = /radial-gradient\([^,]*?(?:at\s+([\d.]+)%\s+([\d.]+)%)?\s*,(.+)\)$/i.exec(css);
+    var lin = /linear-gradient\(\s*([\-\d.]+)deg\s*,(.+)\)$/i.exec(css);
+    function parseStops(str) {
+      // split top-level commas
+      var parts = [], depth = 0, cur = "";
+      for (var i = 0; i < str.length; i++) {
+        var ch = str[i];
+        if (ch === "(") depth++;
+        if (ch === ")") depth--;
+        if (ch === "," && depth === 0) { parts.push(cur); cur = ""; } else cur += ch;
+      }
+      if (cur.trim()) parts.push(cur);
+      return parts.map(function (p) {
+        var m = /(#[0-9a-f]{3,8}|rgba?\([^)]+\))\s*([\d.]+%)?/i.exec(p.trim());
+        return { color: m ? m[1] : p.trim(), pos: m && m[2] ? parseFloat(m[2]) / 100 : null };
+      });
+    }
+    function applyStops(grad, stops) {
+      stops.forEach(function (st, i) {
+        var pos = st.pos != null ? st.pos : (i / Math.max(1, stops.length - 1));
+        try { grad.addColorStop(Math.max(0, Math.min(1, pos)), st.color); } catch (e) {}
+      });
+    }
+    if (rad) {
+      var cxp = rad[1] != null ? parseFloat(rad[1]) / 100 : 0.5;
+      var cyp = rad[2] != null ? parseFloat(rad[2]) / 100 : 0.5;
+      var cx = x + w * cxp, cy = y + h * cyp;
+      var r = Math.max(w, h);
+      g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+      applyStops(g, parseStops(rad[3]));
+    } else if (lin) {
+      var ang = (parseFloat(lin[1]) % 360) * Math.PI / 180;
+      // CSS 0deg = upward; convert to canvas vector
+      var dx = Math.sin(ang), dy = -Math.cos(ang);
+      var halfDiag = (Math.abs(dx) * w + Math.abs(dy) * h) / 2;
+      var ccx = x + w / 2, ccy = y + h / 2;
+      g = ctx.createLinearGradient(ccx - dx * halfDiag, ccy - dy * halfDiag, ccx + dx * halfDiag, ccy + dy * halfDiag);
+      applyStops(g, parseStops(lin[2]));
+    } else {
+      ctx.fillStyle = "#eef3f8"; ctx.fillRect(x, y, w, h); return;
+    }
+    ctx.fillStyle = g; ctx.fillRect(x, y, w, h);
+  }
+
   function exportPng() {
     persist();
+    selectEl(null);
     var rect = stage.getBoundingClientRect();
     var w = Math.round(rect.width), h = Math.round(rect.height);
     var scale = 2;
-    var clone = stage.cloneNode(true);
-    // strip editing chrome
-    [].forEach.call(clone.querySelectorAll(".cb-handle,.cb-del"), function (n) { n.remove(); });
-    [].forEach.call(clone.querySelectorAll(".sel"), function (n) { n.classList.remove("sel"); });
-    clone.style.margin = "0";
-    var css = collectCss();
-    var html =
-      '<div xmlns="http://www.w3.org/1999/xhtml" style="width:' + w + 'px;height:' + h + 'px;">' +
-      '<style>' + css + '</style>' + clone.outerHTML + '</div>';
-    var svg =
-      '<svg xmlns="http://www.w3.org/2000/svg" width="' + (w * scale) + '" height="' + (h * scale) + '" viewBox="0 0 ' + w + ' ' + h + '">' +
-      '<foreignObject width="100%" height="100%">' + html + '</foreignObject></svg>';
-    var blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
-    var url = URL.createObjectURL(blob);
-    var img = new Image();
-    img.onload = function () {
-      var cv = document.createElement("canvas");
-      cv.width = w * scale; cv.height = h * scale;
-      var ctx = cv.getContext("2d");
-      ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, cv.width, cv.height);
-      ctx.drawImage(img, 0, 0);
-      URL.revokeObjectURL(url);
-      try {
-        cv.toBlob(function (b) {
-          var a = document.createElement("a");
-          a.download = (comic.title || "my-comic").replace(/[^a-z0-9]+/gi, "-").toLowerCase() + ".png";
-          a.href = URL.createObjectURL(b); a.click();
-          setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
-          toast("Comic downloaded! 🎉");
-        }, "image/png");
-      } catch (e) {
-        var a = document.createElement("a");
-        a.download = "my-comic.png"; a.href = cv.toDataURL("image/png"); a.click();
-      }
-    };
-    img.onerror = function () {
-      URL.revokeObjectURL(url);
-      toast("Couldn't make a PNG — use Print → Save as PDF instead.");
-    };
-    img.src = url;
-  }
-  function collectCss() {
-    // Inline the page's <style> rules so foreignObject renders correctly.
-    var out = "";
-    [].forEach.call(document.styleSheets, function (sheet) {
-      try {
-        [].forEach.call(sheet.cssRules, function (r) { out += r.cssText + "\n"; });
-      } catch (e) { /* cross-origin (Google Fonts) — skip */ }
+    var cv = document.createElement("canvas");
+    cv.width = w * scale; cv.height = h * scale;
+    var ctx = cv.getContext("2d");
+    ctx.scale(scale, scale);
+    ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, w, h);
+
+    var INK = "#241a40";
+    var page = comic.pages[curPage];
+
+    [].forEach.call(stage.querySelectorAll(".cb-panelcell"), function (cell) {
+      var pi = +cell.dataset.panel;
+      var cr = cell.getBoundingClientRect();
+      var px = cr.left - rect.left, py = cr.top - rect.top, pw = cr.width, ph = cr.height;
+      var panel = page.panels[pi];
+
+      ctx.save();
+      roundRectPath(ctx, px, py, pw, ph, 4);
+      ctx.clip();
+      if (panel && panel.bg) paintSceneGradient(ctx, panel.bg, px, py, pw, ph);
+      else { ctx.fillStyle = "#eef3f8"; ctx.fillRect(px, py, pw, ph); }
+      ctx.restore();
+
+      // panel border
+      ctx.lineWidth = 3; ctx.strokeStyle = INK;
+      roundRectPath(ctx, px + 1.5, py + 1.5, pw - 3, ph - 3, 4);
+      ctx.stroke();
+
+      // elements
+      if (panel) panel.els.forEach(function (el) {
+        var ex = px + el.x * pw, ey = py + el.y * ph;
+        var sc = el.scale || 1;
+        if (el.type === "char") {
+          ctx.font = (54 * sc) + "px 'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif";
+          ctx.textAlign = "center"; ctx.textBaseline = "middle";
+          ctx.fillText(el.val, ex, ey);
+        } else if (el.type === "sfx") {
+          ctx.save();
+          ctx.translate(ex, ey);
+          if (el.rot) ctx.rotate(el.rot * Math.PI / 180);
+          ctx.font = "700 " + (34 * sc) + "px 'Bangers','Fredoka',sans-serif";
+          ctx.textAlign = "center"; ctx.textBaseline = "middle";
+          ctx.lineWidth = Math.max(3, 34 * sc * 0.12); ctx.strokeStyle = INK; ctx.lineJoin = "round";
+          ctx.strokeText(el.val, 0, 0);
+          ctx.fillStyle = "#ffd23f"; ctx.fillText(el.val, 0, 0);
+          ctx.restore();
+        } else { // speech / thought bubble — draw from the live node geometry
+          var node = cell.querySelector('.cb-el[data-el="' + panel.els.indexOf(el) + '"] .cb-bubble');
+          var br = node ? node.getBoundingClientRect() : null;
+          var bw = br ? br.width : 90, bh = br ? br.height : 36;
+          var bx = ex - bw / 2, by = ey - bh / 2;
+          ctx.fillStyle = "#ffffff"; ctx.lineWidth = 3; ctx.strokeStyle = INK;
+          var rr = el.type === "thought" ? Math.min(bw, bh) / 2 : 16;
+          roundRectPath(ctx, bx, by, bw, bh, rr);
+          ctx.fill(); ctx.stroke();
+          // tail
+          if (el.type === "speech") {
+            ctx.beginPath();
+            ctx.moveTo(bx + 22, by + bh - 1);
+            ctx.lineTo(bx + 18, by + bh + 13);
+            ctx.lineTo(bx + 36, by + bh - 1);
+            ctx.closePath();
+            ctx.fillStyle = "#ffffff"; ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(bx + 22, by + bh - 1); ctx.lineTo(bx + 18, by + bh + 13);
+            ctx.moveTo(bx + 18, by + bh + 13); ctx.lineTo(bx + 36, by + bh - 1);
+            ctx.strokeStyle = INK; ctx.stroke();
+          }
+          // text
+          ctx.fillStyle = INK; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+          ctx.font = "600 " + (15 * sc) + "px 'Nunito',sans-serif";
+          var txt = (el.text || "");
+          var maxW = bw - 14;
+          var words = txt.split(/\s+/), lines = [], line = "";
+          words.forEach(function (wd) {
+            var test = line ? line + " " + wd : wd;
+            if (ctx.measureText(test).width > maxW && line) { lines.push(line); line = wd; }
+            else line = test;
+          });
+          if (line) lines.push(line);
+          var lh = 17 * sc;
+          var sy = ey - (lines.length - 1) * lh / 2;
+          lines.forEach(function (ln, i) { ctx.fillText(ln, ex, sy + i * lh); });
+        }
+      });
     });
-    return out;
+
+    // comic title banner
+    var titleText = (comic.title || titleField.value || "").trim();
+    if (titleText) {
+      ctx.font = "700 26px 'Bangers','Fredoka',sans-serif";
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      var tw = Math.min(ctx.measureText(titleText).width + 40, w * 0.9);
+      var thh = 38, tx = w / 2 - tw / 2, ty = 2;
+      ctx.fillStyle = "#ffd23f"; ctx.strokeStyle = INK; ctx.lineWidth = 3;
+      roundRectPath(ctx, tx, ty, tw, thh, 10); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = INK; ctx.fillText(titleText, w / 2, ty + thh / 2 + 2);
+    }
+
+    function finish(href, revoke) {
+      var a = document.createElement("a");
+      a.download = (comic.title || "my-comic").replace(/[^a-z0-9]+/gi, "-").toLowerCase().replace(/^-+|-+$/g, "") + ".png" || "my-comic.png";
+      a.href = href; a.click();
+      if (revoke) setTimeout(function () { URL.revokeObjectURL(href); }, 1000);
+      toast("Comic downloaded! 🎉");
+    }
+    try {
+      if (cv.toBlob) {
+        cv.toBlob(function (b) {
+          if (b) finish(URL.createObjectURL(b), true);
+          else finish(cv.toDataURL("image/png"), false);
+        }, "image/png");
+      } else {
+        finish(cv.toDataURL("image/png"), false);
+      }
+    } catch (e) {
+      toast("Couldn't make a PNG — use Print → Save as PDF instead.");
+    }
   }
 
   /* ---------------- Library modal ---------------- */
