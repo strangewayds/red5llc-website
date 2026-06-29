@@ -109,8 +109,8 @@
       transition:transform .15s ease, box-shadow .15s ease; position:relative;
     }
     body[data-page="gallery"] .gal-card:hover{ transform:translateY(-4px); box-shadow:0 18px 40px rgba(80,60,120,.18); }
-    body[data-page="gallery"] .gal-thumb{ display:block; width:100%; background:var(--accent-soft); }
-    body[data-page="gallery"] .gal-thumb img{ width:100%; display:block; object-fit:cover; }
+    body[data-page="gallery"] .gal-thumb{ display:block; width:100%; aspect-ratio:4 / 3; background:var(--accent-soft); }
+    body[data-page="gallery"] .gal-thumb img{ width:100%; height:100%; display:block; object-fit:cover; object-position:center; image-rendering:auto; }
     body[data-page="gallery"] .ribbon{
       position:absolute; top:.7rem; left:.7rem; z-index:2;
       font-family:var(--font-display); font-weight:700; font-size:.72rem; color:#5a3b00;
